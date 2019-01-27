@@ -1,0 +1,20 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+ETH:
+  name: "Ethereum"
+  address: "0x0000000000000000000000000000000000000000"
+  decimals: 18
+  symbol: "ETH"
+
+REP:
+  name: "Reputation"
+  address: "0xc853ba17650d32daba343294998ea4e33e7a48b9"
+  decimals: 8
+  symbol: "REP"
+
+TRX:
+  name: "Tron"
+  address: "0xf59fad2879fb8380ffa6049a48abf9c9959b3b5c"
+  decimals: 18
+  symbol: "TRX"
+
