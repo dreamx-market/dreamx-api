@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: MyString
+  token: MyString
+  balance: MyString
+  integer: MyString
+  holdBalance: 1
+
+two:
+  account: MyString
+  token: MyString
+  balance: MyString
+  integer: MyString
+  holdBalance: 1

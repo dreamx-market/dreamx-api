@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: MyString
+  giveTokenAddress: MyString
+  giveAmount: 1
+  takeTokenAddress: MyString
+  takeAmount: 1
+  nonce: 1
+  expiryTimestampInMilliseconds: 1
+  orderHash: MyString
+  signature: MyString
+
+two:
+  account: MyString
+  giveTokenAddress: MyString
+  giveAmount: 1
+  takeTokenAddress: MyString
+  takeAmount: 1
+  nonce: 1
+  expiryTimestampInMilliseconds: 1
+  orderHash: MyString
+  signature: MyString

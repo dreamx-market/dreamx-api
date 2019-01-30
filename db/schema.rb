@@ -10,18 +10,44 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_27_194627) do
+ActiveRecord::Schema.define(version: 2019_01_30_171743) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "currencies", force: :cascade do |t|
+  create_table "balances", force: :cascade do |t|
+    t.string "account"
+    t.string "token"
+    t.string "balance"
+    t.string "integer"
+    t.integer "holdBalance"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account"], name: "index_balances_on_account"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.string "account"
+    t.string "giveTokenAddress"
+    t.integer "giveAmount"
+    t.string "takeTokenAddress"
+    t.integer "takeAmount"
+    t.integer "nonce"
+    t.integer "expiryTimestampInMilliseconds"
+    t.string "orderHash"
+    t.string "signature"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "tokens", force: :cascade do |t|
     t.string "name"
     t.string "address"
+    t.string "symbol"
     t.integer "decimals"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "symbol"
+    t.index ["address"], name: "index_tokens_on_address"
   end
 
 end
