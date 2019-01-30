@@ -1,0 +1,1 @@
+json.address Rails.application.config.contract_address
