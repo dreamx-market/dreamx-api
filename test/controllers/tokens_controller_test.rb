@@ -7,6 +7,7 @@ class TokensControllerTest < ActionDispatch::IntegrationTest
 
   test "should get index" do
     get tokens_url, as: :json
+    p json
     assert_response :success
   end
 

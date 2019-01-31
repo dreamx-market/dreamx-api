@@ -4,7 +4,7 @@ class TokensController < ApplicationController
   # GET /tokens
   # GET /tokens.json
   def index
-    @tokens = Token.all
+    @tokens = Token.paginate :page => params[:page], :per_page => params[:per_page]
   end
 
   # GET /tokens/1
