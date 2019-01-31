@@ -1,5 +1,6 @@
 class TokensController < ApplicationController
   before_action :set_token, only: [:show, :update, :destroy]
+  before_action :validate_pagination_params, only: [:index]
 
   # GET /tokens
   # GET /tokens.json
