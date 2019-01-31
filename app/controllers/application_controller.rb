@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::API
 	rescue_from Error::ValidationError do |error|
 		@error = error
-		render '/errors/validation_error'
+		render '/errors/validation_error', status: :bad_request
 	end
 
 	private
