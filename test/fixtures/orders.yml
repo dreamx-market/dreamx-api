@@ -2,22 +2,22 @@
 
 one:
   account: MyString
-  giveTokenAddress: MyString
-  giveAmount: 1
-  takeTokenAddress: MyString
-  takeAmount: 1
+  give_token_address: MyString
+  give_amount: 1
+  take_token_address: MyString
+  take_amount: 1
   nonce: 1
-  expiryTimestampInMilliseconds: 1
-  orderHash: MyString
+  expiry_timestamp_in_milliseconds: 1
+  order_hash: MyString
   signature: MyString
 
 two:
   account: MyString
-  giveTokenAddress: MyString
-  giveAmount: 1
-  takeTokenAddress: MyString
-  takeAmount: 1
+  give_token_address: MyString
+  give_amount: 1
+  take_token_address: MyString
+  take_amount: 1
   nonce: 1
-  expiryTimestampInMilliseconds: 1
-  orderHash: MyString
+  expiry_timestamp_in_milliseconds: 1
+  order_hash: MyString
   signature: MyString

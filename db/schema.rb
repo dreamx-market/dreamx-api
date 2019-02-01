@@ -10,17 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_30_171743) do
+ActiveRecord::Schema.define(version: 2019_02_01_162512) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "accounts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "balances", force: :cascade do |t|
     t.string "account"
     t.string "token"
     t.string "balance"
-    t.string "integer"
-    t.integer "holdBalance"
+    t.string "hold_balance"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account"], name: "index_balances_on_account"
@@ -28,13 +32,13 @@ ActiveRecord::Schema.define(version: 2019_01_30_171743) do
 
   create_table "orders", force: :cascade do |t|
     t.string "account"
-    t.string "giveTokenAddress"
-    t.integer "giveAmount"
-    t.string "takeTokenAddress"
-    t.integer "takeAmount"
-    t.integer "nonce"
-    t.integer "expiryTimestampInMilliseconds"
-    t.string "orderHash"
+    t.string "give_token_address"
+    t.string "give_amount"
+    t.string "take_token_address"
+    t.string "take_amount"
+    t.string "nonce"
+    t.string "expiry_timestamp_in_milliseconds"
+    t.string "order_hash"
     t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -44,7 +48,7 @@ ActiveRecord::Schema.define(version: 2019_01_30_171743) do
     t.string "name"
     t.string "address"
     t.string "symbol"
-    t.integer "decimals"
+    t.string "decimals"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["address"], name: "index_tokens_on_address"

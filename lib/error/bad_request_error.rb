@@ -1,9 +1,8 @@
 module Error
 	class BadRequestError < StandardError
-		attr_reader :code, :reason
+		attr_reader :reason
 
-		def initialize(_code=nil, _reason=nil)
-			@code = _code || 400
+		def initialize(_reason=nil)
 			@reason = _reason || 'Bad Request'
 		end
 	end

@@ -7,10 +7,10 @@ class BalancesController < ApplicationController
   #   @balances = Balance.all
   # end
 
-  # GET /balances/1
-  # GET /balances/1.json
-  def show
-  end
+  # # GET /balances/1
+  # # GET /balances/1.json
+  # def show
+  # end
 
   # # POST /balances
   # # POST /balances.json
@@ -48,6 +48,6 @@ class BalancesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def balance_params
-      params.require(:balance).permit(:account, :token, :balance, :integer, :holdBalance)
+      params.require(:balance).permit(:account, :token, :balance, :holdBalance)
     end
 end

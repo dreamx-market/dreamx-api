@@ -4,12 +4,10 @@ one:
   account: MyString
   token: MyString
   balance: MyString
-  integer: MyString
-  holdBalance: 1
+  hold_balance: 1
 
 two:
   account: MyString
   token: MyString
   balance: MyString
-  integer: MyString
-  holdBalance: 1
+  hold_balance: 1

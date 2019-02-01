@@ -12,7 +12,7 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
 
   test "should create order" do
     assert_difference('Order.count') do
-      post orders_url, params: { order: { account: @order.account, expiryTimestampInMilliseconds: @order.expiryTimestampInMilliseconds, giveAmount: @order.giveAmount, giveTokenAddress: @order.giveTokenAddress, nonce: @order.nonce, orderHash: @order.orderHash, signature: @order.signature, takeAmount: @order.takeAmount, takeTokenAddress: @order.takeTokenAddress } }, as: :json
+      post orders_url, params: { order: { account: @order.account, expiry_timestamp_in_milliseconds: @order.expiry_timestamp_in_milliseconds, give_amount: @order.give_amount, give_token_address: @order.give_token_address, nonce: @order.nonce, order_hash: @order.order_hash, signature: @order.signature, take_amount: @order.take_amount, take_token_address: @order.take_token_address } }, as: :json
     end
 
     assert_response 201
