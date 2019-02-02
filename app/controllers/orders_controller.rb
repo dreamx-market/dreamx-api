@@ -48,6 +48,6 @@ class OrdersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
-      params.require(:order).permit(:account, :giveTokenAddress, :giveAmount, :takeTokenAddress, :takeAmount, :nonce, :expiryTimestampInMilliseconds, :orderHash, :signature)
+      params.require(:order).permit(:account, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature)
     end
 end

@@ -7,7 +7,7 @@ one:
   take_token_address: MyString
   take_amount: 1
   nonce: 1
-  expiry_timestamp_in_milliseconds: 1
+  expiry_timestamp_in_milliseconds: <%= 10.days.from_now.to_i * 1000 %>
   order_hash: MyString
   signature: MyString
 
@@ -17,7 +17,7 @@ two:
   give_amount: 1
   take_token_address: MyString
   take_amount: 1
-  nonce: 1
-  expiry_timestamp_in_milliseconds: 1
+  nonce: 2
+  expiry_timestamp_in_milliseconds: <%= 10.days.from_now.to_i * 1000 %>
   order_hash: MyString
   signature: MyString

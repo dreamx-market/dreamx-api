@@ -48,6 +48,6 @@ class BalancesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def balance_params
-      params.require(:balance).permit(:account, :token, :balance, :holdBalance)
+      params.require(:balance).permit(:account, :token, :balance, :hold_balance)
     end
 end
