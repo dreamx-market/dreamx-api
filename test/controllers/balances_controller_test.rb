@@ -18,10 +18,11 @@ class BalancesControllerTest < ActionDispatch::IntegrationTest
   #   assert_response 201
   # end
 
-  # test "should show balance" do
-  #   get balance_url(@balance.account), as: :json
-  #   assert_response :success
-  # end
+  test "should show balance" do
+    get balance_url(@balance.account_address), as: :json
+    assert_response :success
+    p json
+  end
 
   # test "should update balance" do
   #   patch balance_url(@balance.account), params: { balance: { account: @balance.account, balance: @balance.balance, holdBalance: @balance.holdBalance, integer: @balance.integer, token: @balance.token } }, as: :json

@@ -1,10 +1,8 @@
 class Order < ApplicationRecord
 	# TODO:
-  	# build the order, validate its fields
-	  	# expiry timestamps must be in the future
-  	# check for tokens and token balances' existence
-  	# check for market existence
-  	# check ecrecover(orderHash, signature) must match with `account`
+  	# balance must exist and is sufficient
+  	# market must exist
+  	# ecrecover(orderHash, signature) must match with `account`
   	# a transaction to convert balance to hold_balance and save the order atomically and emit a socket event to notify of balance change
 	
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
@@ -23,5 +21,8 @@ class Order < ApplicationRecord
 		if expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i then
 			errors.add(:expiry_timestamp_in_milliseconds, "must be in the future")
 		end
+	end
+
+	def balance_must_exist_and_is_sufficient
 	end
 end

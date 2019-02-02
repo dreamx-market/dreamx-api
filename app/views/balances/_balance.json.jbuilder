@@ -1,1 +1,1 @@
-json.extract! balance, :token, :balance, :hold_balance
+json.extract! balance, :token_address, :balance, :hold_balance

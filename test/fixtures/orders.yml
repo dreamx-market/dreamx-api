@@ -1,7 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  account: MyString
+  account_address: MyString
   give_token_address: MyString
   give_amount: 1
   take_token_address: MyString
@@ -12,7 +12,7 @@ one:
   signature: MyString
 
 two:
-  account: MyString
+  account_address: MyString
   give_token_address: MyString
   give_amount: 1
   take_token_address: MyString

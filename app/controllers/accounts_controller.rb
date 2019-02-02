@@ -7,12 +7,10 @@ class AccountsController < ApplicationController
   #   @accounts = Account.all
   # end
 
-  # GET /accounts/1
-  # GET /accounts/1.json
-  def show
-  	# @balances = Balance.paginate(:page => params[:page], :per_page => params[:per_page])
-  	@balances = Balance.where(account: params[:address]).paginate(:page => params[:page], :per_page => params[:per_page])
-  end
+  # # GET /accounts/0x8a37b79E54D69e833d79Cac3647C877Ef72830E1
+  # def show
+  # 	@balances = @account.balances.paginate(:page => params[:page], :per_page => params[:per_page])
+  # end
 
   # # POST /accounts
   # # POST /accounts.json
@@ -42,14 +40,14 @@ class AccountsController < ApplicationController
   #   @account.destroy
   # end
 
-  # private
-  #   # Use callbacks to share common setup or constraints between actions.
-  #   def set_account
-  #     @account = Account.find(params[:id])
-  #   end
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_account
+      @account = Account.find_by(address: params[:address])
+    end
 
-  #   # Never trust parameters from the scary internet, only allow the white list through.
-  #   def account_params
-  #     params.fetch(:account, {})
-  #   end
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def account_params
+      params.fetch(:account, {})
+    end
 end

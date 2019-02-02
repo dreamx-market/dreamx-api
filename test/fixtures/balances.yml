@@ -1,13 +1,13 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  account: MyString
-  token: MyString
+  account_address: MyString
+  token_address: MyString
   balance: MyString
   hold_balance: 1
 
 two:
-  account: MyString
-  token: MyString
+  account_address: MyString
+  token_address: MyString
   balance: MyString
   hold_balance: 1
