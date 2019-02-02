@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_02_165310) do
+ActiveRecord::Schema.define(version: 2019_02_02_201109) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,8 +23,8 @@ ActiveRecord::Schema.define(version: 2019_02_02_165310) do
   create_table "balances", force: :cascade do |t|
     t.string "account_address"
     t.string "token_address"
-    t.string "balance"
-    t.string "hold_balance"
+    t.string "balance", default: "0"
+    t.string "hold_balance", default: "0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_address"], name: "index_balances_on_account_address"
