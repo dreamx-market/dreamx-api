@@ -21,7 +21,10 @@ class BalancesControllerTest < ActionDispatch::IntegrationTest
   test "should show balance" do
     get balance_url(@balance.account_address), as: :json
     assert_response :success
-    p json
+    assert_not_nil json['total']
+    assert_not_nil json['page']
+    assert_not_nil json['per_page']
+    assert_not_nil json['records']
   end
 
   # test "should update balance" do

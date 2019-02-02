@@ -3,11 +3,11 @@
 one:
   account_address: MyString
   token_address: MyString
-  balance: MyString
+  balance: 1
   hold_balance: 1
 
 two:
   account_address: MyString
   token_address: MyString
-  balance: MyString
+  balance: 1
   hold_balance: 1

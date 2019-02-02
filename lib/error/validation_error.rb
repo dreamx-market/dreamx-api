@@ -1,10 +1,9 @@
 module Error
 	class ValidationError < BadRequestError
-		attr_reader :code, :validation_errors
+		attr_reader :validation_errors
 
 		def initialize(_validation_errors=[])
-			super('Validation failed')
-			@code = 100
+			super(100, 'Validation failed')
 			@validation_errors = _validation_errors
 		end
 	end

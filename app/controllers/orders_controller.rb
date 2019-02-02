@@ -20,7 +20,11 @@ class OrdersController < ApplicationController
     if @order.save
       render :show, status: :created, location: @order
     else
-      render json: @order.errors, status: :unprocessable_entity
+    	errors = []
+    	@order.errors.messages.each do |key, array|
+    		errors << { :field => key, :reason => array }
+    	end
+    	raise Error::ValidationError.new(errors)
     end
   end
 

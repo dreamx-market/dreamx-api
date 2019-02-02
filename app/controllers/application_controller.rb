@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::API
 	rescue_from Error::ValidationError do |error|
 		@error = error
-		render '/errors/validation_error', status: :bad_request
+		render '/errors/validation_error', status: :unprocessable_entity
 	end
 
 	private
@@ -11,8 +11,7 @@ class ApplicationController < ActionController::API
 	  		raise Error::ValidationError.new([
 	  			{
 	  				:field => 'per_page',
-	  				:code => 1004,
-	  				:reason => "per_page should be less than or equal to #{Rails.application.config.MAX_PER_PAGE}"
+	  				:reason => "should be less than or equal to #{Rails.application.config.MAX_PER_PAGE}"
 	  			}
 	  		])
   		end
