@@ -20,11 +20,7 @@ class OrdersController < ApplicationController
     if @order.save
       render :show, status: :created, location: @order
     else
-    	errors = []
-    	@order.errors.messages.each do |key, array|
-    		errors << { :field => key, :reason => array }
-    	end
-    	raise Error::ValidationError.new(errors)
+    	serialize_active_record_validation_error @order.errors.messages
     end
   end
 

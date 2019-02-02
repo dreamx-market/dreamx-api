@@ -21,7 +21,7 @@ class TokensController < ApplicationController
     if @token.save
       render :show, status: :created, location: @token
     else
-      render json: @token.errors, status: :unprocessable_entity
+      serialize_active_record_validation_error @token.errors.messages
     end
   end
 
