@@ -1,10 +1,10 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  account_address: MyString
-  token_address: MyString
-  balance: 1
-  hold_balance: 1
+  account_address: "0x7d211402597b73e7e5f74133030eb625185298da"
+  token_address: "0x865103e52d21cb376e6846e31e811f992339972a"
+  balance: 100000000000000000000
+  hold_balance: 0
 
 two:
   account_address: MyString

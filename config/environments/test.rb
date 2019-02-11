@@ -43,4 +43,6 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  config.CONTRACT_ADDRESS = "0x9ec974fb9af93469017cf3b95bc99bc77ef2f024"
 end

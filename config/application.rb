@@ -19,6 +19,8 @@ Bundler.require(*Rails.groups)
 
 module NinjatradeApi
   class Application < Rails::Application
+  	require 'ext/string'
+  	
   	config.eager_load_paths << Rails.root.join('lib')
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2

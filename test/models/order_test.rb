@@ -3,6 +3,12 @@ require 'test_helper'
 class OrderTest < ActiveSupport::TestCase
 	setup do
 		@order = orders(:one)
+		@old_contract_address = Rails.application.config.CONTRACT_ADDRESS
+		Rails.application.config.CONTRACT_ADDRESS = "0x6842bd1497cfa9fcde7132d1f2e6e36ef8b536dc"
+	end
+
+	teardown do
+		Rails.application.config.CONTRACT_ADDRESS = @old_contract_address
 	end
 
 	test "amounts cannot be 0" do
@@ -25,7 +31,24 @@ class OrderTest < ActiveSupport::TestCase
   test "market must exist" do
   	@order.take_token_address = 'INVALID'
   	assert_not @order.valid?
-  	assert_equal @order.errors.messages[:give_token], ['market does not exist']
-  	assert_equal @order.errors.messages[:take_token], ['market does not exist']
+  	assert_equal @order.errors.messages[:market], ['market does not exist']
   end
+
+  test "order_hash must be valid" do
+  	assert @order.valid?
+  	valid_order_hash = @order.order_hash
+  	@order.order_hash = 'invalid_order_hash'
+  	assert_not @order.valid?
+  	@order.order_hash = valid_order_hash
+  	assert @order.valid?
+  end
+
+  # test "signature must be from account_address" do
+  # 	assert @order.valid?
+  # 	valid_signature = @order.signature
+  # 	@order.signature = 'invalid_signature'
+  # 	assert_not @order.valid?
+  # 	@order.signature = valid_signature
+  # 	assert @order.valid?
+  # end
 end

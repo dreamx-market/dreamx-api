@@ -3,7 +3,13 @@ require 'test_helper'
 class OrdersControllerTest < ActionDispatch::IntegrationTest
   setup do
     @order = orders(:one)
+    @old_contract_address = Rails.application.config.CONTRACT_ADDRESS
+		Rails.application.config.CONTRACT_ADDRESS = "0x6842bd1497cfa9fcde7132d1f2e6e36ef8b536dc"
   end
+
+  teardown do
+		Rails.application.config.CONTRACT_ADDRESS = @old_contract_address
+	end
 
   # test "should get index" do
   #   get orders_url, as: :json
@@ -11,8 +17,10 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
   # end
 
   test "should create order" do
-  	assert_difference('Order.count') do
-      post orders_url, params: { order: { account_address: @order.account_address, expiry_timestamp_in_milliseconds: @order.expiry_timestamp_in_milliseconds, give_amount: @order.take_amount, give_token_address: @order.give_token_address, nonce: Integer(Time.now), order_hash: @order.order_hash, signature: @order.signature, take_amount: @order.take_amount, take_token_address: @order.take_token_address } }, as: :json
+  	@order.destroy
+
+  	assert_difference("Order.count") do
+      post orders_url, params: { order: { account_address: @order.account_address, expiry_timestamp_in_milliseconds: @order.expiry_timestamp_in_milliseconds, give_amount: @order.give_amount, give_token_address: @order.give_token_address, nonce: @order.nonce, order_hash: @order.order_hash, signature: @order.signature, take_amount: @order.take_amount, take_token_address: @order.take_token_address } }, as: :json
     end
 
     assert_response 201

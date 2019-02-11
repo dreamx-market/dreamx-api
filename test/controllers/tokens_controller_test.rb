@@ -12,7 +12,7 @@ class TokensControllerTest < ActionDispatch::IntegrationTest
 
   test "should create token" do
     assert_difference('Token.count') do
-      post tokens_url, params: { token: { address: @token.address, decimals: @token.decimals, name: @token.name, symbol: @token.symbol } }, as: :json
+      post tokens_url, params: { token: { address: Eth::Key.new.address, decimals: @token.decimals, name: "NewToken", symbol: "NEW" } }, as: :json
     end
 
     assert_response 201

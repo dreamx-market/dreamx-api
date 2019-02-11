@@ -1,8 +1,8 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  base_token_address: MyString
-  quote_token_address: MyString
+  base_token_address: "0x0000000000000000000000000000000000000000"
+  quote_token_address: "0x865103e52d21cb376e6846e31e811f992339972a"
 
 two:
   base_token_address: MyString
