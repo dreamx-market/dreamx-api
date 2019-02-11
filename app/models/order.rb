@@ -1,6 +1,5 @@
 class Order < ApplicationRecord
 	# TODO:
-		# validate orderHash
   	# validate signature, ecrecover(orderHash, signature) must match with `account`
   	# a transaction to convert balance to hold_balance and save the order atomically and emit a socket event to notify of balance change
 	

@@ -1,13 +1,19 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: BaseToken
+  name: One
   address: "0x0000000000000000000000000000000000000000"
-  symbol: BASE
+  symbol: ONE
   decimals: 1
 
 two:
-  name: QuoteToken
+  name: Two
   address: "0x865103e52d21cb376e6846e31e811f992339972a"
-  symbol: QUOTE
+  symbol: TWO
+  decimals: 1
+
+three:
+  name: Three
+  address: "0x12459c951127e0c374ff9105dda097662a027093"
+  symbol: THREE
   decimals: 1

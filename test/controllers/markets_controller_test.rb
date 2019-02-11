@@ -11,6 +11,8 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create market" do
+  	@market.destroy
+
     assert_difference('Market.count') do
       post markets_url, params: { market: { base_token_address: @market.base_token_address, quote_token_address: @market.quote_token_address } }, as: :json
     end
