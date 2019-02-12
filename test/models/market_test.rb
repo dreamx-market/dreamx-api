@@ -9,4 +9,9 @@ class MarketTest < ActiveSupport::TestCase
   	newMarket = Market.new(:base_token_address => @market.base_token_address, :quote_token_address => @market.quote_token_address)
     assert_not newMarket.valid?
   end
+
+  test "quote token address must not equal to base" do
+  	@market.quote_token_address = @market.base_token_address
+  	assert_not @market.valid?
+  end
 end
