@@ -4,7 +4,7 @@ class OrderTest < ActiveSupport::TestCase
 	setup do
 		@order = orders(:one)
 		@old_contract_address = Rails.application.config.CONTRACT_ADDRESS
-		Rails.application.config.CONTRACT_ADDRESS = "0x6842bd1497cfa9fcde7132d1f2e6e36ef8b536dc"
+		Rails.application.config.CONTRACT_ADDRESS = "0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a"
 	end
 
 	teardown do
@@ -43,12 +43,12 @@ class OrderTest < ActiveSupport::TestCase
   	assert @order.valid?
   end
 
-  # test "signature must be from account_address" do
-  # 	assert @order.valid?
-  # 	valid_signature = @order.signature
-  # 	@order.signature = 'invalid_signature'
-  # 	assert_not @order.valid?
-  # 	@order.signature = valid_signature
-  # 	assert @order.valid?
-  # end
+  test "signature must be from account_address" do
+  	assert @order.valid?
+  	valid_signature = @order.signature
+  	@order.signature = 'invalid_signature'
+  	assert_not @order.valid?
+  	@order.signature = valid_signature
+  	assert @order.valid?
+  end
 end

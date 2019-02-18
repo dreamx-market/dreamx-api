@@ -2,7 +2,7 @@
 
 one:
   base_token_address: "0x0000000000000000000000000000000000000000"
-  quote_token_address: "0x865103e52d21cb376e6846e31e811f992339972a"
+  quote_token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
 
 two:
   base_token_address: MyString

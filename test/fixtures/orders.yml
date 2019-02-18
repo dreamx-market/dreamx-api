@@ -1,15 +1,15 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  account_address: "0x7d211402597b73e7e5f74133030eb625185298da"
-  give_token_address: "0x865103e52d21cb376e6846e31e811f992339972a"
+  account_address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
+  give_token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
   give_amount: 100000000000000000000
   take_token_address: "0x0000000000000000000000000000000000000000"
   take_amount: 500000000000000000
-  nonce: 1549905440888
+  nonce: 1550314094931
   expiry_timestamp_in_milliseconds: 4705572264000
-  order_hash: "0xe5543f827df74c3c874ab0b1361cbc89a4135dd73259543cd66addea5b65c1c2"
-  signature: "0x624fd8670d2d722ef7b1e5368304f10e33068d93c236bbbd6d3d35714dc0948e1b6eed3386c63f31bcef4e3c797f8a0ff4cfc37b2d26b6deadac114c41725b1900"
+  order_hash: "0x57a69889d35410e74bed6f1b6849868da2d0b062b47c87b6d11ba894f3690633"
+  signature: "0x5f4b6113ef2400bd13446fe41f6b83f3d46b5f9c6b07f63d1432578f9d71033f3e464699775521aa5ea55b4eb44b7c6ae5482c95c328d064ba60e6ffe25c4b6d1b"
 
 two:
   account_address: MyString

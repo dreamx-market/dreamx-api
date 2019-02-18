@@ -8,7 +8,7 @@ one:
 
 two:
   name: Two
-  address: "0x865103e52d21cb376e6846e31e811f992339972a"
+  address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
   symbol: TWO
   decimals: 1
 

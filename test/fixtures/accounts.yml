@@ -1,8 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one: 
-  address: '0x8a37b79E54D69e833d79Cac3647C877Ef72830E1'
+one:
+  address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
 
-two: 
-  address: '0x4E30dBA9762ABa125f5Ab81647eDEbFF9f9DF7a7'
-  
+two:
+  address: "0x4E30dBA9762ABa125f5Ab81647eDEbFF9f9DF7a7"

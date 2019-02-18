@@ -1,12 +1,11 @@
 class Order < ApplicationRecord
 	# TODO:
-  	# validate signature, ecrecover(orderHash, signature) must match with `account`
-  	# a transaction to convert balance to hold_balance and save the order atomically and emit a socket event to notify of balance change
+	# a transaction to convert balance to hold_balance and save the order atomically
 	
 	validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
 	validate :nonce_must_be_greater_than_last_nonce, on: :create
-	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :balance_must_exist_and_is_sufficient, :market_must_exist, :order_hash_must_be_valid
+	validate :signature_must_be_valid, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :balance_must_exist_and_is_sufficient, :market_must_exist, :order_hash_must_be_valid
 
 	private
 
@@ -50,6 +49,17 @@ class Order < ApplicationRecord
     end
 		if (!result or result != order_hash) then
 			errors.add(:order_hash, "invalid order_hash")
+		end
+	end
+
+	def signature_must_be_valid
+		begin
+			recovered_public_key = Eth::Key.personal_recover_hex(order_hash, signature)
+			recovered_address = Eth::Utils.public_key_to_address recovered_public_key
+		rescue
+		end
+		if (!recovered_address or recovered_address != Eth::Utils.format_address(account_address)) then
+			errors.add(:signature, "account_address: #{account_address}, recovered_address: #{recovered_address}")
 		end
 	end
 
