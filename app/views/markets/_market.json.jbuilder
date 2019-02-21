@@ -1,2 +1,6 @@
-json.extract! market, :id, :base_token_address, :quote_token_address, :created_at, :updated_at
-json.url market_url(market, format: :json)
+json.base_token do
+	json.extract! market.base_token, :name, :symbol, :decimals, :address
+end
+json.quote_token do
+	json.extract! market.quote_token, :name, :symbol, :decimals, :address
+end
