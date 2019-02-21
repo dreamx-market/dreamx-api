@@ -16,7 +16,11 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
   #   assert_response :success
   # end
 
-  test "should create order" do
+  test "should create order and reduce account's balance" do
+  	balance = Balance.find_by(:account_address => @order.account_address, :token_address => @order.give_token_address)
+  	old_balance = balance.balance
+  	old_hold_balance = balance.hold_balance
+
   	@order.destroy
 
   	assert_difference("Order.count") do
@@ -24,6 +28,29 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response 201
+
+    balance.reload
+    new_balance = balance.balance
+    new_hold_balance = balance.hold_balance
+
+    assert_equal new_balance.to_i, old_balance.to_i - @order.give_amount.to_i
+    assert_equal new_hold_balance.to_i, old_hold_balance.to_i + @order.give_amount.to_i
+  end
+
+  test "should not reduce balance if order failed to save" do
+  	balance = Balance.find_by(:account_address => @order.account_address, :token_address => @order.give_token_address)
+  	old_balance = balance.balance
+  	old_hold_balance = balance.hold_balance
+
+  	post orders_url, params: { order: { account_address: @order.account_address, expiry_timestamp_in_milliseconds: @order.expiry_timestamp_in_milliseconds, give_amount: @order.give_amount, give_token_address: @order.give_token_address, nonce: @order.nonce, order_hash: @order.order_hash, signature: @order.signature, take_amount: @order.take_amount, take_token_address: @order.take_token_address } }, as: :json
+    assert_response 422
+
+    balance.reload
+    new_balance = balance.balance
+    new_hold_balance = balance.hold_balance
+
+    assert_equal new_balance.to_i, old_balance.to_i
+    assert_equal new_hold_balance.to_i, old_hold_balance.to_i
   end
 
   # test "should show order" do

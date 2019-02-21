@@ -1,11 +1,10 @@
 class Order < ApplicationRecord
-	# TODO:
-	# a transaction to convert balance to hold_balance and save the order atomically
-	
+	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
 	validate :nonce_must_be_greater_than_last_nonce, on: :create
 	validate :signature_must_be_valid, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :balance_must_exist_and_is_sufficient, :market_must_exist, :order_hash_must_be_valid
+	before_save :hold_balance
 
 	private
 
@@ -69,5 +68,12 @@ class Order < ApplicationRecord
 				errors.add(key, "invalid #{key.to_s}")
 			end
 		end
+	end
+
+	def hold_balance
+		balance = self.account.balances.find_by(:token_address => give_token_address)
+		balance.balance = balance.balance.to_i - give_amount.to_i
+		balance.hold_balance = balance.hold_balance.to_i + give_amount.to_i
+		balance.save
 	end
 end
