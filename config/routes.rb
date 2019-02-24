@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :trades
   resources :markets, defaults: {format: :json} 
   resources :balances, defaults: {format: :json}, param: :account_address
   resources :tokens, defaults: {format: :json}

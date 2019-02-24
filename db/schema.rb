@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_24_194241) do
+ActiveRecord::Schema.define(version: 2019_02_24_212228) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "accounts", force: :cascade do |t|
@@ -62,6 +63,18 @@ ActiveRecord::Schema.define(version: 2019_02_24_194241) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["address"], name: "index_tokens_on_address"
+  end
+
+  create_table "trades", force: :cascade do |t|
+    t.string "account_address"
+    t.string "order_hash"
+    t.string "amount"
+    t.string "nonce"
+    t.string "trade_hash"
+    t.string "signature"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end
