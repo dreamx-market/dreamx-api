@@ -5,3 +5,6 @@ one:
 
 two:
   address: "0x4E30dBA9762ABa125f5Ab81647eDEbFF9f9DF7a7"
+
+three:
+  address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
