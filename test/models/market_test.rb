@@ -6,8 +6,10 @@ class MarketTest < ActiveSupport::TestCase
 	end
 
   test "market must be unique" do
-  	newMarket = Market.new(:base_token_address => @market.base_token_address, :quote_token_address => @market.quote_token_address)
-    assert_not newMarket.valid?
+  	new_market = Market.new(:base_token_address => @market.base_token_address, :quote_token_address => @market.quote_token_address)
+    assert_not new_market.valid?
+    new_market_reversed = Market.new(:base_token_address => @market.quote_token_address, :quote_token_address => @market.base_token_address)
+    assert_not new_market_reversed.valid?
   end
 
   test "quote token address must not equal to base" do
