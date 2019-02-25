@@ -15,5 +15,5 @@ two:
 three:
   account_address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
   token_address: "0x0000000000000000000000000000000000000000"
-  balance: 1
-  hold_balance: 1
+  balance: 100000000000000000000
+  hold_balance: 0

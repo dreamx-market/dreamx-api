@@ -56,6 +56,6 @@ class OrderTest < ActiveSupport::TestCase
   	assert @order.valid?
   	@order.give_amount = @order.give_amount.to_i + 1
   	assert_not @order.valid?
-  	assert_equal @order.errors.messages[:give_amount], ["insufficient balance"]
+  	assert_equal @order.errors.messages[:account_address], ["insufficient balance"]
   end
 end

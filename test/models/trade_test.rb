@@ -11,6 +11,19 @@ class TradeTest < ActiveSupport::TestCase
 		Rails.application.config.CONTRACT_ADDRESS = @old_contract_address
 	end
 
-	# test "" do
-	# end
+	test "must have a uuid" do
+		assert_not_nil @trade.uuid
+	end
+
+	test "amount cannot be 0" do
+		@trade.amount = 0
+		assert_not @trade.valid?
+		assert_equal @trade.errors.messages[:amount], ["must be greater than 0"]
+	end
+
+	test "account_address must have sufficient balance" do
+		@trade.amount = @trade.amount.to_i * 1000000
+		assert_not @trade.valid?
+		assert_equal @trade.errors.messages[:account_address], ["insufficient balance"]
+	end
 end
