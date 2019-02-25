@@ -1,7 +1,4 @@
 class Trade < ApplicationRecord
-	# trade_hash must be valid
-	# signature must be valid
-
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
 
@@ -10,6 +7,8 @@ class Trade < ApplicationRecord
   validates_presence_of VALIDATABLE_ATTRS
 	validates :amount, numericality: { greater_than: 0 }
 	validates :nonce, nonce: true, on: :create
+  validates :trade_hash, signature: true
+
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid
 
 	def balance_must_exist_and_is_sufficient

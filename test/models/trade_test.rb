@@ -44,4 +44,10 @@ class TradeTest < ActiveSupport::TestCase
 		assert_not @trade.valid?
 		assert_equal @trade.errors.messages[:trade_hash], ["invalid"]
 	end
+
+  test "signature must be valid" do
+    @trade.signature = "INVALID"
+    assert_not @trade.valid?
+    assert_equal @trade.errors.messages[:signature], ["invalid"]
+  end
 end
