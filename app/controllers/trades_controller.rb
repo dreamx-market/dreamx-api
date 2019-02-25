@@ -1,16 +1,16 @@
 class TradesController < ApplicationController
   before_action :set_trade, only: [:show, :update, :destroy]
 
-  # GET /trades
-  # GET /trades.json
-  def index
-    @trades = Trade.all
-  end
+  # # GET /trades
+  # # GET /trades.json
+  # def index
+  #   @trades = Trade.all
+  # end
 
-  # GET /trades/1
-  # GET /trades/1.json
-  def show
-  end
+  # # GET /trades/1
+  # # GET /trades/1.json
+  # def show
+  # end
 
   # POST /trades
   # POST /trades.json
@@ -24,21 +24,21 @@ class TradesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /trades/1
-  # PATCH/PUT /trades/1.json
-  def update
-    if @trade.update(trade_params)
-      render :show, status: :ok, location: @trade
-    else
-      render json: @trade.errors, status: :unprocessable_entity
-    end
-  end
+  # # PATCH/PUT /trades/1
+  # # PATCH/PUT /trades/1.json
+  # def update
+  #   if @trade.update(trade_params)
+  #     render :show, status: :ok, location: @trade
+  #   else
+  #     render json: @trade.errors, status: :unprocessable_entity
+  #   end
+  # end
 
-  # DELETE /trades/1
-  # DELETE /trades/1.json
-  def destroy
-    @trade.destroy
-  end
+  # # DELETE /trades/1
+  # # DELETE /trades/1.json
+  # def destroy
+  #   @trade.destroy
+  # end
 
   private
     # Use callbacks to share common setup or constraints between actions.

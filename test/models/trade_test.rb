@@ -26,4 +26,22 @@ class TradeTest < ActiveSupport::TestCase
 		assert_not @trade.valid?
 		assert_equal @trade.errors.messages[:account_address], ["insufficient balance"]
 	end
+
+	test "nonce must be greater than last nonce" do
+		new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => 1, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+		assert_not new_trade.valid?
+		assert_equal new_trade.errors.messages[:nonce], ["must be greater than last nonce"]
+	end
+
+	test "order_hash must be valid" do
+		@trade.order_hash = "INVALID"
+		assert_not @trade.valid?
+		assert_equal @trade.errors.messages[:order], ["must exist"]
+	end
+
+	test "trade_hash must be valid" do
+		@trade.trade_hash = "INVALID"
+		assert_not @trade.valid?
+		assert_equal @trade.errors.messages[:trade_hash], ["invalid"]
+	end
 end

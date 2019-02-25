@@ -2,17 +2,11 @@ class Order < ApplicationRecord
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
-	validate :nonce_must_be_greater_than_last_nonce, on: :create
+	validates :nonce, nonce: true, on: :create
 	validate :signature_must_be_valid, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :balance_must_exist_and_is_sufficient, :market_must_exist, :order_hash_must_be_valid
 	before_save :hold_balance
 
 	private
-
-	def nonce_must_be_greater_than_last_nonce
-		if Order.last && nonce.to_i <= Order.last.nonce.to_i then
-			errors.add(:nonce, 'must be greater than last nonce')
-		end
-	end
 
 	def expiry_timestamp_must_be_in_the_future
 		if expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i then
@@ -47,7 +41,7 @@ class Order < ApplicationRecord
     rescue
     end
 		if (!result or result != order_hash) then
-			errors.add(:order_hash, "invalid order_hash")
+			errors.add(:order_hash, "invalid")
 		end
 	end
 
