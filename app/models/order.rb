@@ -33,7 +33,7 @@ class Order < ApplicationRecord
 	end
 
 	def order_hash_must_be_valid
-		exchange_address = Rails.application.config.CONTRACT_ADDRESS
+		exchange_address = ENV['CONTRACT_ADDRESS']
 	 	begin
 	 		encoder = Ethereum::Encoder.new
 	 		encoded_give_amount = encoder.encode("uint", give_amount.to_i)

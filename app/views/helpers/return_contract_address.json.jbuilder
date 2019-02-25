@@ -1,1 +1,1 @@
-json.address Rails.application.config.CONTRACT_ADDRESS
+json.address ENV['CONTRACT_ADDRESS']

@@ -7,11 +7,11 @@ class ApplicationController < ActionController::API
 	private
 
 		def validate_pagination_params
-			unless !params[:per_page] || Integer(params[:per_page]) < Rails.application.config.MAX_PER_PAGE then
+			unless !params[:per_page] || Integer(params[:per_page]) < ENV['MAX_PER_PAGE'].to_i then
 	  		raise Error::ValidationError.new([
 	  			{
 	  				:field => 'per_page',
-	  				:reason => "should be less than or equal to #{Rails.application.config.MAX_PER_PAGE}"
+	  				:reason => "should be less than or equal to #{ENV['MAX_PER_PAGE']}"
 	  			}
 	  		])
   		end

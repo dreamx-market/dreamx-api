@@ -23,7 +23,7 @@ class Trade < ApplicationRecord
 	end
 
 	def trade_hash_must_be_valid
-		exchange_address = Rails.application.config.CONTRACT_ADDRESS
+		exchange_address = ENV['CONTRACT_ADDRESS']
 	 	begin
 	 		encoder = Ethereum::Encoder.new
 	 		encoded_amount = encoder.encode("uint", amount.to_i)

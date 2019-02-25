@@ -35,11 +35,11 @@ module NinjatradeApi
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    # ninjatrade's contract address
-    config.CONTRACT_ADDRESS = "0x2a0c0dbecc7e4d658f48e01e3fa353f44050c208"
-
     # pagination
     WillPaginate.per_page = 100
-    config.MAX_PER_PAGE = 1000
+
+    # environment variables, can be overridden
+    ENV['CONTRACT_ADDRESS'] = '0x2a0c0dbecc7e4d658f48e01e3fa353f44050c208'
+    ENV['MAX_PER_PAGE'] = '1000'
   end
 end
