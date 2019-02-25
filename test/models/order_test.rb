@@ -51,4 +51,11 @@ class OrderTest < ActiveSupport::TestCase
   	@order.signature = valid_signature
   	assert @order.valid?
   end
+
+  test "balance must be sufficient" do
+  	assert @order.valid?
+  	@order.give_amount = @order.give_amount.to_i + 1
+  	assert_not @order.valid?
+  	assert_equal @order.errors.messages[:give_amount], ["insufficient balance"]
+  end
 end
