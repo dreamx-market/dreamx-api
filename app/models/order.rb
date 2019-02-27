@@ -10,6 +10,10 @@ class Order < ApplicationRecord
 
 	before_save :hold_balance
 
+  def is_sell
+    self.give_token_address == "0x0000000000000000000000000000000000000000" ? true : false
+  end
+
 	private
 
 	def expiry_timestamp_must_be_in_the_future

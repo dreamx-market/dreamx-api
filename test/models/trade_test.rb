@@ -15,12 +15,6 @@ class TradeTest < ActiveSupport::TestCase
 		assert_not_nil @trade.uuid
 	end
 
-	test "amount cannot be 0" do
-		@trade.amount = 0
-		assert_not @trade.valid?
-		assert_equal @trade.errors.messages[:amount], ["must be greater than 0"]
-	end
-
 	test "account_address must have sufficient balance" do
 		@trade.amount = @trade.amount.to_i * 1000000
 		assert_not @trade.valid?
@@ -49,5 +43,11 @@ class TradeTest < ActiveSupport::TestCase
     @trade.signature = "INVALID"
     assert_not @trade.valid?
     assert_equal @trade.errors.messages[:signature], ["invalid"]
+  end
+
+  test "trade volume must be greater than minimum" do
+    @trade.amount = 1
+    assert_not @trade.valid?
+    assert_equal @trade.errors.messages[:amount], [ "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}"]
   end
 end
