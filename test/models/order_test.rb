@@ -58,4 +58,10 @@ class OrderTest < ActiveSupport::TestCase
   	assert_not @order.valid?
   	assert_equal @order.errors.messages[:account_address], ["insufficient balance"]
   end
+
+  test "filled cannot be negative" do
+    @order.filled = -1
+    assert_not @order.valid?
+    assert_equal @order.errors.messages[:filled], ["must be greater than or equal to 0"]
+  end
 end

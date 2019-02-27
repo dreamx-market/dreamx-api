@@ -10,4 +10,10 @@ class ActiveSupport::TestCase
   def json
   	JSON.parse(response.body)
   end
+
+  def assert_model(model, records)
+    records.each do |record|
+      assert_not_nil model.find_by(record)
+    end
+  end
 end

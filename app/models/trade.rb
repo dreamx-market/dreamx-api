@@ -10,6 +10,8 @@ class Trade < ApplicationRecord
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
+  before_save :update_balances
+
 	def balance_must_exist_and_is_sufficient
 		if (!self.account || !self.order) then
 			return
@@ -51,4 +53,37 @@ class Trade < ApplicationRecord
     minimum_volume = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i
     errors.add(:amount, "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}") unless volume >= minimum_volume
   end
+
+  def update_balances
+    formatter = Ethereum::Formatter.new
+    one_ether = formatter.to_wei(1)
+    maker_address = self.order.account_address
+    taker_address = self.account_address
+    fee_address = ENV['FEE_ACCOUNT_ADDRESS']
+    maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
+    taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
+    maker_fee_amount = (self.order.take_amount.to_i * maker_fee.to_i) / one_ether.to_i
+    taker_fee_amount = (self.amount.to_i * taker_fee.to_i) / one_ether.to_i
+
+    maker_give_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.give_token_address })
+    maker_give_balance.hold_balance = maker_give_balance.hold_balance.to_i - self.amount.to_i
+    maker_give_balance.save!
+
+    taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.give_token_address })
+    taker_give_balance.balance = taker_give_balance.balance.to_i + self.amount.to_i - taker_fee_amount.to_i
+    taker_give_balance.save!
+
+    # fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.give_token_address })
+
+    # maker_balance.balance = 69
+    # maker_balance.save!
+
+    # taker_balance.balance = 70
+    # taker_balance.save!
+  end
+
+  # def update_order
+  #   self.order.filled = -1
+  #   self.order.save!
+  # end
 end

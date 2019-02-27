@@ -7,13 +7,31 @@ one:
   hold_balance: 0
 
 two:
-  account_address: MyString
-  token_address: MyString
-  balance: 1
-  hold_balance: 1
+  account_address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
+  token_address: "0x0000000000000000000000000000000000000000"
+  balance: 0
+  hold_balance: 0
 
 three:
   account_address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
+  token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
+  balance: 0
+  hold_balance: 0
+
+four:
+  account_address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
   token_address: "0x0000000000000000000000000000000000000000"
   balance: 100000000000000000000
+  hold_balance: 0
+
+five:
+  account_address: "0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a"
+  token_address: "0x0000000000000000000000000000000000000000"
+  balance: 0
+  hold_balance: 0
+
+six:
+  account_address: "0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a"
+  token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
+  balance: 0
   hold_balance: 0
