@@ -64,27 +64,27 @@ class Trade < ApplicationRecord
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
     maker_fee_amount = (((self.amount.to_i * self.order.take_amount.to_i) / self.order.give_amount.to_i) * maker_fee.to_i) / one_ether.to_i
     taker_fee_amount = (self.amount.to_i * taker_fee.to_i) / one_ether.to_i
+    trade_amount_equivalence_in_take_tokens = (self.amount.to_i * self.order.take_amount.to_i) / self.order.give_amount.to_i
 
     maker_give_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.give_token_address })
-    maker_give_balance.hold_balance = maker_give_balance.hold_balance.to_i - self.amount.to_i
-    maker_give_balance.save!
-    taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.give_token_address })
-    taker_give_balance.balance = taker_give_balance.balance.to_i + self.amount.to_i - taker_fee_amount.to_i
-    taker_give_balance.save!
-    fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.give_token_address })
-    fee_give_balance.balance = fee_give_balance.balance.to_i + taker_fee_amount.to_i
-    fee_give_balance.save!
+    maker_give_balance.spend(self.amount)
 
-    trade_amount_equivalence_in_take_tokens = (self.amount.to_i * self.order.take_amount.to_i) / self.order.give_amount.to_i
+    taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.give_token_address })
+    taker_receiving_amount_minus_fee = self.amount.to_i - taker_fee_amount.to_i
+    taker_give_balance.credit(taker_receiving_amount_minus_fee)
+
+    fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.give_token_address })
+    fee_give_balance.credit(taker_fee_amount)
+
     maker_take_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.take_token_address })
-    maker_take_balance.balance = maker_take_balance.balance.to_i + trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
-    maker_take_balance.save!
+    maker_receiveing_amount_minus_fee = trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
+    maker_take_balance.credit(maker_receiveing_amount_minus_fee)
+
     taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.take_token_address })
-    taker_take_balance.balance = taker_take_balance.balance.to_i - trade_amount_equivalence_in_take_tokens
-    taker_take_balance.save!
+    taker_take_balance.debit(trade_amount_equivalence_in_take_tokens)
+
     fee_take_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.take_token_address })
-    fee_take_balance.balance = fee_take_balance.balance.to_i + maker_fee_amount.to_i
-    fee_take_balance.save!
+    fee_take_balance.credit(maker_fee_amount)
   end
 
   def fill_order
