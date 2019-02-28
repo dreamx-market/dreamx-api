@@ -10,7 +10,7 @@ class Order < ApplicationRecord
 	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :volume_must_be_greater_than_minimum, :filled_must_not_exceed_give_amount
   validate :balance_must_exist_and_is_sufficient, on: :create
 
-	before_save :hold_balance
+	before_create :hold_balance
 
   def is_sell
     self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
@@ -22,6 +22,17 @@ class Order < ApplicationRecord
       self.status = 'closed'
     end
     self.save!
+  end
+
+  def cancel
+    remaining = self.give_amount.to_i - self.filled.to_i
+    give_balance.release(remaining)
+    self.status = 'cancelled'
+    self.save!
+  end
+
+  def give_balance
+    Balance.find_by({ :account_address => self.account_address, :token_address => self.give_token_address })
   end
 
 	private

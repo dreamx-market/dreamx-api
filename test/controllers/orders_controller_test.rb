@@ -17,11 +17,11 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
   # end
 
   test "should create order and reduce account's balance" do
+    uncreate_order(@order)
+
   	balance = Balance.find_by(:account_address => @order.account_address, :token_address => @order.give_token_address)
   	old_balance = balance.balance
   	old_hold_balance = balance.hold_balance
-
-  	@order.destroy
 
   	assert_difference("Order.count") do
       post orders_url, params: { order: { account_address: @order.account_address, expiry_timestamp_in_milliseconds: @order.expiry_timestamp_in_milliseconds, give_amount: @order.give_amount, give_token_address: @order.give_token_address, nonce: @order.nonce, order_hash: @order.order_hash, signature: @order.signature, take_amount: @order.take_amount, take_token_address: @order.take_token_address } }, as: :json

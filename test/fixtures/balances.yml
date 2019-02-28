@@ -3,8 +3,8 @@
 one:
   account_address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
   token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
-  balance: 100000000000000000000
-  hold_balance: 0
+  balance: 0
+  hold_balance: 100000000000000000000
 
 two:
   account_address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"

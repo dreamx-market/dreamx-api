@@ -22,4 +22,11 @@ class ActiveSupport::TestCase
       assert_nil model.find_by(record)
     end
   end
+
+  def uncreate_order(order)
+    remaining = order.give_amount.to_i - order.filled.to_i
+    balance = Balance.find_by(:account_address => order.account_address, :token_address => order.give_token_address)
+    balance.release(remaining)
+    order.destroy!
+  end
 end

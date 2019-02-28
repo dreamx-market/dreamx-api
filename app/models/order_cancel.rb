@@ -7,6 +7,8 @@ class OrderCancel < ApplicationRecord
 
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid
 
+  before_save :cancel_order
+
   def order_must_be_open
     if (!self.order)
       return
@@ -33,5 +35,11 @@ class OrderCancel < ApplicationRecord
     if (!result or result != cancel_hash) then
       errors.add(:cancel_hash, "invalid")
     end
+  end
+
+  private
+
+  def cancel_order
+    self.order.cancel
   end
 end
