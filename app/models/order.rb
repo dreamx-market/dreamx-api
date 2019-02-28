@@ -7,13 +7,13 @@ class Order < ApplicationRecord
   validates :order_hash, signature: true
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }, on: :update
 
-	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid
+	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :volume_must_be_greater_than_minimum
   validate :balance_must_exist_and_is_sufficient, on: :create
 
 	before_save :hold_balance
 
   def is_sell
-    self.give_token_address == "0x0000000000000000000000000000000000000000" ? true : false
+    self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
   end
 
 	private
@@ -69,4 +69,17 @@ class Order < ApplicationRecord
 		balance.hold_balance = balance.hold_balance.to_i + give_amount.to_i
 		balance.save
 	end
+
+  def volume_must_be_greater_than_minimum
+    if (self.is_sell) then
+      attribute = :take_amount
+      volume = self.take_amount.to_i
+    else
+      attribute = :give_amount
+      volume = self.give_amount.to_i
+    end
+
+    minimum_volume = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i
+    errors.add(attribute, "must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}") unless volume >= minimum_volume
+  end
 end

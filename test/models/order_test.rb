@@ -63,4 +63,11 @@ class OrderTest < ActiveSupport::TestCase
     assert_not @order.valid?
     assert_equal @order.errors.messages[:filled], ["must be greater than or equal to 0"]
   end
+
+  test "volume must be greater than minimum" do
+    @order.take_amount = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i - 1
+    assert_not @order.valid?
+    # p @order.errors.messages
+    assert_equal @order.errors.messages[:take_amount], ["must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}"]
+  end
 end
