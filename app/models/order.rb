@@ -38,7 +38,7 @@ class Order < ApplicationRecord
 	private
 
   def filled_must_not_exceed_give_amount
-    errors.add(:filled, 'must not exceed give_amount') unless filled <= give_amount
+    errors.add(:filled, 'must not exceed give_amount') unless filled.to_i <= give_amount.to_i
   end
 
 	def expiry_timestamp_must_be_in_the_future
