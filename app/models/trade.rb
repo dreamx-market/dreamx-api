@@ -89,6 +89,9 @@ class Trade < ApplicationRecord
 
   def update_order
     self.order.filled = self.amount
+    if self.order.filled.to_i == self.order.give_amount.to_i then
+      self.order.status = 'closed'
+    end
     self.order.save!
   end
 end
