@@ -2,7 +2,14 @@ require 'test_helper'
 
 class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    @OLD_CONTRACT_ADDRESS = ENV['CONTRACT_ADDRESS']
+    ENV['CONTRACT_ADDRESS'] = '0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a'
+
     @order_cancel = order_cancels(:one)
+  end
+
+  teardown do
+    ENV['CONTRACT_ADDRESS'] = @OLD_CONTRACT_ADDRESS
   end
 
   # test "should get index" do
@@ -10,7 +17,9 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
   #   assert_response :success
   # end
 
-  test "should create order_cancel" do
+  test "should create order_cancel and refund" do
+    @order_cancel.destroy
+
     assert_difference('OrderCancel.count') do
       post order_cancels_url, params: { order_cancel: { account_address: @order_cancel.account_address, cancel_hash: @order_cancel.cancel_hash, nonce: @order_cancel.nonce, order_hash: @order_cancel.order_hash, signature: @order_cancel.signature } }, as: :json
     end

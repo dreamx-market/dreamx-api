@@ -7,7 +7,7 @@ class Order < ApplicationRecord
   validates :order_hash, signature: true
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }, on: :update
 
-	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :volume_must_be_greater_than_minimum
+	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :volume_must_be_greater_than_minimum, :filled_must_not_exceed_give_amount
   validate :balance_must_exist_and_is_sufficient, on: :create
 
 	before_save :hold_balance
@@ -16,7 +16,19 @@ class Order < ApplicationRecord
     self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
   end
 
+  def fill(amount)
+    self.filled = amount
+    if self.filled.to_i == self.give_amount.to_i then
+      self.status = 'closed'
+    end
+    self.save!
+  end
+
 	private
+
+  def filled_must_not_exceed_give_amount
+    errors.add(:filled, 'must not exceed give_amount') unless filled <= give_amount
+  end
 
 	def expiry_timestamp_must_be_in_the_future
 		if expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i then

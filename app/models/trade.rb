@@ -10,7 +10,7 @@ class Trade < ApplicationRecord
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
-  before_save :update_balances, :update_order
+  before_save :trade_balances, :fill_order
 
 	def balance_must_exist_and_is_sufficient
 		if (!self.account || !self.order) then
@@ -54,7 +54,7 @@ class Trade < ApplicationRecord
     errors.add(:amount, "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}") unless volume >= minimum_volume
   end
 
-  def update_balances
+  def trade_balances
     formatter = Ethereum::Formatter.new
     one_ether = formatter.to_wei(1)
     maker_address = self.order.account_address
@@ -87,11 +87,7 @@ class Trade < ApplicationRecord
     fee_take_balance.save!
   end
 
-  def update_order
-    self.order.filled = self.amount
-    if self.order.filled.to_i == self.order.give_amount.to_i then
-      self.order.status = 'closed'
-    end
-    self.order.save!
+  def fill_order
+    self.order.fill(self.amount)
   end
 end
