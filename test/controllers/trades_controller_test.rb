@@ -3,9 +3,11 @@ require 'test_helper'
 class TradesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @OLD_CONTRACT_ADDRESS = ENV['CONTRACT_ADDRESS']
+    @OLD_FEE_COLLECTOR_ADDRESS = ENV['FEE_COLLECTOR_ADDRESS']
     @OLD_MAKER_FEE_PERCENTAGE = ENV['MAKER_FEE_PERCENTAGE']
     @OLD_TAKER_FEE_PERCENTAGE = ENV['TAKER_FEE_PERCENTAGE']
-    ENV['CONTRACT_ADDRESS'] = "0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a"
+    ENV['CONTRACT_ADDRESS'] = '0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a'
+    ENV['FEE_COLLECTOR_ADDRESS'] = '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a'
     ENV['MAKER_FEE_PERCENTAGE'] = '0.1'
     ENV['TAKER_FEE_PERCENTAGE'] = '0.2'
 
@@ -26,6 +28,7 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
 
   teardown do
     ENV['CONTRACT_ADDRESS'] = @OLD_CONTRACT_ADDRESS
+    ENV['FEE_COLLECTOR_ADDRESS'] = @OLD_FEE_COLLECTOR_ADDRESS
     ENV['MAKER_FEE_PERCENTAGE'] = @OLD_MAKER_FEE_PERCENTAGE
     ENV['TAKER_FEE_PERCENTAGE'] = @OLD_TAKER_FEE_PERCENTAGE
   end
@@ -36,6 +39,8 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
   # end
 
   test "should create trade, collect fees and swap balances" do
+    @trade.destroy
+
     before_trade_balances = [
       { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 100000000000000000000 },
       { :account_address => @maker_address, :token_address => @take_token_address, :balance => 0, :hold_balance => 0 },
@@ -46,11 +51,11 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     ]
     after_trade_balances = [
       { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 },
-      { :account_address => @maker_address, :token_address => @take_token_address, :balance => 495000000000000000, :hold_balance => 0 },
-      { :account_address => @taker_address, :token_address => @give_token_address, :balance => 998000000000000000, :hold_balance => 0 },
+      { :account_address => @maker_address, :token_address => @take_token_address, :balance => 499500000000000000, :hold_balance => 0 },
+      { :account_address => @taker_address, :token_address => @give_token_address, :balance => 99800000000000000000, :hold_balance => 0 },
       { :account_address => @taker_address, :token_address => @take_token_address, :balance => 99500000000000000000, :hold_balance => 0 },
-      { :account_address => @fee_address, :token_address => @take_token_address, :balance => 5000000000000000, :hold_balance => 0 },
-      { :account_address => @fee_address, :token_address => @give_token_address, :balance => 20000000000000000, :hold_balance => 0 }
+      { :account_address => @fee_address, :token_address => @give_token_address, :balance => 200000000000000000, :hold_balance => 0 },
+      { :account_address => @fee_address, :token_address => @take_token_address, :balance => 500000000000000, :hold_balance => 0 }
     ]
     before_trade_orders = [
       { :order_hash => @order.order_hash, :filled => 0 }
@@ -58,26 +63,24 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     after_trade_orders = [
       { :order_hash => @order.order_hash, :filled => 100000000000000000000 }
     ]
+    after_trade_trades = [
+      { :trade_hash => @trade.trade_hash }
+    ]
 
     assert_model(Balance, before_trade_balances)
     assert_model(Order, before_trade_orders)
-
-  	@trade.destroy
+    assert_model_nil(Trade, after_trade_trades)
 
     assert_difference('Trade.count') do
       post trades_url, params: { trade: { account_address: @trade.account_address, amount: @trade.amount, nonce: @trade.nonce, order_hash: @trade.order_hash, signature: @trade.signature, trade_hash: @trade.trade_hash, uuid: @trade.uuid } }, as: :json
-      p Balance.find_by({ :account_address => @maker_address, :token_address => @give_token_address }).balance
-      p Balance.find_by({ :account_address => @taker_address, :token_address => @give_token_address }).balance
     end
 
-    # assert_response 201
+    assert_response 201
 
-    # assert_model(Balance, after_trade_balances)
-    # assert_model(Order, after_trade_orders)
+    assert_model(Balance, after_trade_balances)
+    assert_model(Order, after_trade_orders)
+    assert_model(Trade, after_trade_trades)
   end
-
-  # test "should not swap balances if trade failed to save" do
-  # end
 
   # test "should show trade" do
   #   get trade_url(@trade), as: :json

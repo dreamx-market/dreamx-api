@@ -16,4 +16,10 @@ class ActiveSupport::TestCase
       assert_not_nil model.find_by(record)
     end
   end
+
+  def assert_model_nil(model, records)
+    records.each do |record|
+      assert_nil model.find_by(record)
+    end
+  end
 end

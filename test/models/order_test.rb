@@ -53,10 +53,9 @@ class OrderTest < ActiveSupport::TestCase
   end
 
   test "balance must be sufficient" do
-  	assert @order.valid?
-  	@order.give_amount = @order.give_amount.to_i + 1
-  	assert_not @order.valid?
-  	assert_equal @order.errors.messages[:account_address], ["insufficient balance"]
+    new_order = Order.new(:account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount.to_i + 1, :take_token_address => @order.take_token_address, :take_amount => @order.take_amount, :nonce => @order.nonce, :expiry_timestamp_in_milliseconds => @order.expiry_timestamp_in_milliseconds, :order_hash => @order.order_hash, :signature => @order.signature)
+  	assert_not new_order.valid?
+  	assert_equal new_order.errors.messages[:account_address], ["insufficient balance"]
   end
 
   test "filled cannot be negative" do

@@ -10,7 +10,7 @@ class Trade < ApplicationRecord
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
-  before_save :update_balances
+  before_save :update_balances, :update_order
 
 	def balance_must_exist_and_is_sufficient
 		if (!self.account || !self.order) then
@@ -59,31 +59,36 @@ class Trade < ApplicationRecord
     one_ether = formatter.to_wei(1)
     maker_address = self.order.account_address
     taker_address = self.account_address
-    fee_address = ENV['FEE_ACCOUNT_ADDRESS']
+    fee_address = ENV['FEE_COLLECTOR_ADDRESS']
     maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
-    maker_fee_amount = (self.order.take_amount.to_i * maker_fee.to_i) / one_ether.to_i
+    maker_fee_amount = (((self.amount.to_i * self.order.take_amount.to_i) / self.order.give_amount.to_i) * maker_fee.to_i) / one_ether.to_i
     taker_fee_amount = (self.amount.to_i * taker_fee.to_i) / one_ether.to_i
 
     maker_give_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.give_token_address })
     maker_give_balance.hold_balance = maker_give_balance.hold_balance.to_i - self.amount.to_i
     maker_give_balance.save!
-
     taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.give_token_address })
     taker_give_balance.balance = taker_give_balance.balance.to_i + self.amount.to_i - taker_fee_amount.to_i
     taker_give_balance.save!
+    fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.give_token_address })
+    fee_give_balance.balance = fee_give_balance.balance.to_i + taker_fee_amount.to_i
+    fee_give_balance.save!
 
-    # fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.give_token_address })
-
-    # maker_balance.balance = 69
-    # maker_balance.save!
-
-    # taker_balance.balance = 70
-    # taker_balance.save!
+    trade_amount_equivalence_in_take_tokens = (self.amount.to_i * self.order.take_amount.to_i) / self.order.give_amount.to_i
+    maker_take_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.take_token_address })
+    maker_take_balance.balance = maker_take_balance.balance.to_i + trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
+    maker_take_balance.save!
+    taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.take_token_address })
+    taker_take_balance.balance = taker_take_balance.balance.to_i - trade_amount_equivalence_in_take_tokens
+    taker_take_balance.save!
+    fee_take_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.take_token_address })
+    fee_take_balance.balance = fee_take_balance.balance.to_i + maker_fee_amount.to_i
+    fee_take_balance.save!
   end
 
-  # def update_order
-  #   self.order.filled = -1
-  #   self.order.save!
-  # end
+  def update_order
+    self.order.filled = self.amount
+    self.order.save!
+  end
 end

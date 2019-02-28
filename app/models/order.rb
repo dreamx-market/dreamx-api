@@ -7,7 +7,8 @@ class Order < ApplicationRecord
   validates :order_hash, signature: true
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }, on: :update
 
-	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :balance_must_exist_and_is_sufficient, :market_must_exist, :order_hash_must_be_valid
+	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid
+  validate :balance_must_exist_and_is_sufficient, on: :create
 
 	before_save :hold_balance
 
