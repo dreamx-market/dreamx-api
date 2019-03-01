@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :deposits
   # resources :deposits
   resources :withdraws
   resources :order_cancels
