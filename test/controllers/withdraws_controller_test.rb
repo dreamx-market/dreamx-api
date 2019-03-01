@@ -28,6 +28,9 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
     after_withdraw_balances = [
       { :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :balance => 0, :hold_balance => 0 }
     ]
+    after_withdraw_withdraws = [
+      { :withdraw_hash => @withdraw.withdraw_hash, :fee => "1".to_wei }
+    ]
 
     assert_model(Balance, before_withdraw_balances)
 
@@ -36,6 +39,7 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_model(Balance, after_withdraw_balances)
+    assert_model(Withdraw, after_withdraw_withdraws)
 
     assert_response 201
   end

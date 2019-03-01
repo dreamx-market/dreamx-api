@@ -7,7 +7,7 @@ class Withdraw < ApplicationRecord
 
   validate :balance_must_exist_and_is_sufficient, :amount_must_be_above_minimum, :withdraw_hash_must_be_valid
 
-  before_create :debit_balance
+  before_create :collect_fee_and_debit_balance
 
   def withdraw_hash_must_be_valid
     exchange_address = ENV['CONTRACT_ADDRESS']
@@ -47,7 +47,8 @@ class Withdraw < ApplicationRecord
 
   private
 
-  def debit_balance
+  def collect_fee_and_debit_balance
+    self.fee = (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
     self.account.balance(self.token_address).debit(self.amount)
   end
 end
