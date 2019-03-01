@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :withdraws
   resources :order_cancels
   resources :trades
   resources :balances, defaults: {format: :json}, param: :account_address

@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account_address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
+  amount: "100000000000000000000"
+  token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
+  nonce: "1551375034000"
+  withdraw_hash: "0x4a90ed1f8b0f9eae773245e3aa5413c45395a2cc6b3701ab27495a55998dae5f"
+  signature: "0x61598155b3985f71b81d4610f3659cdfb412e146ad7c8571cbb8cab537e3f8146314417719c90cef1c624149a2784494b335f0651b46079ad41e29051c0e11961b"
+
+two:
+  account_address: MyString
+  amount: MyString
+  token_address: MyString
+  nonce: MyString
+  withdraw_hash: MyString
+  signature: MyString

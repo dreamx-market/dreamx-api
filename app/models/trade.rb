@@ -10,7 +10,7 @@ class Trade < ApplicationRecord
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
-  before_save :trade_balances, :fill_order
+  before_create :trade_balances, :fill_order
 
 	def balance_must_exist_and_is_sufficient
 		if (!self.account || !self.order) then

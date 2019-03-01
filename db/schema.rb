@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_28_110400) do
+ActiveRecord::Schema.define(version: 2019_03_01_092623) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -73,6 +73,8 @@ ActiveRecord::Schema.define(version: 2019_02_28_110400) do
     t.string "decimals"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "withdraw_minimum"
+    t.string "withdraw_fee"
     t.index ["address"], name: "index_tokens_on_address"
   end
 
@@ -84,6 +86,17 @@ ActiveRecord::Schema.define(version: 2019_02_28_110400) do
     t.string "trade_hash"
     t.string "signature"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "withdraws", force: :cascade do |t|
+    t.string "account_address"
+    t.string "amount"
+    t.string "token_address"
+    t.string "nonce"
+    t.string "withdraw_hash"
+    t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
