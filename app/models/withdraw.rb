@@ -48,6 +48,6 @@ class Withdraw < ApplicationRecord
   private
 
   def debit_balance
-    # p self.account.balance(self.token_address)
+    self.account.balance(self.token_address).debit(self.amount)
   end
 end
