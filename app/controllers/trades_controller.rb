@@ -20,7 +20,7 @@ class TradesController < ApplicationController
     if @trade.save
       render :show, status: :created, location: @trade
     else
-      render json: @trade.errors, status: :unprocessable_entity
+      serialize_active_record_validation_error @trade.errors.messages
     end
   end
 

@@ -20,7 +20,7 @@ class WithdrawsController < ApplicationController
     if @withdraw.save
       render :show, status: :created, location: @withdraw
     else
-      render json: @withdraw.errors, status: :unprocessable_entity
+      serialize_active_record_validation_error @withdraw.errors.messages
     end
   end
 

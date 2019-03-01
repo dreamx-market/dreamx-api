@@ -20,7 +20,7 @@ class OrderCancelsController < ApplicationController
     if @order_cancel.save
       render :show, status: :created, location: @order_cancel
     else
-      render json: @order_cancel.errors, status: :unprocessable_entity
+      serialize_active_record_validation_error @order_cancel.errors.messages
     end
   end
 

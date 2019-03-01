@@ -26,13 +26,9 @@ class Order < ApplicationRecord
 
   def cancel
     remaining = self.give_amount.to_i - self.filled.to_i
-    give_balance.release(remaining)
+    self.account.balance(self.give_token_address).release(remaining)
     self.status = 'cancelled'
     self.save!
-  end
-
-  def give_balance
-    Balance.find_by({ :account_address => self.account_address, :token_address => self.give_token_address })
   end
 
 	private

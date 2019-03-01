@@ -7,6 +7,8 @@ class Withdraw < ApplicationRecord
 
   validate :balance_must_exist_and_is_sufficient, :amount_must_be_above_minimum, :withdraw_hash_must_be_valid
 
+  before_create :debit_balance
+
   def withdraw_hash_must_be_valid
     exchange_address = ENV['CONTRACT_ADDRESS']
     begin
@@ -41,5 +43,11 @@ class Withdraw < ApplicationRecord
     if !balance || balance.balance.to_i < self.amount.to_i then
       errors.add(:account_address, 'insufficient balance')
     end
+  end
+
+  private
+
+  def debit_balance
+    # p self.account.balance(self.token_address)
   end
 end

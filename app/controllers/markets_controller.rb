@@ -20,7 +20,7 @@ class MarketsController < ApplicationController
     if @market.save
       render :show, status: :created, location: @market
     else
-      render json: @market.errors, status: :unprocessable_entity
+      serialize_active_record_validation_error @market.errors.messages
     end
   end
 

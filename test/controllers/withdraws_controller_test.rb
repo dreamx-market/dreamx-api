@@ -19,12 +19,23 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   #   assert_response :success
   # end
 
-  test "should create withdraw" do
+  test "should create withdraw and debit balance" do
     @withdraw.destroy
+
+    before_withdraw_balances = [
+      { :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :balance => 100000000000000000000, :hold_balance => 0 }
+    ]
+    after_withdraw_balances = [
+      { :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :balance => 0, :hold_balance => 0 }
+    ]
+
+    assert_model(Balance, before_withdraw_balances)
 
     assert_difference('Withdraw.count') do
       post withdraws_url, params: { withdraw: { account_address: @withdraw.account_address, amount: @withdraw.amount, nonce: @withdraw.nonce, signature: @withdraw.signature, token_address: @withdraw.token_address, withdraw_hash: @withdraw.withdraw_hash } }, as: :json
     end
+
+    assert_model(Balance, after_withdraw_balances)
 
     assert_response 201
   end
