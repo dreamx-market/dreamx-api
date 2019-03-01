@@ -49,7 +49,7 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
 
   test "should cancel a partially filled order and refund" do
     @order_cancel.destroy
-    @order.fill(@order.give_amount.to_i / 2)
+    @order.fill(@order.give_amount.to_i / 2, 0)
 
     before_cancel_balances = [
       { :account_address => @order_cancel.account_address, :token_address => @order_cancel.order.give_token_address, :balance => 0, :hold_balance => 100000000000000000000 }

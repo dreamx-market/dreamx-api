@@ -16,8 +16,9 @@ class Order < ApplicationRecord
     self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
   end
 
-  def fill(amount)
+  def fill(amount, fee)
     self.filled = self.filled.to_i + amount.to_i
+    self.fee = self.fee.to_i + fee.to_i
     if self.filled.to_i == self.give_amount.to_i then
       self.status = 'closed'
     end

@@ -10,7 +10,7 @@ class Trade < ApplicationRecord
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
-  before_create :trade_balances, :fill_order
+  before_create :trade_balances
 
 	def balance_must_exist_and_is_sufficient
 		if (!self.account || !self.order) then
@@ -72,6 +72,7 @@ class Trade < ApplicationRecord
     taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.give_token_address })
     taker_receiving_amount_minus_fee = self.amount.to_i - taker_fee_amount.to_i
     taker_give_balance.credit(taker_receiving_amount_minus_fee)
+    self.fee = taker_fee_amount
 
     fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.give_token_address })
     fee_give_balance.credit(taker_fee_amount)
@@ -79,15 +80,12 @@ class Trade < ApplicationRecord
     maker_take_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.take_token_address })
     maker_receiveing_amount_minus_fee = trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
     maker_take_balance.credit(maker_receiveing_amount_minus_fee)
+    self.order.fill(self.amount, maker_fee_amount)
 
     taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => self.order.take_token_address })
     taker_take_balance.debit(trade_amount_equivalence_in_take_tokens)
 
     fee_take_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.take_token_address })
     fee_take_balance.credit(maker_fee_amount)
-  end
-
-  def fill_order
-    self.order.fill(self.amount)
   end
 end

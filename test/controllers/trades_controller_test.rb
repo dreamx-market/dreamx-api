@@ -58,13 +58,13 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
       { :account_address => @fee_address, :token_address => @take_token_address, :balance => 500000000000000, :hold_balance => 0 }
     ]
     before_trade_orders = [
-      { :order_hash => @order.order_hash, :filled => 0, :status => "open" }
+      { :order_hash => @order.order_hash, :filled => 0, :status => "open", :fee => 0 }
     ]
     after_trade_orders = [
-      { :order_hash => @order.order_hash, :filled => 100000000000000000000, :status => "closed" }
+      { :order_hash => @order.order_hash, :filled => 100000000000000000000, :status => "closed", :fee => 500000000000000 }
     ]
     after_trade_trades = [
-      { :trade_hash => @trade.trade_hash }
+      { :trade_hash => @trade.trade_hash, :fee => 200000000000000000 }
     ]
 
     assert_model(Balance, before_trade_balances)
