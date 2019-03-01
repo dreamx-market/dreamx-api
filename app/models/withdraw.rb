@@ -3,12 +3,24 @@ class Withdraw < ApplicationRecord
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
 
   validates :nonce, nonce: true, on: :create
+  validates :withdraw_hash, signature: true
 
-  validate :balance_must_exist_and_is_sufficient, :amount_must_be_above_minimum
+  validate :balance_must_exist_and_is_sufficient, :amount_must_be_above_minimum, :withdraw_hash_must_be_valid
 
-  # amount must be greater than minimum volume
-  # withdraw_hash must be valid
-  # signature must be valid
+  def withdraw_hash_must_be_valid
+    exchange_address = ENV['CONTRACT_ADDRESS']
+    begin
+      encoder = Ethereum::Encoder.new
+      encoded_amount = encoder.encode("uint", amount.to_i)
+      encoded_nonce = encoder.encode("uint", nonce.to_i)
+      payload = exchange_address + account_address.without_prefix + token_address.without_prefix + encoded_amount + encoded_nonce
+      result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
+    rescue
+    end
+    if (!result or result != withdraw_hash) then
+      errors.add(:withdraw_hash, "invalid")
+    end
+  end
 
   def amount_must_be_above_minimum
     if (!self.token)

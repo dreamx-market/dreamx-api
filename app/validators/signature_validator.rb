@@ -5,7 +5,11 @@ class SignatureValidator < ActiveModel::EachValidator
       recovered_address = Eth::Utils.public_key_to_address recovered_public_key
     rescue
     end
-    if (!recovered_address or recovered_address != Eth::Utils.format_address(record.account_address)) then
+    if (
+      !recovered_address or 
+      !Eth::Utils.valid_address?(record.account_address) or
+      recovered_address != Eth::Utils.format_address(record.account_address)
+    ) then
       record.errors[:signature] << (options[:message] || "invalid")
     end
   end

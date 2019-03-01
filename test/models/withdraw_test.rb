@@ -45,4 +45,16 @@ class WithdrawTest < ActiveSupport::TestCase
     assert_not @withdraw.valid?
     assert_equal @withdraw.errors.messages[:amount], ["must be greater than #{@withdraw.token.withdraw_minimum.to_ether}"]
   end
+
+  test "withdraw_hash must be valid" do
+    @withdraw.withdraw_hash = 'INVALID'
+    assert_not @withdraw.valid?
+    assert_equal @withdraw.errors.messages[:withdraw_hash], ['invalid']
+  end
+
+  test "signature must be valid" do
+    @withdraw.signature = 'INVALID'
+    assert_not @withdraw.valid?
+    assert_equal @withdraw.errors.messages[:signature], ['invalid']
+  end
 end
