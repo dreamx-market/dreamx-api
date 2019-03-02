@@ -11,7 +11,7 @@ class Trade < ApplicationRecord
   validates :trade_hash, signature: true
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
-  validate :balances_must_be_authentic, on: :create
+  # validate :balances_must_be_authentic, on: :create
 
   before_create :trade_balances
 
@@ -67,7 +67,7 @@ class Trade < ApplicationRecord
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
     maker_fee_amount = (((self.amount.to_i * self.order.take_amount.to_i) / self.order.give_amount.to_i) * maker_fee.to_i) / one_ether.to_i
     taker_fee_amount = (self.amount.to_i * taker_fee.to_i) / one_ether.to_i
-    trade_amount_equivalence_in_take_tokens = (self.amount.to_i * self.order.take_amount.to_i) / self.order.give_amount.to_i
+    trade_amount_equivalence_in_take_tokens = self.order.calculate_take_amount(self.amount)
 
     maker_give_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.give_token_address })
     maker_give_balance.spend(self.amount)

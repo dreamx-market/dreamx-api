@@ -12,6 +12,10 @@ class Order < ApplicationRecord
 
 	before_create :hold_balance
 
+  def calculate_take_amount(give_amount)
+    (give_amount.to_i * self.take_amount.to_i) / self.give_amount.to_i
+  end
+
   def is_sell
     self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
   end

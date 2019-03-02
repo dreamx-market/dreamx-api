@@ -65,11 +65,11 @@ class TradeTest < ActiveSupport::TestCase
 
   # end
 
-  test "when balance is compromised because of invalid trades" do
-    new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => @trade.nonce, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
-    assert new_trade.valid?
-    assert_equal new_trade.errors.messages[:balance], [ "is compromised"]
-  end
+  # test "when balance is compromised because of invalid trades" do
+  #   new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => @trade.nonce, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+  #   assert new_trade.valid?
+  #   assert_equal new_trade.errors.messages[:balance], [ "is compromised"]
+  # end
 
   # test "when balance is compromised because of invalid hold_balance" do
 

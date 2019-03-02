@@ -21,3 +21,15 @@ two:
   expiry_timestamp_in_milliseconds: <%= 10.days.from_now.to_i * 1000 %>
   order_hash: MyString
   signature: MyString
+
+three:
+  account_address: MyString
+  give_token_address: MyString
+  give_amount: 1
+  take_token_address: MyString
+  take_amount: 1
+  nonce: 2
+  expiry_timestamp_in_milliseconds: <%= 10.days.from_now.to_i * 1000 %>
+  order_hash: MyString
+  signature: MyString
+  status: "partially_filled"

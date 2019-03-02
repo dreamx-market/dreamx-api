@@ -10,8 +10,9 @@ module FraudProtectable
   end
 
   def balance_authentic?(balance)
-    calculated_balance = balance.total_deposited + balance.total_traded - balance.hold_balance - balance.total_withdrawn
-    return calculated_balance === balance.balance.to_i
+    p balance.total_traded
+    # calculated_balance = balance.total_deposited + balance.total_traded - balance.hold_balance - balance.total_withdrawn
+    # return calculated_balance === balance.balance.to_i
   end
 
   def hold_balance_authentic?(balance)
