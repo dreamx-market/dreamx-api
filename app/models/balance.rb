@@ -29,15 +29,14 @@ class Balance < ApplicationRecord
 
   def total_traded
     total = 0
-    # WRONG MATH
     self.closed_and_partially_filled_sell_orders.each do |order|
       total -= order.filled.to_i
     end
     self.closed_and_partially_filled_buy_orders.each do |order|
-      total += order.filled.to_i
+      total += order.calculate_take_amount(order.filled)
     end
     self.sell_trades.each do |trade|
-      total -= trade.amount.to_i
+      total -= trade.order.calculate_take_amount(trade.amount)
     end
     self.buy_trades.each do |trade|
       total += trade.amount.to_i

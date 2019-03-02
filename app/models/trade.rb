@@ -11,7 +11,7 @@ class Trade < ApplicationRecord
   validates :trade_hash, signature: true
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
-  # validate :balances_must_be_authentic, on: :create
+  validate :balances_must_be_authentic, on: :create
 
   before_create :trade_balances
 
