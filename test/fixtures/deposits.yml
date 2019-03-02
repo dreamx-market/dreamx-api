@@ -6,6 +6,6 @@ one:
   amount: "100000000000000000000"
 
 two:
-  account_address: MyString
-  token_address: MyString
-  amount: MyString
+  account_address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
+  token_address: "0x0000000000000000000000000000000000000000"
+  amount: "100000000000000000000"

@@ -19,8 +19,10 @@ class Order < ApplicationRecord
   def fill(amount, fee)
     self.filled = self.filled.to_i + amount.to_i
     self.fee = self.fee.to_i + fee.to_i
-    if self.filled.to_i == self.give_amount.to_i then
+    if self.filled.to_i === self.give_amount.to_i then
       self.status = 'closed'
+    else
+      self.status = 'partially_filled'
     end
     self.save!
   end

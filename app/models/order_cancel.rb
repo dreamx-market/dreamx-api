@@ -13,7 +13,7 @@ class OrderCancel < ApplicationRecord
     if (!self.order)
       return
     end
-    errors.add(:order_hash, "must be open") unless self.order.status == 'open'
+    errors.add(:order_hash, "must be open") unless self.order.status != 'closed'
   end
 
   def account_address_must_be_owner

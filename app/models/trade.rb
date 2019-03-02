@@ -1,4 +1,6 @@
 class Trade < ApplicationRecord
+  include FraudPreventable
+
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
 
@@ -9,6 +11,7 @@ class Trade < ApplicationRecord
   validates :trade_hash, signature: true
 
 	validate :balance_must_exist_and_is_sufficient, :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
+  validate :balances_must_be_authentic, on: :create
 
   before_create :trade_balances
 
@@ -87,5 +90,9 @@ class Trade < ApplicationRecord
 
     fee_take_balance = Balance.find_by({ :account_address => fee_address, :token_address => self.order.take_token_address })
     fee_take_balance.credit(maker_fee_amount)
+  end
+
+  def balances_must_be_authentic
+    validate_balances_integrity(self.account.balance(self.order.take_token_address))
   end
 end

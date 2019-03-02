@@ -58,7 +58,7 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
       { :account_address => @order_cancel.account_address, :token_address => @order_cancel.order.give_token_address, :balance => 50000000000000000000, :hold_balance => 50000000000000000000 }
     ]
     before_cancel_orders = [
-      { :order_hash => @order.order_hash, :status => "open" }
+      { :order_hash => @order.order_hash, :status => "partially_filled" }
     ]
     after_cancel_orders = [
       { :order_hash => @order.order_hash, :status => "cancelled" } 

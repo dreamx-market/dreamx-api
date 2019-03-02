@@ -11,43 +11,67 @@ class TradeTest < ActiveSupport::TestCase
 		ENV['CONTRACT_ADDRESS'] = @old_contract_address
 	end
 
-	test "must have a uuid" do
-		assert_not_nil @trade.uuid
-	end
+	# test "must have a uuid" do
+	# 	assert_not_nil @trade.uuid
+	# end
 
-	test "account_address must have sufficient balance" do
-		@trade.amount = @trade.amount.to_i * 1000000
-		assert_not @trade.valid?
-		assert_equal @trade.errors.messages[:account_address], ["insufficient balance"]
-	end
+	# test "account_address must have sufficient balance" do
+	# 	@trade.amount = @trade.amount.to_i * 1000000
+	# 	assert_not @trade.valid?
+	# 	assert_equal @trade.errors.messages[:account_address], ["insufficient balance"]
+	# end
 
-	test "nonce must be greater than last nonce" do
-		new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => 1, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
-		assert_not new_trade.valid?
-		assert_equal new_trade.errors.messages[:nonce], ["must be greater than last nonce"]
-	end
+	# test "nonce must be greater than last nonce" do
+	# 	new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => 1, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+	# 	assert_not new_trade.valid?
+	# 	assert_equal new_trade.errors.messages[:nonce], ["must be greater than last nonce"]
+	# end
 
-	test "order_hash must be valid" do
-		@trade.order_hash = "INVALID"
-		assert_not @trade.valid?
-		assert_equal @trade.errors.messages[:order], ["must exist"]
-	end
+	# test "order_hash must be valid" do
+	# 	@trade.order_hash = "INVALID"
+	# 	assert_not @trade.valid?
+	# 	assert_equal @trade.errors.messages[:order], ["must exist"]
+	# end
 
-	test "trade_hash must be valid" do
-		@trade.trade_hash = "INVALID"
-		assert_not @trade.valid?
-		assert_equal @trade.errors.messages[:trade_hash], ["invalid"]
-	end
+	# test "trade_hash must be valid" do
+	# 	@trade.trade_hash = "INVALID"
+	# 	assert_not @trade.valid?
+	# 	assert_equal @trade.errors.messages[:trade_hash], ["invalid"]
+	# end
 
-  test "signature must be valid" do
-    @trade.signature = "INVALID"
-    assert_not @trade.valid?
-    assert_equal @trade.errors.messages[:signature], ["invalid"]
-  end
+ #  test "signature must be valid" do
+ #    @trade.signature = "INVALID"
+ #    assert_not @trade.valid?
+ #    assert_equal @trade.errors.messages[:signature], ["invalid"]
+ #  end
 
-  test "trade volume must be greater than minimum" do
-    @trade.amount = 1
-    assert_not @trade.valid?
-    assert_equal @trade.errors.messages[:amount], [ "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}"]
-  end
+ #  test "trade volume must be greater than minimum" do
+ #    @trade.amount = 1
+ #    assert_not @trade.valid?
+ #    assert_equal @trade.errors.messages[:amount], [ "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}"]
+ #  end
+
+  # test "when balances are authentic" do
+  #   @trade.destroy
+  #   new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => @trade.nonce, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+  #   assert new_trade.valid?
+  # end
+
+  # test "when balance is compromised because of invalid deposits" do
+
+  # end
+
+  # test "when balance is compromised because of invalid withdraws" do
+
+  # end
+
+  # test "when balance is compromised because of invalid trades" do
+  #   new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => @trade.nonce, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+  #   assert new_trade.valid?
+  #   assert_equal new_trade.errors.messages[:balance], [ "is compromised"]
+  # end
+
+  # test "when balance is compromised because of invalid hold_balance" do
+
+  # end
 end
