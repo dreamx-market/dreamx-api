@@ -1,5 +1,5 @@
 class Trade < ApplicationRecord
-  include FraudPreventable
+  include FraudProtectable
 
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'

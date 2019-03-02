@@ -75,4 +75,10 @@ class OrderTest < ActiveSupport::TestCase
     assert_not @order.valid?
     assert_equal @order.errors.messages[:filled], ["must not exceed give_amount"]
   end
+
+  test "status can only be open, closed or partially_filed" do
+    @order.status = 'INVALID'
+    assert_not @order.valid?
+    assert_equal @order.errors.messages[:status], ["must be open, closed or partially_filled"]
+  end
 end

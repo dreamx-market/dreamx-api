@@ -31,7 +31,7 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
       { :order_hash => @order.order_hash, :status => "open" }
     ]
     after_cancel_orders = [
-      { :order_hash => @order.order_hash, :status => "cancelled" } 
+      { :order_hash => @order.order_hash, :status => "closed" } 
     ]
 
     assert_model(Balance, before_cancel_balances)
@@ -61,7 +61,7 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
       { :order_hash => @order.order_hash, :status => "partially_filled" }
     ]
     after_cancel_orders = [
-      { :order_hash => @order.order_hash, :status => "cancelled" } 
+      { :order_hash => @order.order_hash, :status => "closed" } 
     ]
 
     assert_model(Balance, before_cancel_balances)

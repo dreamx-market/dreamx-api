@@ -1,4 +1,4 @@
-module FraudPreventable
+module FraudProtectable
   extend ActiveSupport::Concern
 
   def validate_balances_integrity(balance)
