@@ -3,42 +3,59 @@ class Balance < ApplicationRecord
 
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
 
+  def authentic?
+    return (balance_authentic? and hold_balance_authentic?)
+  end
+
+  def balance_authentic?
+    calculated_balance = total_deposited.to_i + total_traded.to_i - hold_balance.to_i - total_withdrawn.to_i
+    return calculated_balance.to_i === balance.to_i
+  end
+
+  def hold_balance_authentic?
+    return total_volume_held_in_open_orders.to_i === hold_balance.to_i
+  end
+
+  def open_orders
+    Order.where({ :account_address => account_address, :give_token_address => token_address }).where.not({ status: 'closed' })
+  end
+
   def deposits
-    Deposit.where({ :account_address => self.account_address, :token_address => self.token_address })
+    Deposit.where({ :account_address => account_address, :token_address => token_address })
   end
 
   def withdraws
-    Withdraw.where({ :account_address => self.account_address, :token_address => self.token_address })
+    Withdraw.where({ :account_address => account_address, :token_address => token_address })
   end
 
   def closed_and_partially_filled_sell_orders
-    Order.where({ :account_address => self.account_address, :give_token_address => self.token_address }).where.not({ status: 'open' })
+    Order.where({ :account_address => account_address, :give_token_address => token_address }).where.not({ status: 'open' })
   end
 
   def closed_and_partially_filled_buy_orders
-    Order.where({ :account_address => self.account_address, :take_token_address => self.token_address }).where.not({ status: 'open' })
+    Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' })
   end
 
   def sell_trades
-    Trade.joins(:order).where( :trades => { :account_address => self.account_address }, :orders => { :take_token_address => self.token_address } )
+    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } )
   end
 
   def buy_trades
-    Trade.joins(:order).where( :trades => { :account_address => self.account_address }, :orders => { :give_token_address => self.token_address } )
+    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :give_token_address => token_address } )
   end
 
   def total_traded
     total = 0
-    self.closed_and_partially_filled_sell_orders.each do |order|
+    closed_and_partially_filled_sell_orders.each do |order|
       total -= order.filled.to_i
     end
-    self.closed_and_partially_filled_buy_orders.each do |order|
+    closed_and_partially_filled_buy_orders.each do |order|
       total += order.calculate_take_amount(order.filled)
     end
-    self.sell_trades.each do |trade|
+    sell_trades.each do |trade|
       total -= trade.order.calculate_take_amount(trade.amount)
     end
-    self.buy_trades.each do |trade|
+    buy_trades.each do |trade|
       total += trade.amount.to_i
     end
     return total
@@ -46,7 +63,7 @@ class Balance < ApplicationRecord
 
   def total_deposited
     total = 0
-    self.deposits.each do |deposit|
+    deposits.each do |deposit|
       total += deposit.amount.to_i
     end
     return total
@@ -54,7 +71,7 @@ class Balance < ApplicationRecord
 
   def total_withdrawn
     total = 0
-    balance.withdraws.each do |withdraw|
+    withdraws.each do |withdraw|
       total += withdraw.amount.to_i
     end
     return total
@@ -62,36 +79,36 @@ class Balance < ApplicationRecord
 
   def total_volume_held_in_open_orders
     total = 0
-    self.open_orders.each do |order|
+    open_orders.each do |order|
       total += (order.give_amount.to_i - order.filled.to_i)
     end
     return total
   end
 
   def credit(amount)
-    self.balance = self.balance.to_i + amount.to_i
-    self.save!
+    balance = balance.to_i + amount.to_i
+    save!
   end
 
   def debit(amount)
-    self.balance = self.balance.to_i - amount.to_i
-    self.save!
+    balance = balance.to_i - amount.to_i
+    save!
   end
 
   def hold(amount)
-    self.balance = self.balance.to_i - amount.to_i
-    self.hold_balance = self.hold_balance.to_i + amount.to_i
-    self.save!
+    balance = balance.to_i - amount.to_i
+    hold_balance = hold_balance.to_i + amount.to_i
+    save!
   end
 
   def release(amount)
-    self.balance = self.balance.to_i + amount.to_i
-    self.hold_balance = self.hold_balance.to_i - amount.to_i
-    self.save!
+    balance = balance.to_i + amount.to_i
+    hold_balance = hold_balance.to_i - amount.to_i
+    save!
   end
 
   def spend(amount)
-    self.hold_balance = self.hold_balance.to_i - amount.to_i
-    self.save!
+    hold_balance = hold_balance.to_i - amount.to_i
+    save!
   end
 end
