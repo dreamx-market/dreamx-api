@@ -23,26 +23,27 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   # end
 
   test "should create withdraw and debit balance" do
-    # before_balances = [
-    #   { :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :balance => 100000000000000000000, :hold_balance => 0 }
-    # ]
-    # after_balances = [
-    #   { :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :balance => 0, :hold_balance => 0 }
-    # ]
-    # after_withdraws = [
-    #   { :withdraw_hash => @withdraw.withdraw_hash, :fee => "1".to_wei }
-    # ]
+    withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
+    before_balances = [
+      { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 100000000000000000000, :hold_balance => 0 }
+    ]
+    after_balances = [
+      { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 0, :hold_balance => 0 }
+    ]
+    after_withdraws = [
+      { :withdraw_hash => withdraw[:withdraw_hash], :fee => "1".to_wei }
+    ]
 
-    # assert_model(Balance, before_balances)
+    assert_model(Balance, before_balances)
 
-    # assert_difference('Withdraw.count') do
-    #   post withdraws_url, params: { withdraw: { account_address: @withdraw.account_address, amount: @withdraw.amount, nonce: @withdraw.nonce, signature: @withdraw.signature, token_address: @withdraw.token_address, withdraw_hash: @withdraw.withdraw_hash } }, as: :json
-    # end
+    assert_difference('Withdraw.count') do
+      post withdraws_url, params: withdraw, as: :json
+    end
 
-    # assert_model(Balance, after_balances)
-    # assert_model(Withdraw, after_withdraws)
+    assert_response 201
 
-    # assert_response 201
+    assert_model(Balance, after_balances)
+    assert_model(Withdraw, after_withdraws)
   end
 
   # test "should show withdraw" do
