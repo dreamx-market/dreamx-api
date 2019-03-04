@@ -35,9 +35,10 @@ class WithdrawTest < ActiveSupport::TestCase
   end
 
   test "account must have sufficient balance" do
-    @withdraw.amount = @withdraw.amount.to_i + 1
-    assert_not @withdraw.valid?
-    assert_equal @withdraw.errors.messages[:account_address], ['insufficient balance']
+    new_withdraw = Withdraw.new({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
+    new_withdraw.amount = new_withdraw.amount.to_i + 1
+    assert_not new_withdraw.valid?
+    assert_equal new_withdraw.errors.messages[:account_address], ['insufficient balance']
   end
 
   test "amount must be greater than minimum volume" do

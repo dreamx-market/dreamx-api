@@ -1,15 +1,8 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  order_hash: "0x57a69889d35410e74bed6f1b6849868da2d0b062b47c87b6d11ba894f3690633"
-  account_address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
+  order_hash: "0x0af93d915d9a51b02decd8aa3eb178834ef27e2bde33356989e834c742e27f4e"
+  account_address: "0xbfd525710ecb49a266337683971bac0d72d746a6"
   nonce: "1551351258000"
-  cancel_hash: "0x2e337f6d1fa78ac49f11f9507087ab757e5f7bce3ab8333ed2ca60c916ce9d54"
-  signature: "0x644bdc5296d509957118e24105a573adffc7a530fa5858410f6145c154ade5175b5f7f7a7e39b911d7a789d13b96ee35c936f010004dc1c3ddffda320e277bd01c"
-
-two:
-  order_hash: MyString
-  account_address: MyString
-  nonce: MyString
-  cancel_hash: MyString
-  signature: MyString
+  cancel_hash: "0xc832fa1532fb59ee696ca2168ae6d95368373357070a75f5d09b555027a60cf1"
+  signature: "0x948950ff55b7dd02a623ba7ad0eaf83fc838ea2dc34de671519650b4f86f39924506f56a6beed3b25f421d49d3329a5df114db8ddaf2ef132bd2e6cfc4c31e641b"

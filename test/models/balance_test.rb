@@ -16,4 +16,31 @@ class BalanceTest < ActiveSupport::TestCase
     assert_not @balance.valid?
     assert_equal @balance.errors.messages[:hold_balance], ["must be greater than or equal to 0"]
   end
+
+  # test "when balances are authentic" do
+  #   @trade.destroy
+  #   new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => @trade.nonce, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+  #   assert new_trade.valid?
+  # end
+
+  # test "when balance is compromised because of invalid deposits" do
+
+  # end
+
+  # test "when balance is compromised because of invalid withdraws" do
+
+  # end
+
+  # test "when balance is compromised because of invalid trades" do
+  #   # why is 1 wei rounded to 0 ?
+  #   @trade.amount = @trade.amount.to_i + 1
+  #   @trade.save(validate: false)
+  #   new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => @trade.nonce, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+  #   assert_not new_trade.valid?
+  #   assert_equal new_trade.errors.messages[:balance], [ "is compromised"]
+  # end
+
+  # test "when balance is compromised because of invalid hold_balance" do
+
+  # end
 end

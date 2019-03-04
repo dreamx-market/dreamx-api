@@ -3,33 +3,22 @@
 one:
   account_address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
   give_token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
-  give_amount: 100000000000000000000
+  give_amount: "100000000000000000000"
   take_token_address: "0x0000000000000000000000000000000000000000"
-  take_amount: 500000000000000000
-  nonce: 1550314094931
-  expiry_timestamp_in_milliseconds: 4705572264000
+  take_amount: "500000000000000000"
+  nonce: "1550314094931"
+  expiry_timestamp_in_milliseconds: "4705572264000"
   order_hash: "0x57a69889d35410e74bed6f1b6849868da2d0b062b47c87b6d11ba894f3690633"
   signature: "0x5f4b6113ef2400bd13446fe41f6b83f3d46b5f9c6b07f63d1432578f9d71033f3e464699775521aa5ea55b4eb44b7c6ae5482c95c328d064ba60e6ffe25c4b6d1b"
+  fee: "500000000000000"
 
 two:
-  account_address: MyString
-  give_token_address: MyString
-  give_amount: 1
-  take_token_address: MyString
-  take_amount: 1
-  nonce: 2
-  expiry_timestamp_in_milliseconds: <%= 10.days.from_now.to_i * 1000 %>
-  order_hash: MyString
-  signature: MyString
-
-three:
-  account_address: MyString
-  give_token_address: MyString
-  give_amount: 1
-  take_token_address: MyString
-  take_amount: 1
-  nonce: 2
-  expiry_timestamp_in_milliseconds: <%= 10.days.from_now.to_i * 1000 %>
-  order_hash: MyString
-  signature: MyString
-  status: "partially_filled"
+  account_address: "0xbfd525710ecb49a266337683971bac0d72d746a6"
+  give_token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
+  give_amount: "100000000000000000000"
+  take_token_address: "0x0000000000000000000000000000000000000000"
+  take_amount: "500000000000000000"
+  nonce: "1550314094931"
+  expiry_timestamp_in_milliseconds: "4705572264000"
+  order_hash: "0x0af93d915d9a51b02decd8aa3eb178834ef27e2bde33356989e834c742e27f4e"
+  signature: "0x3b8631c557419fc33efe2ed9759b2ea4c38352237ef69bf0c95b1639a70691064fd71763c4550aad83397a7434e804fa7f117a600c93ea426a5a0213c35a2ca71c"

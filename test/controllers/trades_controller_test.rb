@@ -38,49 +38,49 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
   #   assert_response :success
   # end
 
-  test "should create trade, collect fees and swap balances" do
-    @trade.destroy
+  # test "should create trade, collect fees and swap balances" do
+  #   @trade.destroy
 
-    before_trade_balances = [
-      { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 100000000000000000000 },
-      { :account_address => @maker_address, :token_address => @take_token_address, :balance => 0, :hold_balance => 0 },
-      { :account_address => @taker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 },
-      { :account_address => @taker_address, :token_address => @take_token_address, :balance => 100000000000000000000, :hold_balance => 0 },
-      { :account_address => @fee_address, :token_address => @take_token_address, :balance => 0, :hold_balance => 0 },
-      { :account_address => @fee_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 }
-    ]
-    after_trade_balances = [
-      { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 },
-      { :account_address => @maker_address, :token_address => @take_token_address, :balance => 499500000000000000, :hold_balance => 0 },
-      { :account_address => @taker_address, :token_address => @give_token_address, :balance => 99800000000000000000, :hold_balance => 0 },
-      { :account_address => @taker_address, :token_address => @take_token_address, :balance => 99500000000000000000, :hold_balance => 0 },
-      { :account_address => @fee_address, :token_address => @give_token_address, :balance => 200000000000000000, :hold_balance => 0 },
-      { :account_address => @fee_address, :token_address => @take_token_address, :balance => 500000000000000, :hold_balance => 0 }
-    ]
-    before_trade_orders = [
-      { :order_hash => @order.order_hash, :filled => 0, :status => "open", :fee => 0 }
-    ]
-    after_trade_orders = [
-      { :order_hash => @order.order_hash, :filled => 100000000000000000000, :status => "closed", :fee => 500000000000000 }
-    ]
-    after_trade_trades = [
-      { :trade_hash => @trade.trade_hash, :fee => 200000000000000000 }
-    ]
+  #   before_trade_balances = [
+  #     { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 100000000000000000000 },
+  #     { :account_address => @maker_address, :token_address => @take_token_address, :balance => 0, :hold_balance => 0 },
+  #     { :account_address => @taker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 },
+  #     { :account_address => @taker_address, :token_address => @take_token_address, :balance => 100000000000000000000, :hold_balance => 0 },
+  #     { :account_address => @fee_address, :token_address => @take_token_address, :balance => 0, :hold_balance => 0 },
+  #     { :account_address => @fee_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 }
+  #   ]
+  #   after_trade_balances = [
+  #     { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 },
+  #     { :account_address => @maker_address, :token_address => @take_token_address, :balance => 499500000000000000, :hold_balance => 0 },
+  #     { :account_address => @taker_address, :token_address => @give_token_address, :balance => 99800000000000000000, :hold_balance => 0 },
+  #     { :account_address => @taker_address, :token_address => @take_token_address, :balance => 99500000000000000000, :hold_balance => 0 },
+  #     { :account_address => @fee_address, :token_address => @give_token_address, :balance => 200000000000000000, :hold_balance => 0 },
+  #     { :account_address => @fee_address, :token_address => @take_token_address, :balance => 500000000000000, :hold_balance => 0 }
+  #   ]
+  #   before_trade_orders = [
+  #     { :order_hash => @order.order_hash, :filled => 0, :status => "open", :fee => 0 }
+  #   ]
+  #   after_trade_orders = [
+  #     { :order_hash => @order.order_hash, :filled => 100000000000000000000, :status => "closed", :fee => 500000000000000 }
+  #   ]
+  #   after_trade_trades = [
+  #     { :trade_hash => @trade.trade_hash, :fee => 200000000000000000 }
+  #   ]
 
-    assert_model(Balance, before_trade_balances)
-    assert_model(Order, before_trade_orders)
-    assert_model_nil(Trade, after_trade_trades)
+  #   # assert_model(Balance, before_trade_balances)
+  #   # assert_model(Order, before_trade_orders)
+  #   # assert_model_nil(Trade, after_trade_trades)
 
-    assert_difference('Trade.count') do
-      post trades_url, params: { trade: { account_address: @trade.account_address, amount: @trade.amount, nonce: @trade.nonce, order_hash: @trade.order_hash, signature: @trade.signature, trade_hash: @trade.trade_hash, uuid: @trade.uuid } }, as: :json
-    end
+  #   # assert_difference('Trade.count') do
+  #   #   post trades_url, params: { trade: { account_address: @trade.account_address, amount: @trade.amount, nonce: @trade.nonce, order_hash: @trade.order_hash, signature: @trade.signature, trade_hash: @trade.trade_hash, uuid: @trade.uuid } }, as: :json
+  #   # end
 
-    assert_response 201
+  #   # assert_response 201
 
-    assert_model(Balance, after_trade_balances)
-    assert_model(Order, after_trade_orders)
-    assert_model(Trade, after_trade_trades)
-  end
+  #   # assert_model(Balance, after_trade_balances)
+  #   # assert_model(Order, after_trade_orders)
+  #   # assert_model(Trade, after_trade_trades)
+  # end
 
   # test "should show trade" do
   #   get trade_url(@trade), as: :json

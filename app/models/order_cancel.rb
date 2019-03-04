@@ -1,4 +1,6 @@
 class OrderCancel < ApplicationRecord
+  include FraudProtectable
+  
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
   belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
 
@@ -6,6 +8,7 @@ class OrderCancel < ApplicationRecord
   validates :cancel_hash, signature: true
 
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid
+  validate :balances_must_be_authentic, on: :create
 
   before_save :cancel_order
 
@@ -41,5 +44,13 @@ class OrderCancel < ApplicationRecord
 
   def cancel_order
     self.order.cancel
+  end
+
+  def balances_must_be_authentic
+    if (!self.account or !self.order)
+      return
+    end
+    
+    validate_balances_integrity(self.account.balance(self.order.give_token_address))
   end
 end

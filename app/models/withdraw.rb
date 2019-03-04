@@ -1,11 +1,14 @@
 class Withdraw < ApplicationRecord
+  include FraudProtectable
+  
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
 
   validates :nonce, nonce: true, on: :create
   validates :withdraw_hash, signature: true
 
-  validate :balance_must_exist_and_is_sufficient, :amount_must_be_above_minimum, :withdraw_hash_must_be_valid
+  validate :amount_must_be_above_minimum, :withdraw_hash_must_be_valid
+  validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :collect_fee_and_debit_balance
 
@@ -50,5 +53,13 @@ class Withdraw < ApplicationRecord
   def collect_fee_and_debit_balance
     self.fee = (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
     self.account.balance(self.token_address).debit(self.amount)
+  end
+
+  def balances_must_be_authentic
+    if (!self.account)
+      return
+    end
+
+    validate_balances_integrity(self.account.balance(self.token_address))
   end
 end

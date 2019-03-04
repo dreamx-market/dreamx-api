@@ -79,36 +79,36 @@ class Balance < ApplicationRecord
 
   def total_volume_held_in_open_orders
     total = 0
-    open_orders.each do |order|
+    self.open_orders.each do |order|
       total += (order.give_amount.to_i - order.filled.to_i)
     end
     return total
   end
 
   def credit(amount)
-    balance = balance.to_i + amount.to_i
+    self.balance = balance.to_i + amount.to_i
     save!
   end
 
   def debit(amount)
-    balance = balance.to_i - amount.to_i
+    self.balance = balance.to_i - amount.to_i
     save!
   end
 
   def hold(amount)
-    balance = balance.to_i - amount.to_i
-    hold_balance = hold_balance.to_i + amount.to_i
+    self.balance = balance.to_i - amount.to_i
+    self.hold_balance = hold_balance.to_i + amount.to_i
     save!
   end
 
   def release(amount)
-    balance = balance.to_i + amount.to_i
-    hold_balance = hold_balance.to_i - amount.to_i
+    self.balance = balance.to_i + amount.to_i
+    self.hold_balance = hold_balance.to_i - amount.to_i
     save!
   end
 
   def spend(amount)
-    hold_balance = hold_balance.to_i - amount.to_i
+    self.hold_balance = hold_balance.to_i - amount.to_i
     save!
   end
 end
