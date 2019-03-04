@@ -23,7 +23,7 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   # end
 
   test "should create withdraw and debit balance" do
-    withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
+    withdraw = generate_withdraw(@withdraw)
     before_balances = [
       { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 100000000000000000000, :hold_balance => 0 }
     ]

@@ -13,18 +13,24 @@ class Withdraw < ApplicationRecord
   before_create :collect_fee_and_debit_balance
 
   def withdraw_hash_must_be_valid
+    calculated_hash = self.class.calculate_hash(self)
+    if (!calculated_hash or calculated_hash != withdraw_hash) then
+      errors.add(:withdraw_hash, "invalid")
+    end
+  end
+
+  # params { :account_address, :token_address, :amount, :nonce }
+  def self.calculate_hash(params)
     exchange_address = ENV['CONTRACT_ADDRESS']
     begin
       encoder = Ethereum::Encoder.new
-      encoded_amount = encoder.encode("uint", amount.to_i)
-      encoded_nonce = encoder.encode("uint", nonce.to_i)
-      payload = exchange_address + account_address.without_prefix + token_address.without_prefix + encoded_amount + encoded_nonce
+      encoded_amount = encoder.encode("uint", params[:amount].to_i)
+      encoded_nonce = encoder.encode("uint", params[:nonce].to_i)
+      payload = exchange_address + params[:account_address].without_prefix + params[:token_address].without_prefix + encoded_amount + encoded_nonce
       result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
     rescue
     end
-    if (!result or result != withdraw_hash) then
-      errors.add(:withdraw_hash, "invalid")
-    end
+    return result
   end
 
   def amount_must_be_above_minimum

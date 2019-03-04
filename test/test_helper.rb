@@ -38,34 +38,43 @@ class ActiveSupport::TestCase
     end
   end
 
-  def uncreate_order(order)
-    remaining = order.give_amount.to_i - order.filled.to_i
-    balance = Balance.find_by(:account_address => order.account_address, :token_address => order.give_token_address)
-    balance.release(remaining)
-    order.destroy!
-  end
-
   def batch_deposit(deposits)
     deposits.each do |deposit|
       Deposit.create(deposit)
     end
   end
 
+  # params { :account_address, :token_address, :amount }
   def generate_withdraw(params)
-    withdraw = params
-
-    encoder = Ethereum::Encoder.new
-
-    withdraw[:nonce] = (Time.now.to_i * 1000).to_s
-
-    encoded_amount = encoder.encode("uint", withdraw[:amount].to_i)
-    encoded_nonce = encoder.encode("uint", withdraw[:nonce].to_i)
-    payload = ENV['CONTRACT_ADDRESS'] + withdraw[:account_address].without_prefix + withdraw[:token_address].without_prefix + encoded_amount + encoded_nonce
-    withdraw[:withdraw_hash] = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
-
-    key = Eth::Key.new priv: accounts[:"#{withdraw[:account_address]}"]
-    withdraw[:signature] = Eth::Utils.prefix_hex(key.personal_sign(Eth::Utils.hex_to_bin(withdraw[:withdraw_hash])))
-
+    withdraw = { 
+      :account_address => params[:account_address], 
+      :token_address => params[:token_address], 
+      :amount => params[:amount],
+      :nonce => (Time.now.to_i * 1000).to_s,
+    }
+    withdraw[:withdraw_hash] = Withdraw.calculate_hash(withdraw)
+    withdraw[:signature] = sign_message(withdraw[:account_address], withdraw[:withdraw_hash])
     return withdraw
+  end
+
+  # params { :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount }
+  def generate_order(params)
+    order = { 
+      :account_address => params[:account_address], 
+      :give_token_address => params[:give_token_address], 
+      :give_amount => params[:give_amount], 
+      :take_token_address => params[:take_token_address], 
+      :take_amount => params[:take_amount],
+      :nonce => (Time.now.to_i * 1000).to_s,
+      :expiry_timestamp_in_milliseconds => (7.days.from_now.to_i * 1000).to_s
+    }
+    order[:order_hash] = Order.calculate_hash(order)
+    order[:signature] = sign_message(order[:account_address], order[:order_hash])
+    return order
+  end
+
+  def sign_message(account_address, message)
+    key = Eth::Key.new priv: accounts[:"#{account_address}"]
+    return Eth::Utils.prefix_hex(key.personal_sign(Eth::Utils.hex_to_bin(message)))
   end
 end

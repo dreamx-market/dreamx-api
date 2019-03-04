@@ -73,21 +73,27 @@ class Order < ApplicationRecord
 	end
 
 	def order_hash_must_be_valid
-		exchange_address = ENV['CONTRACT_ADDRESS']
-	 	begin
-	 		encoder = Ethereum::Encoder.new
-	 		encoded_give_amount = encoder.encode("uint", give_amount.to_i)
-			encoded_take_amount = encoder.encode("uint", take_amount.to_i)
-			encoded_nonce = encoder.encode("uint", nonce.to_i)
-			encoded_expiry = encoder.encode("uint", expiry_timestamp_in_milliseconds.to_i)
-			payload = exchange_address + account_address.without_prefix + give_token_address.without_prefix + encoded_give_amount + take_token_address.without_prefix + encoded_take_amount + encoded_nonce + encoded_expiry
-      result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
-    rescue
-    end
-		if (!result or result != order_hash) then
+    calculated_hash = self.class.calculate_hash(self)
+		if (!calculated_hash or calculated_hash != order_hash) then
 			errors.add(:order_hash, "invalid")
 		end
 	end
+
+  # params { :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry }
+  def self.calculate_hash(params)
+    exchange_address = ENV['CONTRACT_ADDRESS']
+    begin
+      encoder = Ethereum::Encoder.new
+      encoded_give_amount = encoder.encode("uint", params[:give_amount].to_i)
+      encoded_take_amount = encoder.encode("uint", params[:take_amount].to_i)
+      encoded_nonce = encoder.encode("uint", params[:nonce].to_i)
+      encoded_expiry = encoder.encode("uint", params[:expiry_timestamp_in_milliseconds].to_i)
+      payload = exchange_address + params[:account_address].without_prefix + params[:give_token_address].without_prefix + encoded_give_amount + params[:take_token_address].without_prefix + encoded_take_amount + encoded_nonce + encoded_expiry
+      result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
+    rescue
+    end
+    return result
+  end
 
 	def addresses_must_be_valid
 		[:account_address, :give_token_address, :take_token_address].each do |key|
