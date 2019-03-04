@@ -39,9 +39,27 @@ class ActiveSupport::TestCase
   end
 
   def batch_deposit(deposits)
+    created = []
     deposits.each do |deposit|
-      Deposit.create(deposit)
+      created << Deposit.create(deposit)
     end
+    return created
+  end
+
+  def batch_order(orders)
+    created = []
+    orders.each do |order|
+      created << Order.create(generate_order(order))
+    end
+    return created
+  end
+
+  def batch_trade(trades)
+    created = []
+    trades.each do |trade|
+      created << Trade.create(generate_trade(trade))
+    end
+    return created
   end
 
   # params { :account_address, :token_address, :amount }
@@ -71,6 +89,31 @@ class ActiveSupport::TestCase
     order[:order_hash] = Order.calculate_hash(order)
     order[:signature] = sign_message(order[:account_address], order[:order_hash])
     return order
+  end
+
+  # params { :order_hash, :account_address, :nonce }
+  def generate_order_cancel(params)
+    order_cancel = {
+      :order_hash => params[:order_hash],
+      :account_address => params[:account_address],
+      :nonce => (Time.now.to_i * 1000).to_s
+    }
+    order_cancel[:cancel_hash] = OrderCancel.calculate_hash(order_cancel)
+    order_cancel[:signature] = sign_message(order_cancel[:account_address], order_cancel[:cancel_hash])
+    return order_cancel
+  end
+
+  # params { :account_address, :order_hash, :amount, :nonce }
+  def generate_trade(params)
+    trade = {
+      :account_address => params[:account_address],
+      :order_hash => params[:order_hash],
+      :amount => params[:amount],
+      :nonce => (Time.now.to_i * 1000).to_s
+    }
+    trade[:trade_hash] = Trade.calculate_hash(trade)
+    trade[:signature] = sign_message(trade[:account_address], trade[:trade_hash])
+    return trade
   end
 
   def sign_message(account_address, message)

@@ -10,7 +10,7 @@ class OrderCancel < ApplicationRecord
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid
   validate :balances_must_be_authentic, on: :create
 
-  before_save :cancel_order
+  before_create :cancel_order
 
   def order_must_be_open
     if (!self.order)
@@ -27,17 +27,23 @@ class OrderCancel < ApplicationRecord
   end
 
   def cancel_hash_must_be_valid
+    calculated_hash = self.class.calculate_hash(self)
+    if (!calculated_hash or calculated_hash != cancel_hash) then
+      errors.add(:cancel_hash, "invalid")
+    end
+  end
+
+  # params { :order_hash, :account_address, :nonce }
+  def self.calculate_hash(params)
     exchange_address = ENV['CONTRACT_ADDRESS']
     begin
       encoder = Ethereum::Encoder.new
-      encoded_nonce = encoder.encode("uint", nonce.to_i)
-      payload = exchange_address + account_address.without_prefix + order_hash.without_prefix + encoded_nonce
+      encoded_nonce = encoder.encode("uint", params[:nonce].to_i)
+      payload = exchange_address + params[:account_address].without_prefix + params[:order_hash].without_prefix + encoded_nonce
       result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
     rescue
     end
-    if (!result or result != cancel_hash) then
-      errors.add(:cancel_hash, "invalid")
-    end
+    return result
   end
 
   private
@@ -50,7 +56,7 @@ class OrderCancel < ApplicationRecord
     if (!self.account or !self.order)
       return
     end
-    
+
     validate_balances_integrity(self.account.balance(self.order.give_token_address))
   end
 end

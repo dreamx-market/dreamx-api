@@ -28,19 +28,25 @@ class Trade < ApplicationRecord
 	end
 
 	def trade_hash_must_be_valid
-		exchange_address = ENV['CONTRACT_ADDRESS']
-	 	begin
-	 		encoder = Ethereum::Encoder.new
-	 		encoded_amount = encoder.encode("uint", amount.to_i)
-			encoded_nonce = encoder.encode("uint", nonce.to_i)
-			payload = exchange_address + order_hash.without_prefix + account_address.without_prefix + encoded_amount + encoded_nonce
-      result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
-    rescue
-    end
-		if (!result or result != trade_hash) then
+    calculated_hash = self.class.calculate_hash(self)
+		if (!calculated_hash or calculated_hash != self.trade_hash) then
 			errors.add(:trade_hash, "invalid")
 		end
 	end
+
+  # params { :account_address, :order_hash, :amount, :nonce }
+  def self.calculate_hash(params)
+    exchange_address = ENV['CONTRACT_ADDRESS']
+    begin
+      encoder = Ethereum::Encoder.new
+      encoded_amount = encoder.encode("uint", params[:amount].to_i)
+      encoded_nonce = encoder.encode("uint", params[:nonce].to_i)
+      payload = exchange_address + params[:order_hash].without_prefix + params[:account_address].without_prefix + encoded_amount + encoded_nonce
+      result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
+    rescue
+    end
+    return result
+  end
 
   def volume_must_be_greater_than_minimum
     if (!order) then
@@ -75,12 +81,12 @@ class Trade < ApplicationRecord
     taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.give_token_address })
     taker_receiving_amount_minus_fee = amount.to_i - taker_fee_amount.to_i
     taker_give_balance.credit(taker_receiving_amount_minus_fee)
-    fee = taker_fee_amount
+    self.fee = taker_fee_amount
 
     fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => order.give_token_address })
     fee_give_balance.credit(taker_fee_amount)
 
-    maker_take_balance = Balance.find_by({ :account_address => maker_address, :token_address => order.take_token_address })
+    maker_take_balance = Balance.find_by({ :account_address => maker_address, :token_address => self.order.take_token_address })
     maker_receiveing_amount_minus_fee = trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
     maker_take_balance.credit(maker_receiveing_amount_minus_fee)
     order.fill(amount, maker_fee_amount)

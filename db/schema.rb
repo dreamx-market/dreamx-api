@@ -98,7 +98,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_143658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "fee", default: "0"
-    t.string "total"
+    t.string "total", default: "0"
   end
 
   create_table "withdraws", force: :cascade do |t|

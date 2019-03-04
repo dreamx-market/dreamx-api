@@ -24,3 +24,4 @@ two:
   expiry_timestamp_in_milliseconds: "4705572264000"
   order_hash: "0x0af93d915d9a51b02decd8aa3eb178834ef27e2bde33356989e834c742e27f4e"
   signature: "0x3b8631c557419fc33efe2ed9759b2ea4c38352237ef69bf0c95b1639a70691064fd71763c4550aad83397a7434e804fa7f117a600c93ea426a5a0213c35a2ca71c"
+  status: "closed"

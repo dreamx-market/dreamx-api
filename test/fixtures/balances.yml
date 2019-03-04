@@ -48,3 +48,9 @@ six:
   balance: "100000000000000000000"
   hold_balance: "0"
 
+seven:
+  account_address: "0xbfd525710ecb49a266337683971bac0d72d746a6"
+  token_address: "0x0000000000000000000000000000000000000000"
+  balance: "0"
+  hold_balance: "0"
+

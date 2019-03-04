@@ -12,7 +12,6 @@ class OrderCancelTest < ActiveSupport::TestCase
   end
 
   test "order with order_hash must exist" do
-    assert @order_cancel.valid?
     @order_cancel.order_hash = 'INVALID'
     assert_not @order_cancel.valid?
     assert_equal @order_cancel.errors.messages[:order], ["must exist"]
@@ -37,14 +36,12 @@ class OrderCancelTest < ActiveSupport::TestCase
   end
 
   test "cancel_hash must be valid" do
-    assert @order_cancel.valid?
     @order_cancel.cancel_hash = 'INVALID'
     assert_not @order_cancel.valid?
     assert_equal @order_cancel.errors.messages[:cancel_hash], ["invalid"]
   end
 
   test "signature must be valid" do
-    assert @order_cancel.valid?
     @order_cancel.signature = 'INVALID'
     assert_not @order_cancel.valid?
     assert_equal @order_cancel.errors.messages[:signature], ["invalid"]
