@@ -29,4 +29,10 @@ class ActiveSupport::TestCase
     balance.release(remaining)
     order.destroy!
   end
+
+  def batch_deposit(deposits)
+    deposits.each do |deposit|
+      Deposit.create(deposit)
+    end
+  end
 end
