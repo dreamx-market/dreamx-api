@@ -29,10 +29,10 @@ class DepositTest < ActiveSupport::TestCase
     new_deposit = Deposit.new({ :account_address => @deposit.account_address, :token_address => @deposit.token_address, :amount => @deposit.amount })
 
     before_balances = [
-      { :account_address => new_deposit.account_address, :token_address => new_deposit.token_address, :balance => 0, :hold_balance => 100000000000000000000 }
+      { :account_address => new_deposit.account_address, :token_address => new_deposit.token_address, :balance => 0, :hold_balance => 0 }
     ]
     after_balances = [
-      { :account_address => new_deposit.account_address, :token_address => new_deposit.token_address, :balance => 100000000000000000000, :hold_balance => 100000000000000000000 }
+      { :account_address => new_deposit.account_address, :token_address => new_deposit.token_address, :balance => 100000000000000000000, :hold_balance => 0 }
     ]
 
     assert_model(Balance, before_balances)

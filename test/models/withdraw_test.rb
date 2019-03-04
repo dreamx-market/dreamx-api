@@ -6,8 +6,6 @@ class WithdrawTest < ActiveSupport::TestCase
     ENV['CONTRACT_ADDRESS'] = "0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a"
 
     @withdraw = withdraws(:one)
-    @balance = balances(:one)
-    @balance.release(@withdraw.amount)
   end
 
   teardown do
@@ -29,7 +27,7 @@ class WithdrawTest < ActiveSupport::TestCase
   end
 
   test "nonce must be valid" do
-    new_withdraw = Withdraw.new({ :nonce => 1 })
+    new_withdraw = Withdraw.new({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :nonce => 1 })
     assert_not new_withdraw.valid?
     assert_equal new_withdraw.errors.messages[:nonce], ['must be greater than last nonce']
   end

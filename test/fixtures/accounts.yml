@@ -1,5 +1,8 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+fee:
+  address: "0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a"
+
 one:
   address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
 
@@ -10,4 +13,8 @@ three:
   address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
 
 four:
-  address: "0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a"
+  address: "0xfa46ed8f8d3f15e7d820e7246233bbd9450903e3"
+
+five:
+  address: "0xbfd525710ecb49a266337683971bac0d72d746a6"
+
