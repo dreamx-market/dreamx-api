@@ -14,7 +14,7 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
       { :account_address => @trade.account_address, :token_address => @order.take_token_address, :amount => @order.take_amount }
     ]
     order_data = [
-      @order
+      { :account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount, :take_token_address => @order.take_token_address, :take_amount => @order.take_amount }
     ]
     @deposits = batch_deposit(deposit_data)
     @orders = batch_order(order_data)

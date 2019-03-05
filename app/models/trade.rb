@@ -11,7 +11,7 @@ class Trade < ApplicationRecord
   validates :trade_hash, signature: true
 
 	validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
-  validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
+  validate :order_must_be_open, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :trade_balances
 
@@ -104,5 +104,11 @@ class Trade < ApplicationRecord
     end
 
     validate_balances_integrity(account.balance(order.take_token_address))
+  end
+
+  def order_must_be_open
+    if self.order.status === 'closed'
+      self.errors.add(:order, 'has been closed')
+    end
   end
 end

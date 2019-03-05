@@ -91,7 +91,7 @@ class ActiveSupport::TestCase
     return order
   end
 
-  # params { :order_hash, :account_address, :nonce }
+  # params { :order_hash, :account_address }
   def generate_order_cancel(params)
     order_cancel = {
       :order_hash => params[:order_hash],
@@ -103,7 +103,7 @@ class ActiveSupport::TestCase
     return order_cancel
   end
 
-  # params { :account_address, :order_hash, :amount, :nonce }
+  # params { :account_address, :order_hash, :amount }
   def generate_trade(params)
     trade = {
       :account_address => params[:account_address],

@@ -12,18 +12,23 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     ENV['TAKER_FEE_PERCENTAGE'] = '0.2'
 
     @trade = trades(:one)
-
     @order = orders(:one)
-    uncreate_order(@order)
-    assert_difference("Order.count") do
-      post orders_url, params: { order: { account_address: @order.account_address, expiry_timestamp_in_milliseconds: @order.expiry_timestamp_in_milliseconds, give_amount: @order.give_amount, give_token_address: @order.give_token_address, nonce: @order.nonce, order_hash: @order.order_hash, signature: @order.signature, take_amount: @order.take_amount, take_token_address: @order.take_token_address } }, as: :json
-    end
+    @fee_account = Account.find_by({ :address => ENV['FEE_COLLECTOR_ADDRESS'] })
 
-    @maker_address = @trade.order.account_address
-    @taker_address = @trade.account_address
-    @fee_address = ENV['FEE_COLLECTOR_ADDRESS']
-    @give_token_address = @trade.order.give_token_address
-    @take_token_address = @trade.order.take_token_address
+    @deposits = batch_deposit([
+      { :account_address => @trade.account_address, :token_address => @order.take_token_address, :amount => @order.take_amount },
+      { :account_address => @order.account_address, :token_address => @order.give_token_address, :amount => @order.give_amount }
+    ])
+    @orders = batch_order([
+      { :account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount, :take_token_address => @order.take_token_address, :take_amount => @order.take_amount }
+    ])
+
+    @maker_give_balance = @order.account.balance(@order.give_token_address)
+    @maker_take_balance = @order.account.balance(@order.take_token_address)
+    @taker_give_balance = @trade.account.balance(@order.give_token_address)
+    @taker_take_balance = @trade.account.balance(@order.take_token_address)
+    @fee_give_balance = @fee_account.balance(@order.give_token_address)
+    @fee_take_balance = @fee_account.balance(@order.take_token_address)
   end
 
   teardown do
@@ -38,49 +43,48 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
   #   assert_response :success
   # end
 
-  # test "should create trade, collect fees and swap balances" do
-  #   @trade.destroy
+  test "should create trade, collect fees and swap balances" do
+    trade = generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount })
+    before_trade_balances = [
+      { :account_address => @maker_give_balance.account_address, :token_address => @maker_give_balance.token_address, :balance => @maker_give_balance.balance, :hold_balance => @maker_give_balance.hold_balance },
+      { :account_address => @maker_take_balance.account_address, :token_address => @maker_take_balance.token_address, :balance => @maker_take_balance.balance, :hold_balance => @maker_take_balance.hold_balance },
+      { :account_address => @taker_give_balance.account_address, :token_address => @taker_give_balance.token_address, :balance => @taker_give_balance.balance, :hold_balance => @taker_give_balance.hold_balance },
+      { :account_address => @taker_take_balance.account_address, :token_address => @taker_take_balance.token_address, :balance => @taker_take_balance.balance, :hold_balance => @taker_take_balance.hold_balance },
+      { :account_address => @fee_give_balance.account_address, :token_address => @fee_give_balance.token_address, :balance => @fee_give_balance.balance, :hold_balance => @fee_give_balance.hold_balance },
+      { :account_address => @fee_take_balance.account_address, :token_address => @fee_take_balance.token_address, :balance => @fee_take_balance.balance, :hold_balance => @fee_take_balance.hold_balance }
+    ]
+    after_trade_balances = [
+      { :account_address => @maker_give_balance.account_address, :token_address => @maker_give_balance.token_address, :balance => @maker_give_balance.balance, :hold_balance => @maker_give_balance.hold_balance.to_i - 100000000000000000000 },
+      { :account_address => @maker_take_balance.account_address, :token_address => @maker_take_balance.token_address, :balance => @maker_take_balance.balance.to_i + 499500000000000000, :hold_balance => @maker_take_balance.hold_balance },
+      { :account_address => @taker_give_balance.account_address, :token_address => @taker_give_balance.token_address, :balance => @taker_give_balance.balance.to_i + 99800000000000000000, :hold_balance => @taker_give_balance.hold_balance },
+      { :account_address => @taker_take_balance.account_address, :token_address => @taker_take_balance.token_address, :balance => @taker_take_balance.balance.to_i - 500000000000000000, :hold_balance => @taker_take_balance.hold_balance },
+      { :account_address => @fee_give_balance.account_address, :token_address => @fee_give_balance.token_address, :balance => @fee_give_balance.balance.to_i + 200000000000000000, :hold_balance => @fee_give_balance.hold_balance },
+      { :account_address => @fee_take_balance.account_address, :token_address => @fee_take_balance.token_address, :balance => @fee_take_balance.balance.to_i + 500000000000000, :hold_balance => @fee_take_balance.hold_balance }
+    ]
+    before_trade_orders = [
+      { :order_hash => @orders[0].order_hash, :filled => 0, :status => "open", :fee => 0 }
+    ]
+    after_trade_orders = [
+      { :order_hash => @orders[0].order_hash, :filled => 100000000000000000000, :status => "closed", :fee => 500000000000000 }
+    ]
+    after_trade_trades = [
+      { :trade_hash => trade[:trade_hash], :fee => 200000000000000000 }
+    ]
 
-  #   before_trade_balances = [
-  #     { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 100000000000000000000 },
-  #     { :account_address => @maker_address, :token_address => @take_token_address, :balance => 0, :hold_balance => 0 },
-  #     { :account_address => @taker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 },
-  #     { :account_address => @taker_address, :token_address => @take_token_address, :balance => 100000000000000000000, :hold_balance => 0 },
-  #     { :account_address => @fee_address, :token_address => @take_token_address, :balance => 0, :hold_balance => 0 },
-  #     { :account_address => @fee_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 }
-  #   ]
-  #   after_trade_balances = [
-  #     { :account_address => @maker_address, :token_address => @give_token_address, :balance => 0, :hold_balance => 0 },
-  #     { :account_address => @maker_address, :token_address => @take_token_address, :balance => 499500000000000000, :hold_balance => 0 },
-  #     { :account_address => @taker_address, :token_address => @give_token_address, :balance => 99800000000000000000, :hold_balance => 0 },
-  #     { :account_address => @taker_address, :token_address => @take_token_address, :balance => 99500000000000000000, :hold_balance => 0 },
-  #     { :account_address => @fee_address, :token_address => @give_token_address, :balance => 200000000000000000, :hold_balance => 0 },
-  #     { :account_address => @fee_address, :token_address => @take_token_address, :balance => 500000000000000, :hold_balance => 0 }
-  #   ]
-  #   before_trade_orders = [
-  #     { :order_hash => @order.order_hash, :filled => 0, :status => "open", :fee => 0 }
-  #   ]
-  #   after_trade_orders = [
-  #     { :order_hash => @order.order_hash, :filled => 100000000000000000000, :status => "closed", :fee => 500000000000000 }
-  #   ]
-  #   after_trade_trades = [
-  #     { :trade_hash => @trade.trade_hash, :fee => 200000000000000000 }
-  #   ]
+    assert_model(Balance, before_trade_balances)
+    assert_model(Order, before_trade_orders)
+    assert_model_nil(Trade, after_trade_trades)
 
-  #   # assert_model(Balance, before_trade_balances)
-  #   # assert_model(Order, before_trade_orders)
-  #   # assert_model_nil(Trade, after_trade_trades)
+    assert_difference('Trade.count') do
+      post trades_url, params: trade, as: :json
+    end
 
-  #   # assert_difference('Trade.count') do
-  #   #   post trades_url, params: { trade: { account_address: @trade.account_address, amount: @trade.amount, nonce: @trade.nonce, order_hash: @trade.order_hash, signature: @trade.signature, trade_hash: @trade.trade_hash, uuid: @trade.uuid } }, as: :json
-  #   # end
+    assert_response 201
 
-  #   # assert_response 201
-
-  #   # assert_model(Balance, after_trade_balances)
-  #   # assert_model(Order, after_trade_orders)
-  #   # assert_model(Trade, after_trade_trades)
-  # end
+    assert_model(Balance, after_trade_balances)
+    assert_model(Order, after_trade_orders)
+    assert_model(Trade, after_trade_trades)
+  end
 
   # test "should show trade" do
   #   get trade_url(@trade), as: :json
