@@ -50,13 +50,13 @@ class Balance < ApplicationRecord
       total -= order.filled.to_i
     end
     closed_and_partially_filled_buy_orders.each do |order|
-      total += order.calculate_take_amount(order.filled)
+      total += (order.calculate_take_amount(order.filled).to_i - order.fee.to_i)
     end
     sell_trades.each do |trade|
       total -= trade.order.calculate_take_amount(trade.amount)
     end
     buy_trades.each do |trade|
-      total += trade.amount.to_i
+      total += (trade.amount.to_i - trade.fee.to_i)
     end
     return total
   end
