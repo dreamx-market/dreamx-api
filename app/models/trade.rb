@@ -108,7 +108,7 @@ class Trade < ApplicationRecord
 
   def order_must_be_open
     if self.order.status === 'closed'
-      self.errors.add(:order, 'has been closed')
+      self.errors.add(:order, 'must be open')
     end
   end
 end

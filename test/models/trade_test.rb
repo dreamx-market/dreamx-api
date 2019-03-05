@@ -50,4 +50,10 @@ class TradeTest < ActiveSupport::TestCase
     assert_not @trade.valid?
     assert_equal @trade.errors.messages[:amount], [ "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}"]
   end
+
+  test "trade's order must be open" do
+    new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => 1, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+    assert_not new_trade.valid?
+    assert_equal new_trade.errors.messages[:order], ['must be open']
+  end
 end
