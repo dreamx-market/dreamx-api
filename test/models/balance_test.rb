@@ -2,7 +2,6 @@ require 'test_helper'
 
 class BalanceTest < ActiveSupport::TestCase
   setup do
-    @balance = balances(:three)
     @trade = trades(:one)
     @order = orders(:one)
   end
@@ -34,8 +33,8 @@ class BalanceTest < ActiveSupport::TestCase
   # end
 
   test "when balance is compromised because of invalid trades" do
-    # why is 1 wei rounded to 0 ?
-    p @order.calculate_take_amount(@trade.amount.to_i + 1000)
+    balance = @trade.account.balance(@trade.order.give_token_address)
+    p balance
     # @trade.amount = @trade.amount.to_i + 1
     # @trade.save(validate: false)
     # p @balance.total_traded

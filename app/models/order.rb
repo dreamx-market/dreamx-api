@@ -14,8 +14,8 @@ class Order < ApplicationRecord
 
 	before_create :hold_balance
 
-  def calculate_take_amount(give_amount)
-    (give_amount.to_i * self.take_amount.to_i) / self.give_amount.to_i
+  def calculate_take_amount(fill_amount)
+    (fill_amount.to_i * self.take_amount.to_i) / self.give_amount.to_i
   end
 
   def is_sell
