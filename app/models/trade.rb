@@ -103,8 +103,6 @@ class Trade < ApplicationRecord
       return
     end
 
-    p 'lol'
-
     validate_balances_integrity(account.balance(order.take_token_address))
   end
 

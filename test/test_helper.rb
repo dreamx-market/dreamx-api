@@ -38,6 +38,7 @@ class ActiveSupport::TestCase
     end
   end
 
+  # deposits [ { :account_address, :token_address, :amount }, ... ]
   def batch_deposit(deposits)
     created = []
     deposits.each do |deposit|
@@ -46,6 +47,7 @@ class ActiveSupport::TestCase
     return created
   end
 
+  # orders [ { :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount }, ... ]
   def batch_order(orders)
     created = []
     orders.each do |order|
@@ -54,10 +56,20 @@ class ActiveSupport::TestCase
     return created
   end
 
+  # trades [ { :account_address, :order_hash, :amount }, ... ]
   def batch_trade(trades)
     created = []
     trades.each do |trade|
       created << Trade.create(generate_trade(trade))
+    end
+    return created
+  end
+
+  # withdraws [ { :account_address, :token_address, :amount }, ... ]
+  def batch_withdraw(withdraws)
+    created = []
+    withdraws.each do |withdraw|
+      created << Withdraw.create(generate_withdraw(withdraw))
     end
     return created
   end
@@ -68,7 +80,7 @@ class ActiveSupport::TestCase
       :account_address => params[:account_address], 
       :token_address => params[:token_address], 
       :amount => params[:amount],
-      :nonce => (Time.now.to_i * 1000).to_s,
+      :nonce => Withdraw.last ? Withdraw.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
     }
     withdraw[:withdraw_hash] = Withdraw.calculate_hash(withdraw)
     withdraw[:signature] = sign_message(withdraw[:account_address], withdraw[:withdraw_hash])
@@ -83,7 +95,7 @@ class ActiveSupport::TestCase
       :give_amount => params[:give_amount], 
       :take_token_address => params[:take_token_address], 
       :take_amount => params[:take_amount],
-      :nonce => (Time.now.to_i * 1000).to_s,
+      :nonce => Order.last ? Order.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
       :expiry_timestamp_in_milliseconds => (7.days.from_now.to_i * 1000).to_s
     }
     order[:order_hash] = Order.calculate_hash(order)
@@ -96,7 +108,7 @@ class ActiveSupport::TestCase
     order_cancel = {
       :order_hash => params[:order_hash],
       :account_address => params[:account_address],
-      :nonce => (Time.now.to_i * 1000).to_s
+      :nonce => OrderCancel.last ? OrderCancel.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
     }
     order_cancel[:cancel_hash] = OrderCancel.calculate_hash(order_cancel)
     order_cancel[:signature] = sign_message(order_cancel[:account_address], order_cancel[:cancel_hash])
@@ -109,7 +121,7 @@ class ActiveSupport::TestCase
       :account_address => params[:account_address],
       :order_hash => params[:order_hash],
       :amount => params[:amount],
-      :nonce => (Time.now.to_i * 1000).to_s
+      :nonce => Trade.last ? Trade.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
     }
     trade[:trade_hash] = Trade.calculate_hash(trade)
     trade[:signature] = sign_message(trade[:account_address], trade[:trade_hash])

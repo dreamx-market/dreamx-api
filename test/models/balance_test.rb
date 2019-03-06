@@ -4,6 +4,12 @@ class BalanceTest < ActiveSupport::TestCase
   setup do
     @trade = trades(:one)
     @order = orders(:one)
+    @withdraw = withdraws(:one)
+    @deposit = deposits(:one)
+    @maker = balances(:eight)
+    @taker = balances(:nine)
+    @give_token = tokens(:one)
+    @take_token = tokens(:two)
   end
 
   # test "balance cannot be negative" do
@@ -18,31 +24,64 @@ class BalanceTest < ActiveSupport::TestCase
   #   assert_equal @balance.errors.messages[:hold_balance], ["must be greater than or equal to 0"]
   # end
 
-  # test "when balances are authentic" do
-  #   @trade.destroy
-  #   new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => @trade.nonce, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
-  #   assert new_trade.valid?
-  # end
+  test "when balances are authentic" do
+    assert @maker.authentic?
 
-  # test "when balance is compromised because of invalid deposits" do
+    deposits = batch_deposit([
+      { :account_address => @maker.account_address, :token_address => @give_token.address, :amount => "1".to_wei },
+      { :account_address => @taker.account_address, :token_address => @take_token.address, :amount => "0.6".to_wei }
+    ])
+    orders = batch_order([
+      { :account_address => @maker.account_address, :give_token_address => @give_token.address, :give_amount => "0.5".to_wei, :take_token_address => @take_token.address, :take_amount => "0.3".to_wei }
+    ])
+    trades = batch_trade([
+      { :account_address => @taker.account_address, :order_hash => orders[0].order_hash, :amount => "0.4".to_wei }
+    ])
+    withdraws = batch_withdraw([
+      { :account_address => @maker.account_address, :token_address => @give_token.address, :amount => "0.5".to_wei },
+    ])
 
-  # end
+    @maker.reload
+    assert @maker.authentic?
+  end
 
-  # test "when balance is compromised because of invalid withdraws" do
+  test "when balance is compromised because of invalid deposits" do
+    balance = @deposit.account.balance(@deposit.token_address)
+    assert balance.authentic?
 
-  # end
+    @deposit.amount = @deposit.amount.to_i * 2
+    @deposit.save(validate: false)
+
+    assert_not balance.authentic?
+  end
+
+  test "when balance is compromised because of invalid withdraws" do
+    balance = @withdraw.account.balance(@withdraw.token_address)
+    assert balance.authentic?
+
+    @withdraw.amount = @withdraw.amount.to_i * 2
+    @withdraw.save(validate: false)
+
+    assert_not balance.authentic?
+  end
 
   test "when balance is compromised because of invalid trades" do
     balance = @trade.account.balance(@trade.order.give_token_address)
-    p balance
-    # @trade.amount = @trade.amount.to_i + 1
-    # @trade.save(validate: false)
-    # p @balance.total_traded
-    # assert_not new_trade.valid?
-    # assert_equal new_trade.errors.messages[:balance], [ "is compromised"]
+    assert balance.authentic?
+
+    @trade.amount = @trade.amount.to_i * 2
+    @trade.save(validate: false)
+
+    assert_not balance.authentic?
   end
 
-  # test "when balance is compromised because of invalid hold_balance" do
+  test "when balance is compromised because of invalid hold_balance" do
+    balance = Balance.last
+    assert balance.authentic?
 
-  # end
+    balance.hold_balance = '1234'
+    balance.save(validate: false)
+
+    assert_not balance.authentic? 
+  end
 end
