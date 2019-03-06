@@ -15,6 +15,11 @@ class OrderCancelsController < ApplicationController
   # POST /order_cancels
   # POST /order_cancels.json
   def create
+    if ENV["READONLY"] === 'true'
+      render json: "service is under maintainence", status: :service_unavailable
+      return
+    end
+
     @order_cancel = OrderCancel.new(order_cancel_params)
 
     if @order_cancel.save

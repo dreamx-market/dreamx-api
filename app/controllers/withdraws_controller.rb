@@ -15,6 +15,11 @@ class WithdrawsController < ApplicationController
   # POST /withdraws
   # POST /withdraws.json
   def create
+    if ENV["READONLY"] === 'true'
+      render json: "service is under maintainence", status: :service_unavailable
+      return
+    end
+    
     @withdraw = Withdraw.new(withdraw_params)
 
     if @withdraw.save

@@ -3,7 +3,17 @@ class Balance < ApplicationRecord
 
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
 
+  def mark_fraud!
+    self.fraud = true
+    self.save!
+  end
+
   def authentic?
+    if !(balance_authentic? and hold_balance_authentic?)
+      self.mark_fraud!
+      ENV['READONLY'] = 'true'
+    end
+
     return (balance_authentic? and hold_balance_authentic?)
   end
 

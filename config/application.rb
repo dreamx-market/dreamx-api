@@ -46,5 +46,6 @@ module NinjatradeApi
     ENV['MAKER_FEE_PER_ETHER_IN_WEI'] = '1000000000000000' # 0.001 per Ether
     ENV['TAKER_FEE_PER_ETHER_IN_WEI'] = '2000000000000000' # 0.002 per Ether
     ENV['FEE_COLLECTOR_ADDRESS'] = '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a'
+    ENV['READONLY'] = 'false'
   end
 end

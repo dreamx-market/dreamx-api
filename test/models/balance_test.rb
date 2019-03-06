@@ -53,6 +53,10 @@ class BalanceTest < ActiveSupport::TestCase
     @deposit.save(validate: false)
 
     assert_not balance.authentic?
+    assert_equal balance.fraud, true
+    assert_equal ENV['READONLY'], 'true'
+    # always reset environment variables back to its initial state
+    ENV['READONLY'] = 'false'
   end
 
   test "when balance is compromised because of invalid withdraws" do
@@ -63,6 +67,10 @@ class BalanceTest < ActiveSupport::TestCase
     @withdraw.save(validate: false)
 
     assert_not balance.authentic?
+    assert_equal balance.fraud, true
+    assert_equal ENV['READONLY'], 'true'
+    # always reset environment variables back to its initial state
+    ENV['READONLY'] = 'false'
   end
 
   test "when balance is compromised because of invalid trades" do
@@ -73,6 +81,10 @@ class BalanceTest < ActiveSupport::TestCase
     @trade.save(validate: false)
 
     assert_not balance.authentic?
+    assert_equal balance.fraud, true
+    assert_equal ENV['READONLY'], 'true'
+    # always reset environment variables back to its initial state
+    ENV['READONLY'] = 'false'
   end
 
   test "when balance is compromised because of invalid hold_balance" do
@@ -82,6 +94,10 @@ class BalanceTest < ActiveSupport::TestCase
     balance.hold_balance = '1234'
     balance.save(validate: false)
 
-    assert_not balance.authentic? 
+    assert_not balance.authentic?
+    assert_equal balance.fraud, true
+    assert_equal ENV['READONLY'], 'true'
+    # always reset environment variables back to its initial state
+    ENV['READONLY'] = 'false'
   end
 end
