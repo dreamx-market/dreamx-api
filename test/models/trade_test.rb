@@ -52,8 +52,14 @@ class TradeTest < ActiveSupport::TestCase
   end
 
   test "trade's order must be open" do
-    new_trade = Trade.new(:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount, :nonce => 1, :trade_hash => @trade.trade_hash, :signature => @trade.signature)
+    new_trade = Trade.new(generate_trade({:account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount}))
     assert_not new_trade.valid?
-    assert_equal new_trade.errors.messages[:order], ['must be open']
+    assert_equal new_trade.errors.messages[:order], ['must be open', 'must have sufficient volume']
+  end
+
+  test "trade's order must have enough volume" do
+    new_trade = Trade.new(generate_trade({ :account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount }))
+    assert_not new_trade.valid?
+    assert_equal new_trade.errors.messages[:order], ['must be open', 'must have sufficient volume']
   end
 end
