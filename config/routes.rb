@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :order_books
   # resources :deposits
   resources :withdraws, defaults: {format: :json}
   resources :order_cancels, defaults: {format: :json}
