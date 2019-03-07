@@ -5,10 +5,10 @@ class TokensControllerTest < ActionDispatch::IntegrationTest
     @token = tokens(:one)
   end
 
-  # test "should get index" do
-  #   get tokens_url, as: :json
-  #   assert_response :success
-  # end
+  test "should get index" do
+    get tokens_url, as: :json
+    assert_response :success
+  end
 
   # test "should create token" do
   #   assert_difference('Token.count') do

@@ -8,38 +8,38 @@ class TokensController < ApplicationController
     @tokens = Token.paginate :page => params[:page], :per_page => params[:per_page]
   end
 
-  # GET /tokens/1
-  # GET /tokens/1.json
-  def show
-  end
+  # # GET /tokens/1
+  # # GET /tokens/1.json
+  # def show
+  # end
 
-  # POST /tokens
-  # POST /tokens.json
-  def create
-    @token = Token.new(token_params)
+  # # POST /tokens
+  # # POST /tokens.json
+  # def create
+  #   @token = Token.new(token_params)
 
-    if @token.save
-      render :show, status: :created, location: @token
-    else
-      serialize_active_record_validation_error @token.errors.messages
-    end
-  end
+  #   if @token.save
+  #     render :show, status: :created, location: @token
+  #   else
+  #     serialize_active_record_validation_error @token.errors.messages
+  #   end
+  # end
 
-  # PATCH/PUT /tokens/1
-  # PATCH/PUT /tokens/1.json
-  def update
-    if @token.update(token_params)
-      render :show, status: :ok, location: @token
-    else
-      render json: @token.errors, status: :unprocessable_entity
-    end
-  end
+  # # PATCH/PUT /tokens/1
+  # # PATCH/PUT /tokens/1.json
+  # def update
+  #   if @token.update(token_params)
+  #     render :show, status: :ok, location: @token
+  #   else
+  #     render json: @token.errors, status: :unprocessable_entity
+  #   end
+  # end
 
-  # DELETE /tokens/1
-  # DELETE /tokens/1.json
-  def destroy
-    @token.destroy
-  end
+  # # DELETE /tokens/1
+  # # DELETE /tokens/1.json
+  # def destroy
+  #   @token.destroy
+  # end
 
   private
     # Use callbacks to share common setup or constraints between actions.
