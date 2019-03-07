@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   # resources :deposits
-  resources :withdraws
-  resources :order_cancels
-  resources :trades
+  resources :withdraws, defaults: {format: :json}
+  resources :order_cancels, defaults: {format: :json}
+  resources :trades, defaults: {format: :json}
   resources :balances, defaults: {format: :json}, param: :account_address
   resources :orders, defaults: {format: :json}
   get 'return_contract_address', :to => 'helpers#return_contract_address', defaults: {format: :json}

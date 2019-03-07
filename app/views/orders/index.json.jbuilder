@@ -1,1 +1,4 @@
-json.array! @orders, partial: 'orders/order', as: :order
+json.total @orders.length
+json.page Integer(@orders.current_page)
+json.per_page @orders.per_page
+json.records @orders, partial: 'orders/order', as: :order

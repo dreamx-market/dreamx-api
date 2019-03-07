@@ -2,11 +2,11 @@ class OrdersController < ApplicationController
   before_action :check_if_readonly, only: [:create]
   # before_action :set_order, only: [:show, :update, :destroy]
 
-  # # GET /orders
-  # # GET /orders.json
-  # def index
-  #   @orders = Order.all
-  # end
+  # GET /orders
+  # GET /orders.json
+  def index
+    @orders = Order.paginate(:page => params[:page], :per_page => params[:per_page]).where(extract_filters_from_query_params([ :account_address, :order_hash ]))
+  end
 
   # # GET /orders/1
   # # GET /orders/1.json

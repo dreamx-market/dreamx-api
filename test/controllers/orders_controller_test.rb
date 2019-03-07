@@ -17,10 +17,10 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
 		ENV['CONTRACT_ADDRESS'] = @old_contract_address
 	end
 
-  # test "should get index" do
-  #   get orders_url, as: :json
-  #   assert_response :success
-  # end
+  test "should get index" do
+    get orders_url, as: :json
+    assert_response :success
+  end
 
   test "should create order and reduce account's balance" do
     order = generate_order(@order)

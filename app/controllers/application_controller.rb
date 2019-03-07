@@ -1,4 +1,12 @@
 class ApplicationController < ActionController::API
+  def extract_filters_from_query_params(filters)
+    extracted = {}
+    filters.each do |filter|
+      extracted[filter] = params[filter] if params[filter]
+    end
+    return extracted
+  end
+
   def check_if_readonly
     if ENV["READONLY"] === 'true'
       render json: "service is under maintainence", status: :service_unavailable
