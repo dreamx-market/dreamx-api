@@ -1,4 +1,11 @@
 class ApplicationController < ActionController::API
+  def check_if_readonly
+    if ENV["READONLY"] === 'true'
+      render json: "service is under maintainence", status: :service_unavailable
+      return
+    end
+  end
+
 	rescue_from Error::ValidationError do |error|
 		@error = error
 		render '/errors/validation_error', status: :unprocessable_entity

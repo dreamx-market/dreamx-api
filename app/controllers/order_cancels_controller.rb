@@ -1,4 +1,5 @@
 class OrderCancelsController < ApplicationController
+  before_action :check_if_readonly, only: [:create]
   before_action :set_order_cancel, only: [:show, :update, :destroy]
 
   # # GET /order_cancels
@@ -15,11 +16,6 @@ class OrderCancelsController < ApplicationController
   # POST /order_cancels
   # POST /order_cancels.json
   def create
-    if ENV["READONLY"] === 'true'
-      render json: "service is under maintainence", status: :service_unavailable
-      return
-    end
-
     @order_cancel = OrderCancel.new(order_cancel_params)
 
     if @order_cancel.save

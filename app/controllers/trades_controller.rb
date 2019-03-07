@@ -1,4 +1,5 @@
 class TradesController < ApplicationController
+  before_action :check_if_readonly, only: [:create]
   before_action :set_trade, only: [:show, :update, :destroy]
 
   # # GET /trades
@@ -15,11 +16,6 @@ class TradesController < ApplicationController
   # POST /trades
   # POST /trades.json
   def create
-    if ENV["READONLY"] === 'true'
-      render json: "service is under maintainence", status: :service_unavailable
-      return
-    end
-    
     @trade = Trade.new(trade_params)
 
     if @trade.save

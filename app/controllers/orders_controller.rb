@@ -1,4 +1,5 @@
 class OrdersController < ApplicationController
+  before_action :check_if_readonly, only: [:create]
   # before_action :set_order, only: [:show, :update, :destroy]
 
   # # GET /orders
@@ -15,11 +16,6 @@ class OrdersController < ApplicationController
   # POST /orders
   # POST /orders.json
   def create
-    if ENV["READONLY"] === 'true'
-      render json: "service is under maintainence", status: :service_unavailable
-      return
-    end
-
     @order = Order.new(order_params)
 
     if @order.save
