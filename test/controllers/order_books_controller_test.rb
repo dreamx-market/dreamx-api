@@ -2,7 +2,7 @@ require 'test_helper'
 
 class OrderBooksControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @order_book = order_books(:one)
+    @order_book = "ONE_TWO"
   end
 
   # test "should get index" do

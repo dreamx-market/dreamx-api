@@ -18,6 +18,14 @@ class Order < ApplicationRecord
     (fill_amount.to_i * self.take_amount.to_i) / self.give_amount.to_i
   end
 
+  def price
+    if (is_sell)
+      (self.take_amount.to_f / self.give_amount.to_f)
+    else
+      (self.give_amount.to_f / self.take_amount.to_f)
+    end
+  end
+
   def is_sell
     self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
   end

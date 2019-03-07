@@ -1,2 +1,4 @@
-json.extract! order_book, :id, :created_at, :updated_at
-json.url order_book_url(order_book, format: :json)
+json.total order_book.total_entries
+json.page Integer(order_book.current_page)
+json.per_page order_book.per_page
+json.records sorted_order_book, partial: 'orders/order', as: :order

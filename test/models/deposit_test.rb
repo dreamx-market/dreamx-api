@@ -3,6 +3,7 @@ require 'test_helper'
 class DepositTest < ActiveSupport::TestCase
   setup do
     @deposit = deposits(:one)
+    @balance = balances(:one)
   end
 
   test "account must exist" do
@@ -28,14 +29,9 @@ class DepositTest < ActiveSupport::TestCase
   test "should credit balance on create" do
     new_deposit = Deposit.new({ :account_address => @deposit.account_address, :token_address => @deposit.token_address, :amount => @deposit.amount })
 
-    before_balances = [
-      { :account_address => new_deposit.account_address, :token_address => new_deposit.token_address, :balance => 0, :hold_balance => 0 }
-    ]
     after_balances = [
-      { :account_address => new_deposit.account_address, :token_address => new_deposit.token_address, :balance => 100000000000000000000, :hold_balance => 0 }
+      { :account_address => new_deposit.account_address, :token_address => new_deposit.token_address, :balance => @balance.balance.to_i + 100000000000000000000, :hold_balance => @balance.hold_balance }
     ]
-
-    assert_model(Balance, before_balances)
 
     new_deposit.save
 
