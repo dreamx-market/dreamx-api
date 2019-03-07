@@ -5,10 +5,10 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
     @market = markets(:one)
   end
 
-  # test "should get index" do
-  #   get markets_url, as: :json
-  #   assert_response :success
-  # end
+  test "should get index" do
+    get markets_url, as: :json
+    assert_response :success
+  end
 
   # test "should create market" do
   # 	@market.destroy

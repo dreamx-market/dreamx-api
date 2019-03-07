@@ -7,38 +7,38 @@ class MarketsController < ApplicationController
     @markets = Market.paginate :page => params[:page], :per_page => params[:per_page]
   end
 
-  # GET /markets/1
-  # GET /markets/1.json
-  def show
-  end
+  # # GET /markets/1
+  # # GET /markets/1.json
+  # def show
+  # end
 
-  # POST /markets
-  # POST /markets.json
-  def create
-    @market = Market.new(market_params)
+  # # POST /markets
+  # # POST /markets.json
+  # def create
+  #   @market = Market.new(market_params)
 
-    if @market.save
-      render :show, status: :created, location: @market
-    else
-      serialize_active_record_validation_error @market.errors.messages
-    end
-  end
+  #   if @market.save
+  #     render :show, status: :created, location: @market
+  #   else
+  #     serialize_active_record_validation_error @market.errors.messages
+  #   end
+  # end
 
-  # PATCH/PUT /markets/1
-  # PATCH/PUT /markets/1.json
-  def update
-    if @market.update(market_params)
-      render :show, status: :ok, location: @market
-    else
-      render json: @market.errors, status: :unprocessable_entity
-    end
-  end
+  # # PATCH/PUT /markets/1
+  # # PATCH/PUT /markets/1.json
+  # def update
+  #   if @market.update(market_params)
+  #     render :show, status: :ok, location: @market
+  #   else
+  #     render json: @market.errors, status: :unprocessable_entity
+  #   end
+  # end
 
-  # DELETE /markets/1
-  # DELETE /markets/1.json
-  def destroy
-    @market.destroy
-  end
+  # # DELETE /markets/1
+  # # DELETE /markets/1.json
+  # def destroy
+  #   @market.destroy
+  # end
 
   private
     # Use callbacks to share common setup or constraints between actions.
