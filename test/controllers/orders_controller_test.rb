@@ -59,10 +59,10 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     assert_equal new_hold_balance.to_i, old_hold_balance.to_i
   end
 
-  # test "should show order" do
-  #   get order_url(@order), as: :json
-  #   assert_response :success
-  # end
+  test "should show order" do
+    get order_url(@order.order_hash), as: :json
+    assert_response :success
+  end
 
   # test "should update order" do
   #   patch order_url(@order), params: { order: { account: @order.account, expiryTimestampInMilliseconds: @order.expiryTimestampInMilliseconds, giveAmount: @order.giveAmount, giveTokenAddress: @order.giveTokenAddress, nonce: @order.nonce, orderHash: @order.orderHash, signature: @order.signature, takeAmount: @order.takeAmount, takeTokenAddress: @order.takeTokenAddress } }, as: :json
