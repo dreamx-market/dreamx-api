@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_07_192613) do
+ActiveRecord::Schema.define(version: 2019_03_08_144757) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(version: 2019_03_07_192613) do
     t.string "quote_token_address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "symbol"
     t.index ["base_token_address"], name: "index_markets_on_base_token_address"
     t.index ["quote_token_address"], name: "index_markets_on_quote_token_address"
   end
@@ -79,6 +80,11 @@ ActiveRecord::Schema.define(version: 2019_03_07_192613) do
     t.string "filled", default: "0"
     t.string "status", default: "open"
     t.string "fee", default: "0"
+  end
+
+  create_table "tickers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "tokens", force: :cascade do |t|

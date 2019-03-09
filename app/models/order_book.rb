@@ -1,16 +1,13 @@
 class OrderBook < ApplicationRecord
-  def self.find_by_symbol(symbol, page=nil, per_page=nil)
-    base, quote = symbol.split("_")
+  def self.find_by_market_symbol(symbol, page=nil, per_page=nil)
+    market = Market.find_by({ :symbol => symbol })
 
-    base_token = Token.find_by({ :symbol => base })
-    quote_token = Token.find_by({ :symbol => quote })
-
-    if (!base_token or !quote_token)
-      return
+    if (!market)
+      return nil
     end
 
-    buybook = Order.paginate(:page => page, :per_page => per_page).where({ :give_token_address => base_token.address, :take_token_address => quote_token.address }).where.not({ status: 'closed' })
-    sellbook = Order.paginate(:page => page, :per_page => per_page).where({ :give_token_address => quote_token.address, :take_token_address => base_token.address }).where.not({ status: 'closed' })
+    buybook = market.open_buy_orders.paginate(:page => page, :per_page => per_page)
+    sellbook = market.open_sell_orders.paginate(:page => page, :per_page => per_page)
 
     return {
       :buybook => buybook,

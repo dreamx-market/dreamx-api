@@ -15,6 +15,14 @@ class Trade < ApplicationRecord
 
   before_create :trade_balances
 
+  def is_sell
+    return !self.order.is_sell
+  end
+
+  def price
+    return self.order.price
+  end
+
 	def balance_must_exist_and_is_sufficient
 		if (!account || !order) then
 			return

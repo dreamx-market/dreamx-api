@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  resources :order_books, defaults: { format: :json }, param: :symbol
+  resources :tickers, defaults: { format: :json }, param: :market_symbol
+  resources :order_books, defaults: { format: :json }, param: :market_symbol
   # resources :deposits
   resources :withdraws, defaults: { format: :json }
   resources :order_cancels, defaults: { format: :json }
