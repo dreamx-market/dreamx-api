@@ -6,7 +6,7 @@ class Ticker < ApplicationRecord
       return
     end
 
-    p market.quote_volume_24h
+    p market.percent_change_24h
 
     return {
       :base_token_address => market.base_token_address,

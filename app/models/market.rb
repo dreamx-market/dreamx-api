@@ -104,7 +104,7 @@ class Market < ApplicationRecord
     return result
   end
 
-  # def percent_change_24h
-  #   return 0
-  # end
+  def percent_change_24h
+    return 0
+  end
 end
