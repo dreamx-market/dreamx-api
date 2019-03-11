@@ -48,7 +48,6 @@ class TickersControllerTest < ActionDispatch::IntegrationTest
 
   test "should show ticker" do
     get ticker_url(@ticker), as: :json
-    # pp json
     assert_response :success
   end
 

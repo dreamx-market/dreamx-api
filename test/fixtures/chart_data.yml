@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  market_symbol: "ONE_TWO"
+  high: "0.03149999"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 2.hours.ago %>
+
+two:
+  market_symbol: "ONE_TWO"
+  high: "0.03153475"
+  low: "0.031265"
+  open: "0.03151497"
+  close: "0.03141781"
+  volume: "39.82606009"
+  quote_volume: "1268.53159161"
+  average: "0.0313954"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 1.hours.ago %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_08_144757) do
+ActiveRecord::Schema.define(version: 2019_03_11_132136) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -30,6 +30,20 @@ ActiveRecord::Schema.define(version: 2019_03_08_144757) do
     t.datetime "updated_at", null: false
     t.boolean "fraud", default: false
     t.index ["account_address"], name: "index_balances_on_account_address"
+  end
+
+  create_table "chart_data", force: :cascade do |t|
+    t.string "high"
+    t.string "low"
+    t.string "open"
+    t.string "close"
+    t.string "volume"
+    t.string "quote_volume"
+    t.string "average"
+    t.string "period"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "market_symbol"
   end
 
   create_table "deposits", force: :cascade do |t|
