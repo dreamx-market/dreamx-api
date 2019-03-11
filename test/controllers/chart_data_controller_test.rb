@@ -20,7 +20,6 @@ class ChartDataControllerTest < ActionDispatch::IntegrationTest
 
   test "should show chart_datum" do
     get chart_datum_url(@chart_datum.market_symbol), as: :json
-    pp json
     assert_response :success
   end
 

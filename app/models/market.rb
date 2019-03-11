@@ -1,10 +1,19 @@
 class Market < ApplicationRecord
+  has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol'
 	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
 	validates_uniqueness_of :base_token_address, scope: [:quote_token_address]
 	validate :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market, :symbol_must_be_valid
 
   validates :symbol, presence: true
+
+  def average_price(period)
+    if (!self.high(period) or !self.low(period))
+      return nil
+    end
+
+    return ((self.high(period).to_f + self.low(period).to_f) / 2).to_s
+  end
 
 	def base_and_quote_must_not_equal
 		errors.add(:quote_token_address, 'Quote token address must not equal to base') if base_token_address == quote_token_address
@@ -40,30 +49,40 @@ class Market < ApplicationRecord
     return Order.where({ :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address }).where.not({ status: 'closed' })
   end
 
-  def trades
+  def all_trades
     return Trade.joins(:order).where(:orders => { :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).or(Trade.joins(:order).where(:orders => { :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address }))
   end
 
-  def trades_24h
-    return trades.where({ :created_at => 1.day.ago..Time.current })
+  def all_trades
+    Trade.joins(:order).where(:orders => { :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).or(Trade.joins(:order).where(:orders => { :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address })) 
   end
 
-  def last_price
-    @trades ||= self.trades
-    trades_sorted_by_nonce_asc = @trades.sort_by { |trade| trade.nonce.to_i }
-    return trades_sorted_by_nonce_asc.empty? ? nil : trades_sorted_by_nonce_asc.last.price
+  def trades(period)
+    if (!period)
+      # return all trades
+      return self.all_trades
+    else
+      # return trades within the period
+      return self.all_trades.where({ :created_at => (Time.current - period)..Time.current })
+    end
   end
 
-  def high_24h
-    @trades_24h ||= self.trades_24h
-    trades_24h_sorted_by_price_asc = @trades_24h.sort_by { |trade| trade.price }
-    return trades_24h_sorted_by_price_asc.empty? ? nil : trades_24h_sorted_by_price_asc.last.price
+  def last_price(period)
+    @trades_within_period ||= self.trades(period)
+    trades_sorted_by_nonce_asc = @trades_within_period.sort_by { |trade| trade.nonce.to_i }
+    return trades_sorted_by_nonce_asc.empty? ? nil : trades_sorted_by_nonce_asc.last.price.to_s
   end
 
-  def low_24h
-    @trades_24h ||= self.trades_24h
-    trades_24h_sorted_by_price_asc = @trades_24h.sort_by { |trade| trade.price }
-    return trades_24h_sorted_by_price_asc.empty? ? nil : trades_24h_sorted_by_price_asc.first.price
+  def high(period)
+    @trades_within_period ||= self.trades(period)
+    trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
+    return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.last.price.to_s
+  end
+
+  def low(period)
+    @trades_within_period ||= self.trades(period)
+    trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
+    return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.first.price.to_s
   end
 
   def lowest_ask
@@ -76,32 +95,32 @@ class Market < ApplicationRecord
     return @buy_orders_sorted_by_price_asc.empty? ? nil : @buy_orders_sorted_by_price_asc.last.price
   end
 
-  def base_volume_24h
-    @trades_24h ||= self.trades_24h
+  def volume(period)
+    @trades_within_period ||= self.trades(period)
 
     result = 0
-    @trades_24h.each do |trade|
+    @trades_within_period.each do |trade|
       if trade.is_sell
         result += trade.amount.to_i
       else
         result += trade.order.calculate_take_amount(trade.amount)
       end
     end
-    return result
+    return result.to_s.to_ether
   end
 
-  def quote_volume_24h
-    @trades_24h ||= self.trades_24h
+  def quote_volume(period)
+    @trades_within_period ||= self.trades(period)
 
     result = 0
-    @trades_24h.each do |trade|
+    @trades_within_period.each do |trade|
       if trade.is_sell
         result += trade.order.calculate_take_amount(trade.amount)
       else
         result += trade.amount.to_i
       end
     end
-    return result
+    return result.to_s.to_ether
   end
 
   def percent_change_24h
