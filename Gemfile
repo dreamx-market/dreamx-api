@@ -51,3 +51,5 @@ gem 'figaro'
 gem 'eth', :git => 'https://github.com/odintrade/ruby-eth.git'
 
 gem 'ethereum.rb'
+
+gem 'whenever', require: false

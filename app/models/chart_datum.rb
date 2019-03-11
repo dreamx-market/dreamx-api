@@ -14,7 +14,6 @@ class ChartDatum < ApplicationRecord
         :period => period.to_s,
         :market_symbol => market.symbol,
       }
-      pp new_chart_datum
       self.create!(new_chart_datum)
     end
   end
