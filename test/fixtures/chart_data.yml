@@ -34,4 +34,4 @@ three:
   quote_volume: "2055.56810329"
   average: "0.03131241"
   period: <%= 1.hour.to_i %>
-  created_at: <%= 1.week.ago %>
+  created_at: <%= 90.days.ago %>

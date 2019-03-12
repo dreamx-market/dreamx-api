@@ -37,4 +37,10 @@ class ChartDatumTest < ActiveSupport::TestCase
       ChartDatum.aggregate(1.hour)
     end
   end
+
+  test "should remove expired data" do
+    assert_difference('ChartDatum.count', -1) do
+      ChartDatum.remove_expired
+    end
+  end
 end
