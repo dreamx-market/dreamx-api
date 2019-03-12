@@ -4,7 +4,7 @@ class TickersController < ApplicationController
   # GET /tickers
   # GET /tickers.json
   def index
-    @tickers = Ticker.all
+    @tickers = Ticker.find_all_and_paginate(params[:page], params[:per_page])
   end
 
   # GET /tickers/1

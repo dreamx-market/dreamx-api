@@ -33,10 +33,10 @@ class TickersControllerTest < ActionDispatch::IntegrationTest
     ])
   end
 
-  # test "should get index" do
-  #   get tickers_url, as: :json
-  #   assert_response :success
-  # end
+  test "should get index" do
+    get tickers_url, as: :json
+    assert_response :success
+  end
 
   # test "should create ticker" do
   #   assert_difference('Ticker.count') do

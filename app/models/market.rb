@@ -57,29 +57,29 @@ class Market < ApplicationRecord
     Trade.joins(:order).where(:orders => { :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).or(Trade.joins(:order).where(:orders => { :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address })) 
   end
 
-  def trades(period)
+  def trades(period=nil)
     if (!period)
       # return all trades
       return self.all_trades
-    else
-      # return trades within the period
-      return self.all_trades.where({ :created_at => (Time.current - period)..Time.current })
     end
+
+    # return trades within the period
+    return self.all_trades.where({ :created_at => (Time.current - period)..Time.current })
   end
 
-  def last_price(period)
+  def last_price(period=1.day)
     @trades_within_period ||= self.trades(period)
     trades_sorted_by_nonce_asc = @trades_within_period.sort_by { |trade| trade.nonce.to_i }
     return trades_sorted_by_nonce_asc.empty? ? nil : trades_sorted_by_nonce_asc.last.price.to_s
   end
 
-  def high(period)
+  def high(period=1.day)
     @trades_within_period ||= self.trades(period)
     trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.last.price.to_s
   end
 
-  def low(period)
+  def low(period=1.day)
     @trades_within_period ||= self.trades(period)
     trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.first.price.to_s
@@ -95,7 +95,7 @@ class Market < ApplicationRecord
     return @buy_orders_sorted_by_price_asc.empty? ? nil : @buy_orders_sorted_by_price_asc.last.price
   end
 
-  def volume(period)
+  def volume(period=1.day)
     @trades_within_period ||= self.trades(period)
 
     result = 0
@@ -109,7 +109,7 @@ class Market < ApplicationRecord
     return result.to_s.to_ether
   end
 
-  def quote_volume(period)
+  def quote_volume(period=1.day)
     @trades_within_period ||= self.trades(period)
 
     result = 0
@@ -124,6 +124,22 @@ class Market < ApplicationRecord
   end
 
   def percent_change_24h
-    return 0
+    if !self.price_previous_24h
+      return 0
+    end
+
+    return ((self.last_price.to_f * 100) / self.price_previous_24h.to_f) - 100
+  end
+
+  def chart_data_by(period)
+    return self.chart_data.where({ :period => period.to_s })
+  end
+
+  def price_previous_24h
+    if (self.chart_data_by(1.hour).count < 24)
+      return nil
+    end
+
+    return self.chart_data_by(1.hour).last(24).sort_by { |chart_datum| chart_datum.created_at }.first.close
   end
 end

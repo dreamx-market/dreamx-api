@@ -29,9 +29,273 @@ three:
   high: "0.03149999"
   low: "0.031"
   open: "0.03144307"
-  close: "0.03124064"
+  close: "2"
   volume: "64.36480422"
   quote_volume: "2055.56810329"
   average: "0.03131241"
   period: <%= 1.hour.to_i %>
   created_at: <%= 90.days.ago %>
+
+four:
+  market_symbol: "ONE_TWO"
+  high: "2"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 2.hours.ago %>
+
+five:
+  market_symbol: "ONE_TWO"
+  high: "3"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 3.hours.ago %>
+
+six:
+  market_symbol: "ONE_TWO"
+  high: "4"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 4.hours.ago %>
+
+seven:
+  market_symbol: "ONE_TWO"
+  high: "5"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 5.hours.ago %>
+
+eight:
+  market_symbol: "ONE_TWO"
+  high: "6"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 6.hours.ago %>
+
+nine:
+  market_symbol: "ONE_TWO"
+  high: "7"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 7.hours.ago %>
+
+ten:
+  market_symbol: "ONE_TWO"
+  high: "8"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 8.hours.ago %>
+
+eleven:
+  market_symbol: "ONE_TWO"
+  high: "9"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 9.hours.ago %>
+
+twelve:
+  market_symbol: "ONE_TWO"
+  high: "10"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 10.hours.ago %>
+
+thirteen:
+  market_symbol: "ONE_TWO"
+  high: "11"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 11.hours.ago %>
+
+forteen:
+  market_symbol: "ONE_TWO"
+  high: "12"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 12.hours.ago %>
+
+fifteen:
+  market_symbol: "ONE_TWO"
+  high: "13"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 13.hours.ago %>
+
+sixteen:
+  market_symbol: "ONE_TWO"
+  high: "14"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 14.hours.ago %>
+
+seventeen:
+  market_symbol: "ONE_TWO"
+  high: "15"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 15.hours.ago %>
+
+eighteen:
+  market_symbol: "ONE_TWO"
+  high: "16"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 16.hours.ago %>
+
+nineteen:
+  market_symbol: "ONE_TWO"
+  high: "17"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 17.hours.ago %>
+
+twenty:
+  market_symbol: "ONE_TWO"
+  high: "18"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 18.hours.ago %>
+
+twentyone:
+  market_symbol: "ONE_TWO"
+  high: "19"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 19.hours.ago %>
+
+twentytwo:
+  market_symbol: "ONE_TWO"
+  high: "20"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 20.hours.ago %>
+
+twentythree:
+  market_symbol: "ONE_TWO"
+  high: "21"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 21.hours.ago %>
+
+twentyfour:
+  market_symbol: "ONE_TWO"
+  high: "22"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 22.hours.ago %>
+
+twentyfive:
+  market_symbol: "ONE_TWO"
+  high: "23"
+  low: "0.031"
+  open: "0.03144307"
+  close: "0.03124064"
+  volume: "64.36480422"
+  quote_volume: "2055.56810329"
+  average: "0.03131241"
+  period: <%= 1.hour.to_i %>
+  created_at: <%= 23.hours.ago %>
