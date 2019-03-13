@@ -1,0 +1,1 @@
+json.extract! transfer, :id, :token_address, :amount, :status, :transaction_hash, :block_hash, :block_number, :created_at
