@@ -6,8 +6,8 @@ class OrderBook < ApplicationRecord
       return nil
     end
 
-    buybook = market.open_buy_orders.paginate(:page => page, :per_page => per_page)
-    sellbook = market.open_sell_orders.paginate(:page => page, :per_page => per_page)
+    buybook = market.open_buy_orders.sort_by { |order| [-order.price, order.created_at.to_i] }.paginate(:page => page, :per_page => per_page)
+    sellbook = market.open_sell_orders.sort_by { |order| [order.price, order.created_at.to_i] }.paginate(:page => page, :per_page => per_page)
 
     return {
       :buybook => buybook,

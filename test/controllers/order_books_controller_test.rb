@@ -19,7 +19,7 @@ class OrderBooksControllerTest < ActionDispatch::IntegrationTest
   # end
 
   test "should show order_book" do
-    get order_book_url(@order_book), as: :json
+    get order_book_url(@order_book, { :per_page => 2 }), as: :json
     assert_response :success
   end
 
