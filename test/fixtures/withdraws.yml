@@ -11,3 +11,4 @@ one:
   transaction_hash: "0xb844692c9c29ae7d7cb246bacac84f8a435a402d2074a85c37bbf03af928f60f"
   block_hash: nil
   block_number: nil
+  created_at: <%= 1.hour.ago %>
