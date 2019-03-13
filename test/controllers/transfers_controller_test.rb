@@ -20,6 +20,7 @@ class TransfersControllerTest < ActionDispatch::IntegrationTest
 
   test "should show transfer" do
     get transfer_url(@withdraw.account_address), as: :json
+    pp json
     assert_response :success
   end
 
