@@ -43,10 +43,10 @@ class ChartDataController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_chart_datum
-      start_timestamp = params[:start] || ChartDatum.first.created_at
+      start_timestamp = params[:start] || 0
       end_timestamp = params[:end] || Time.current
       period = params[:period] || 1.hour.to_i
-      @chart_data = ChartDatum.where({ :market_symbol => params[:market_symbol], :period => period, :created_at => Time.at(start_timestamp.to_i)..Time.at(end_timestamp.to_i) }).paginate({ :page => params[:page], :per_page => params[:per_page] })
+      @chart_data = ChartDatum.where({ :market_symbol => params[:market_symbol], :period => period, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) }).paginate({ :page => params[:page], :per_page => params[:per_page] })
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
