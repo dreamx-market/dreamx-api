@@ -5,7 +5,7 @@ class OrdersController < ApplicationController
   # GET /orders
   # GET /orders.json
   def index
-    @orders = Order.paginate(:page => params[:page], :per_page => params[:per_page]).where(extract_filters_from_query_params([ :account_address ]))
+    @orders = Order.where(extract_filters_from_query_params([ :account_address ])).paginate(:page => params[:page], :per_page => params[:per_page])
   end
 
   # GET /orders/1

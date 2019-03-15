@@ -14,6 +14,10 @@ class Order < ApplicationRecord
 
 	before_create :hold_balance
 
+  def market
+    return Market.find_by({ :base_token_address => self.take_token_address, :quote_token_address => self.give_token_address }) || Market.find_by({ :base_token_address => self.give_token_address, :quote_token_address => self.take_token_address })
+  end
+
   def calculate_take_amount(fill_amount)
     (fill_amount.to_i * self.take_amount.to_i) / self.give_amount.to_i
   end

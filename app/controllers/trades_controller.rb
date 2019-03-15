@@ -2,16 +2,22 @@ class TradesController < ApplicationController
   before_action :check_if_readonly, only: [:create]
   before_action :set_trade, only: [:show, :update, :destroy]
 
-  # # GET /trades
-  # # GET /trades.json
-  # def index
-  #   @trades = Trade.all
-  # end
+  # GET /trades
+  # GET /trades.json
+  def index
+    start_timestamp = params[:start] || 0
+    end_timestamp = params[:end] || Time.current
+    @trades = Trade.where(extract_filters_from_query_params([ :account_address ])).where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
+    if (params[:market_symbol])
+      @trades = @trades.select { |trade|  trade.market_symbol == params[:market_symbol] }
+    end
+    @trades = @trades.paginate(:page => params[:page], :per_page => params[:per_page])
+  end
 
-  # # GET /trades/1
-  # # GET /trades/1.json
-  # def show
-  # end
+  # GET /trades/1
+  # GET /trades/1.json
+  def show
+  end
 
   # POST /trades
   # POST /trades.json

@@ -4,16 +4,52 @@ class Trade < ApplicationRecord
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
 
-	NON_VALIDATABLE_ATTRS = ["id", "created_at", "updated_at", "uuid"]
+	NON_VALIDATABLE_ATTRS = ["id", "created_at", "updated_at", "uuid", "gas_fee", "transaction_hash"]
   VALIDATABLE_ATTRS = attribute_names.reject{|attr| NON_VALIDATABLE_ATTRS.include?(attr)}
   validates_presence_of VALIDATABLE_ATTRS
 	validates :nonce, nonce: true, on: :create
   validates :trade_hash, signature: true
 
+  def validate_gas_fee
+    p self
+  end
+
 	validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :trade_balances
+
+  def taker_fee
+    return self.fee
+  end
+
+  def give_token_address
+    return self.order.give_token_address
+  end
+
+  def take_token_address
+    return self.order.take_token_address
+  end
+
+  def give_amount
+    return self.amount
+  end
+
+  def take_amount
+    return self.order.calculate_take_amount(self.amount)
+  end
+
+  def maker_address
+    return self.order.account_address
+  end
+
+  def taker_address
+    return self.account_address
+  end
+
+  def market_symbol
+    return self.order.market.symbol
+  end
 
   def is_sell
     return !self.order.is_sell
@@ -79,9 +115,9 @@ class Trade < ApplicationRecord
     fee_address = ENV['FEE_COLLECTOR_ADDRESS']
     maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
-    maker_fee_amount = (((amount.to_i * order.take_amount.to_i) / order.give_amount.to_i) * maker_fee.to_i) / one_ether.to_i
-    taker_fee_amount = (amount.to_i * taker_fee.to_i) / one_ether.to_i
     trade_amount_equivalence_in_take_tokens = order.calculate_take_amount(amount)
+    maker_fee_amount = (trade_amount_equivalence_in_take_tokens * maker_fee.to_i) / one_ether.to_i
+    taker_fee_amount = (amount.to_i * taker_fee.to_i) / one_ether.to_i
 
     maker_give_balance = Balance.find_by({ :account_address => maker_address, :token_address => order.give_token_address })
     maker_give_balance.spend(amount)
@@ -90,6 +126,7 @@ class Trade < ApplicationRecord
     taker_receiving_amount_minus_fee = amount.to_i - taker_fee_amount.to_i
     taker_give_balance.credit(taker_receiving_amount_minus_fee)
     self.fee = taker_fee_amount
+    self.maker_fee = maker_fee_amount
 
     fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => order.give_token_address })
     fee_give_balance.credit(taker_fee_amount)

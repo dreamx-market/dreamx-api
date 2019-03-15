@@ -38,10 +38,10 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     ENV['TAKER_FEE_PERCENTAGE'] = @OLD_TAKER_FEE_PERCENTAGE
   end
 
-  # test "should get index" do
-  #   get trades_url, as: :json
-  #   assert_response :success
-  # end
+  test "should get index" do
+    get trades_url, as: :json
+    assert_response :success
+  end
 
   test "should create trade, collect fees and swap balances" do
     trade = generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount })

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_13_183219) do
+ActiveRecord::Schema.define(version: 2019_03_15_144943) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -129,6 +129,9 @@ ActiveRecord::Schema.define(version: 2019_03_13_183219) do
     t.datetime "updated_at", null: false
     t.string "fee", default: "0"
     t.string "total", default: "0"
+    t.string "maker_fee", default: "0"
+    t.string "gas_fee"
+    t.string "transaction_hash"
   end
 
   create_table "transfers", force: :cascade do |t|
