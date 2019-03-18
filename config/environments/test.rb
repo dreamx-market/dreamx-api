@@ -44,5 +44,5 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  config.CONTRACT_ADDRESS = "0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a"
+  ENV['CONTRACT_ADDRESS'] = '0x8137064a86006670d407c24e191b5a55da5b2889'
 end
