@@ -5,7 +5,7 @@
 
 # Dev dependencies
 
-* ganache-cli
+* ganache-cli 6.1.8
 
 # Deployment:
 
@@ -13,3 +13,8 @@
 * duplicate config/application.yml.sample into config/application.yml to set environemnt variables
 * rake db:create
 * rake db:migrate
+
+# Running the test suite
+
+* rake ganache:up
+* rake test
