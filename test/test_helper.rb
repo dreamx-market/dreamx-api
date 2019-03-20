@@ -42,9 +42,20 @@ class ActiveSupport::TestCase
   # deposits [ { :account_address, :token_address, :amount }, ... ]
   def batch_deposit(deposits)
     created = []
+    created_txs = []
+
     deposits.each do |deposit|
+      new_tx = rand(1000..9999)
+      while created_txs.include? new_tx
+        new_tx = rand(1000..9999)
+      end
+      created_txs << new_tx
+
+      deposit[:transaction_hash] = new_tx
+
       created << Deposit.create(deposit)
     end
+
     return created
   end
 
