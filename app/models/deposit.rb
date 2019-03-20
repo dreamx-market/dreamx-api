@@ -5,15 +5,12 @@ class Deposit < ApplicationRecord
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
 
   validates :amount, numericality: { greater_than: 0 }
+  validates :transaction_hash, uniqueness: true, on: :create
   validate :balances_must_be_authentic, on: :create
 
   before_create :credit_balance
 
   private
-
-  # def transaction_hash_must_be_unique
-    
-  # end
 
   def credit_balance
     if (!self.account)
