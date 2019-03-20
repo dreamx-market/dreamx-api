@@ -32,9 +32,9 @@ class Deposit < ApplicationRecord
   end
 
   def self.aggregate(block_number)
-    # confirmed_block_number = block_number - ENV['TRANSACTION_CONFIRMATIONS'].to_i
+    confirmed_block_number = block_number - ENV['TRANSACTION_CONFIRMATIONS'].to_i
     @exchange ||= Contract::Exchange.new
-    deposits = @exchange.deposits(block_number)
+    deposits = @exchange.deposits(confirmed_block_number)
     deposits.each do |deposit|
       Account.initialize_if_not_exist(deposit['account'], deposit['token'])
       new_deposit = {

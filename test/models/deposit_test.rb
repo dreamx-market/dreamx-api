@@ -40,7 +40,7 @@ class DepositTest < ActiveSupport::TestCase
 
   test "should aggregate new deposits" do
     assert_difference('Deposit.count') do
-      Deposit.aggregate(10)
+      Deposit.aggregate(20)
     end
   end
 end
