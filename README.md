@@ -2,6 +2,7 @@
 
 * ruby 2.5.1p57
 * postgresql 10.4
+<!-- * redis-server 4.0.10 -->
 
 # Dev dependencies
 

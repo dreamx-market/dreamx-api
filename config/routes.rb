@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  # resources :blocks
   get 'return_contract_address', :to => 'helpers#return_contract_address', defaults: { format: :json }
   get 'fees', :to => 'helpers#return_fees', defaults: { format: :json }
   resources :transfers, defaults: { format: :json }, param: :account_address, only: [:show]

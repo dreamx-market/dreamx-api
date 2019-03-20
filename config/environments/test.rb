@@ -44,5 +44,7 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  # environment variables, can be overridden
   ENV['CONTRACT_ADDRESS'] = '0x8137064a86006670d407c24e191b5a55da5b2889'
+  ENV['ETHEREUM_HOST'] = 'http://localhost:8545'
 end

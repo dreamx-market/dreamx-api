@@ -19,7 +19,8 @@ Bundler.require(*Rails.groups)
 
 module NinjatradeApi
   class Application < Rails::Application
-  	require 'ext/string'
+    require 'ext/string'
+  	require 'ext/integer'
   	
   	config.eager_load_paths << Rails.root.join('lib')
     # Initialize configuration defaults for originally generated Rails version.
@@ -39,6 +40,7 @@ module NinjatradeApi
     WillPaginate.per_page = 100
 
     # environment variables, can be overridden
+    ENV['ETHEREUM_HOST'] = 'https://rinkeby.infura.io/pVTvEWYTqXvSRvluzCCe'
     ENV['CONTRACT_ADDRESS'] = '0x2a0c0dbecc7e4d658f48e01e3fa353f44050c208'
     ENV['MAX_PER_PAGE'] = '1000'
     ENV['MAKER_MINIMUM_ETH_IN_WEI'] = '150000000000000000'
@@ -50,5 +52,6 @@ module NinjatradeApi
     ENV['CHART_DATUM_EXPIRY_5M'] = 7.days.to_s
     ENV['CHART_DATUM_EXPIRY_15M'] = 20.days.to_s
     ENV['CHART_DATUM_EXPIRY_1H'] = 90.days.to_s
+    ENV['TRANSACTION_CONFIRMATIONS'] = '12'
   end
 end
