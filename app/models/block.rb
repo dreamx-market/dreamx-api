@@ -9,18 +9,19 @@ class Block < ApplicationRecord
 
     last_confirmed_block_number = current_block - ENV['TRANSACTION_CONFIRMATIONS'].to_i
     last_processed_block_number = self.last ? self.last.number : 0
-    last_block = nil
+    last_block_number = nil
 
     Integer(last_confirmed_block_number - last_processed_block_number).times do |i|
       new_block_number = last_processed_block_number + i + 1
-      new_block = @client.eth_get_block_by_number(new_block_number, false)
-      self.process_block(new_block)
-      last_block = new_block
+      self.process_block(new_block_number)
+      last_block_number = new_block_number
     end
 
+    last_block = @client.eth_get_block_by_number(last_block_number, false)
     self.find_or_initialize_by(:id => 1).update!(:block_number => last_block["result"]["number"].hex, :block_hash => last_block["result"]["hash"], :parent_hash => last_block["result"]["parentHash"])
   end
 
-  def self.process_block(block)
+  def self.process_block(block_number)
+    Deposit.aggregate(block_number)
   end
 end
