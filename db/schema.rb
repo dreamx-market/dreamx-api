@@ -33,8 +33,9 @@ ActiveRecord::Schema.define(version: 2019_03_19_170900) do
   end
 
   create_table "blocks", force: :cascade do |t|
-    t.string "hash"
-    t.integer "number"
+    t.string "block_hash"
+    t.string "parent_hash"
+    t.integer "block_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

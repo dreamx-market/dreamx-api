@@ -1,7 +1,9 @@
 require 'test_helper'
 
 class BlockTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test "should process new blocks" do
+    assert_difference('Block.count') do
+      Block.process_new_confirmed_blocks
+    end
+  end
 end
