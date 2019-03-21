@@ -1,6 +1,10 @@
 set :output, "#{path}/log/cron.log"
 
 every 5.minute do
+  rake "ethereum:process_new_confirmed_blocks"
+end
+
+every 5.minute do
   rake "chart:aggregate_5m"
 end
 

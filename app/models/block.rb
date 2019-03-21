@@ -8,8 +8,8 @@ class Block < ApplicationRecord
     end
 
     last_confirmed_block_number = current_block - ENV['TRANSACTION_CONFIRMATIONS'].to_i
-    last_processed_block_number = self.last ? self.last.number : 0
-    last_block_number = nil
+    last_processed_block_number = self.last ? self.last.block_number : 0
+    last_block_number = last_processed_block_number
 
     Integer(last_confirmed_block_number - last_processed_block_number).times do |i|
       new_block_number = last_processed_block_number + i + 1
