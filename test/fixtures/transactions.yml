@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  action_type: MyString
+  action_hash: MyString
+  raw: MyString
+  gas_limit: MyString
+  gas_price: MyString
+  hash: MyString
+  block_hash: MyString
+  block_number: MyString
+  status: MyString
+  nonce: MyString
+
+two:
+  action_type: MyString
+  action_hash: MyString
+  raw: MyString
+  gas_limit: MyString
+  gas_price: MyString
+  hash: MyString
+  block_hash: MyString
+  block_number: MyString
+  status: MyString
+  nonce: MyString

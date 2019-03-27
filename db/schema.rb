@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_19_170900) do
+ActiveRecord::Schema.define(version: 2019_03_27_160246) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_170900) do
     t.string "transaction_hash"
     t.string "block_hash"
     t.string "block_number"
+    t.index ["transaction_hash"], name: "index_deposits_on_transaction_hash"
   end
 
   create_table "markets", force: :cascade do |t|
@@ -89,6 +90,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_170900) do
     t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cancel_hash"], name: "index_order_cancels_on_cancel_hash"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -106,6 +108,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_170900) do
     t.string "filled", default: "0"
     t.string "status", default: "open"
     t.string "fee", default: "0"
+    t.index ["order_hash"], name: "index_orders_on_order_hash"
   end
 
   create_table "tickers", force: :cascade do |t|
@@ -140,6 +143,23 @@ ActiveRecord::Schema.define(version: 2019_03_19_170900) do
     t.string "maker_fee", default: "0"
     t.string "gas_fee"
     t.string "transaction_hash"
+    t.index ["trade_hash"], name: "index_trades_on_trade_hash"
+  end
+
+  create_table "transactions", force: :cascade do |t|
+    t.string "action_type"
+    t.string "action_hash"
+    t.string "raw"
+    t.string "gas_limit"
+    t.string "gas_price"
+    t.string "hash"
+    t.string "block_hash"
+    t.string "block_number"
+    t.string "status"
+    t.string "nonce"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hash"], name: "index_transactions_on_hash"
   end
 
   create_table "transfers", force: :cascade do |t|
@@ -161,6 +181,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_170900) do
     t.string "transaction_hash"
     t.string "block_hash"
     t.string "block_number"
+    t.index ["withdraw_hash"], name: "index_withdraws_on_withdraw_hash"
   end
 
 end
