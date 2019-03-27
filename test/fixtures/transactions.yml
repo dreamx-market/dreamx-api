@@ -1,8 +1,8 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  action_type: MyString
-  action_hash: MyString
+  transactable_type: MyString
+  transactable_id: 1
   raw: MyString
   gas_limit: MyString
   gas_price: MyString
@@ -13,8 +13,8 @@ one:
   nonce: MyString
 
 two:
-  action_type: MyString
-  action_hash: MyString
+  transactable_type: MyString
+  transactable_id: 1
   raw: MyString
   gas_limit: MyString
   gas_price: MyString

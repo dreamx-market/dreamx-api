@@ -3,6 +3,7 @@ class Trade < ApplicationRecord
 
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
+  has_many :transactions, as: :transactable
 
 	NON_VALIDATABLE_ATTRS = ["id", "created_at", "updated_at", "uuid", "gas_fee", "transaction_hash"]
   VALIDATABLE_ATTRS = attribute_names.reject{|attr| NON_VALIDATABLE_ATTRS.include?(attr)}

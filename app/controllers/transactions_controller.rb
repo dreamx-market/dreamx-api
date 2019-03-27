@@ -48,6 +48,6 @@ class TransactionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def transaction_params
-      params.require(:transaction).permit(:action_type, :action_hash, :raw, :gas_limit, :gas_price, :hash, :block_hash, :block_number, :status, :nonce)
+      params.require(:transaction).permit(:transactable_type, :transactable_id, :raw, :gas_limit, :gas_price, :hash, :block_hash, :block_number, :status, :nonce)
     end
 end

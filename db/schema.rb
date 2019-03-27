@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_27_160246) do
+ActiveRecord::Schema.define(version: 2019_03_27_162305) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -147,8 +147,8 @@ ActiveRecord::Schema.define(version: 2019_03_27_160246) do
   end
 
   create_table "transactions", force: :cascade do |t|
-    t.string "action_type"
-    t.string "action_hash"
+    t.string "transactable_type"
+    t.string "transactable_id"
     t.string "raw"
     t.string "gas_limit"
     t.string "gas_price"
@@ -160,6 +160,8 @@ ActiveRecord::Schema.define(version: 2019_03_27_160246) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hash"], name: "index_transactions_on_hash"
+    t.index ["transactable_id"], name: "index_transactions_on_transactable_id"
+    t.index ["transactable_type"], name: "index_transactions_on_transactable_type"
   end
 
   create_table "transfers", force: :cascade do |t|
