@@ -1,5 +1,5 @@
 class Order < ApplicationRecord
-  include FraudProtectable
+  # include FraudProtectable
   
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
   
@@ -142,6 +142,6 @@ class Order < ApplicationRecord
       return
     end
     
-    validate_balances_integrity(self.account.balance(self.give_token_address))
+    # validate_balances_integrity(self.account.balance(self.give_token_address))
   end
 end

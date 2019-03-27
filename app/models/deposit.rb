@@ -1,5 +1,5 @@
 class Deposit < ApplicationRecord
-  include FraudProtectable
+  # include FraudProtectable
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
@@ -25,7 +25,7 @@ class Deposit < ApplicationRecord
       return
     end
 
-    validate_balances_integrity(self.account.balance(self.token_address))
+    # validate_balances_integrity(self.account.balance(self.token_address))
   end
 
   def self.aggregate(block_number)

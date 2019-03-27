@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/hieudoan2609/ethereum.rb.git
-  revision: 4e725cca0e3866917cb22e94b06c90ccda83a7fb
+  revision: d1726bbbeb8bb9aa3eb615713bde7e156edbe16e
   specs:
     ethereum.rb (2.2)
       activesupport (>= 4.0)
