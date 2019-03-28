@@ -26,7 +26,7 @@ class Withdraw < ApplicationRecord
       encoder = Ethereum::Encoder.new
       encoded_amount = encoder.encode("uint", params[:amount].to_i)
       encoded_nonce = encoder.encode("uint", params[:nonce].to_i)
-      payload = exchange_address + params[:account_address].without_prefix + params[:token_address].without_prefix + encoded_amount + encoded_nonce
+      payload = exchange_address + params[:token_address].without_prefix + encoded_amount +  params[:account_address].without_prefix + encoded_nonce
       result = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(payload)))
     rescue
     end
