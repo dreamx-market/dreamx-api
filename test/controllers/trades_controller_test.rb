@@ -86,6 +86,16 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     assert_model(Trade, after_trade_trades)
   end
 
+  test "should generate transaction" do
+    trade = generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount })
+
+    assert_difference('Transaction.count') do
+      post trades_url, params: trade, as: :json
+    end
+
+    assert_response 201
+  end
+
   # test "should show trade" do
   #   get trade_url(@trade), as: :json
   #   assert_response :success

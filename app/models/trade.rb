@@ -11,6 +11,8 @@ class Trade < ApplicationRecord
 	validates :nonce, nonce: true, on: :create
   validates :trade_hash, signature: true
 
+  before_create :generate_transaction
+
   def gas_fee
     self.tx ? self.tx.fee : nil
   end
@@ -171,4 +173,10 @@ class Trade < ApplicationRecord
       self.errors.add(:order, 'must have sufficient volume')
     end
   end
+
+  private
+
+  def generate_transaction
+    self.tx = Transaction.new({ status: 'pending' })
+  end  
 end
