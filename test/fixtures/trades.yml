@@ -1,6 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
   account_address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
   order_hash: "0x57a69889d35410e74bed6f1b6849868da2d0b062b47c87b6d11ba894f3690633"
   amount: "100000000000000000000"

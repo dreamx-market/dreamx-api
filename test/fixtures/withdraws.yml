@@ -1,6 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
   account_address: "0xfa46ed8f8d3f15e7d820e7246233bbd9450903e3"
   amount: "100000000000000000000"
   token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
