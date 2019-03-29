@@ -3,7 +3,6 @@
 one:
   transactable_type: Withdraw
   transactable_id: 1
-  raw: MyString
   gas_limit: MyString
   gas_price: MyString
   transaction_hash: MyString
@@ -11,11 +10,11 @@ one:
   block_number: MyString
   status: MyString
   nonce: MyString
+  fee: MyString
 
 two:
   transactable_type: Trade
   transactable_id: 1
-  raw: MyString
   gas_limit: MyString
   gas_price: MyString
   transaction_hash: MyString
@@ -23,3 +22,4 @@ two:
   block_number: MyString
   status: MyString
   nonce: MyString
+  fee: MyString

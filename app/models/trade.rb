@@ -3,13 +3,21 @@ class Trade < ApplicationRecord
 
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
-  has_many :transactions, as: :transactable
+  has_one :tx, class_name: 'Transaction', as: :transactable
 
 	NON_VALIDATABLE_ATTRS = ["id", "created_at", "updated_at", "uuid", "gas_fee", "transaction_hash"]
   VALIDATABLE_ATTRS = attribute_names.reject{|attr| NON_VALIDATABLE_ATTRS.include?(attr)}
   validates_presence_of VALIDATABLE_ATTRS
 	validates :nonce, nonce: true, on: :create
   validates :trade_hash, signature: true
+
+  def gas_fee
+    self.tx ? self.tx.fee : nil
+  end
+
+  def transaction_hash
+    self.tx ? self.tx.transaction_hash : nil
+  end
 
   def validate_gas_fee
     p self

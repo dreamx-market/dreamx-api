@@ -63,7 +63,7 @@ class TradeTest < ActiveSupport::TestCase
     assert_equal new_trade.errors.messages[:order], ['must be open', 'must have sufficient volume']
   end
 
-  test "has transactions" do
-    assert_not_empty @trade.transactions
+  test "has a transaction" do
+    assert_not_nil @trade.tx
   end
 end

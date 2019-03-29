@@ -46,6 +46,16 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
     assert_model(Withdraw, after_withdraws)
   end
 
+  test "should automatically generate transactions for creation of withdraws" do
+    withdraw = generate_withdraw(@withdraw)
+
+    assert_difference('Transaction.count') do
+      post withdraws_url, params: withdraw, as: :json
+    end
+
+    assert_response 201
+  end
+
   # test "should show withdraw" do
   #   get withdraw_url(@withdraw), as: :json
   #   assert_response :success

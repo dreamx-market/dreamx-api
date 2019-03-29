@@ -57,7 +57,7 @@ class WithdrawTest < ActiveSupport::TestCase
     assert_equal @withdraw.errors.messages[:signature], ['invalid']
   end
 
-  test "has transactions" do
-    assert_not_empty @withdraw.transactions
+  test "has a transaction" do
+    assert_not_nil @withdraw.tx
   end
 end

@@ -3,14 +3,14 @@ class Withdraw < ApplicationRecord
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
-  has_many :transactions, as: :transactable
+  has_one :tx, class_name: 'Transaction', as: :transactable
 
   validates :nonce, nonce: true, on: :create
   validates :withdraw_hash, signature: true
   validate :amount_must_be_above_minimum, :withdraw_hash_must_be_valid
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
-  before_create :collect_fee_and_debit_balance
+  before_create :collect_fee_and_debit_balance, :generate_transaction
 
   def withdraw_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
@@ -67,5 +67,9 @@ class Withdraw < ApplicationRecord
     end
 
     # validate_balances_integrity(self.account.balance(self.token_address))
+  end
+
+  def generate_transaction
+    self.tx = Transaction.new({ status: 'pending' })
   end
 end
