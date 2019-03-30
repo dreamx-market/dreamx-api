@@ -3,23 +3,23 @@
 one:
   transactable_type: Withdraw
   transactable_id: 1
-  gas_limit: MyString
-  gas_price: MyString
-  transaction_hash: MyString
-  block_hash: MyString
-  block_number: MyString
-  status: MyString
-  nonce: MyString
-  fee: MyString
+  gas_limit: null
+  gas_price: null
+  transaction_hash: null
+  block_hash: null
+  block_number: null
+  status: pending
+  nonce: null
+  fee: null
 
 two:
   transactable_type: Trade
   transactable_id: 1
-  gas_limit: MyString
-  gas_price: MyString
-  transaction_hash: MyString
-  block_hash: MyString
-  block_number: MyString
-  status: MyString
-  nonce: MyString
-  fee: MyString
+  gas_limit: null
+  gas_price: null
+  transaction_hash: null
+  block_hash: null
+  block_number: null
+  status: pending
+  nonce: null
+  fee: null
