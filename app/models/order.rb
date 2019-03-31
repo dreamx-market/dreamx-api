@@ -14,6 +14,18 @@ class Order < ApplicationRecord
 
 	before_create :hold_balance
 
+  def v
+    signature[-2..signature.length].hex
+  end
+
+  def r
+    '0x' + signature[2..65]
+  end
+
+  def s
+    '0x' + signature[66..-3]
+  end
+
   def market
     return Market.find_by({ :base_token_address => self.take_token_address, :quote_token_address => self.give_token_address }) || Market.find_by({ :base_token_address => self.give_token_address, :quote_token_address => self.take_token_address })
   end

@@ -10,8 +10,10 @@ class Trade < ApplicationRecord
   validates_presence_of VALIDATABLE_ATTRS
 	validates :nonce, nonce: true, on: :create
   validates :trade_hash, signature: true
+  validate :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
+  validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
-  before_create :generate_transaction
+  before_create :trade_balances, :generate_transaction
 
   def gas_fee
     self.tx ? self.tx.fee : nil
@@ -25,10 +27,47 @@ class Trade < ApplicationRecord
     p self
   end
 
-	validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
-  validate :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
+  def payload
+    maker_address = order.account_address
+    taker_address = account_address
+    give_token = order.give_token_address
+    take_token = order.take_token_address
+    give_amount = order.give_amount.to_i
+    take_amount = order.take_amount.to_i
+    fill_amount = amount.to_i
+    maker_nonce = order.nonce.to_i
+    taker_nonce = nonce.to_i
+    maker_fee = self.maker_fee.to_i
+    taker_fee = fee.to_i
+    expiry = order.expiry_timestamp_in_milliseconds.to_i
+    maker_v = order.v
+    maker_r = order.r
+    maker_s = order.s
+    taker_v = v
+    taker_r = r
+    taker_s = s
 
-  before_create :trade_balances
+    exchange = Contract::Exchange.singleton
+    fun = exchange.instance.parent.functions.select { |fun| fun.name == 'trade'}.first
+    addresses = [maker_address, taker_address, give_token, take_token]
+    uints = [give_amount, take_amount, fill_amount, maker_nonce, taker_nonce, maker_fee, taker_fee, expiry]
+    v = [maker_v, taker_v]
+    rs = [maker_r, maker_s, taker_r, taker_s]
+    args = [addresses, uints, v, rs]
+    exchange.instance.parent.call_payload(fun, args)
+  end
+
+  def v
+    signature[-2..signature.length].hex
+  end
+
+  def r
+    '0x' + signature[2..65]
+  end
+
+  def s
+    '0x' + signature[66..-3]
+  end
 
   def taker_fee
     return self.fee

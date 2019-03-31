@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_29_070800) do
+ActiveRecord::Schema.define(version: 2019_03_30_231004) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -179,8 +179,6 @@ ActiveRecord::Schema.define(version: 2019_03_29_070800) do
     t.string "fee"
     t.string "status"
     t.string "transaction_hash"
-    t.string "block_hash"
-    t.string "block_number"
     t.index ["withdraw_hash"], name: "index_withdraws_on_withdraw_hash"
   end
 

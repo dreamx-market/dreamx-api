@@ -12,6 +12,33 @@ class Withdraw < ApplicationRecord
 
   before_create :collect_fee_and_debit_balance, :generate_transaction
 
+  def block_hash
+    tx.block_hash
+  end
+
+  def block_number
+    tx.block_number
+  end
+
+  def payload
+    exchange = Contract::Exchange.singleton
+    fun = exchange.instance.parent.functions.select { |fun| fun.name == 'withdraw'}.first
+    args = [token_address, amount.to_i, account_address, nonce.to_i, v.to_i, r, s, fee.to_i]
+    exchange.instance.parent.call_payload(fun, args)
+  end
+
+  def v
+    signature[-2..signature.length].hex
+  end
+
+  def r
+    '0x' + signature[2..65]
+  end
+
+  def s
+    '0x' + signature[66..-3]
+  end
+
   def withdraw_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
     if (!calculated_hash or calculated_hash != withdraw_hash) then

@@ -29,8 +29,8 @@ class Deposit < ApplicationRecord
   end
 
   def self.aggregate(block_number)
-    @exchange ||= Contract::Exchange.new
-    deposits = @exchange.deposits(block_number)
+    exchange = Contract::Exchange.new
+    deposits = exchange.deposits(block_number)
     deposits.each do |deposit|
       Account.initialize_if_not_exist(deposit['account'], deposit['token'])
       new_deposit = {

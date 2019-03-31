@@ -2,6 +2,12 @@ module Contract
   class Exchange
     attr_accessor :instance, :abi
 
+    class << self
+      def singleton
+        @singleton ||= new
+      end
+    end
+
     def initialize
       @abi = JSON.parse(File.read("#{__dir__}/contracts/Exchange.json"))["abi"]
       @instance = Ethereum::Contract.create(name: "Exchange", address: ENV['CONTRACT_ADDRESS'], abi: @abi)
