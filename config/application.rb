@@ -40,6 +40,7 @@ module NinjatradeApi
     WillPaginate.per_page = 100
 
     # environment variables, can be overridden
+    ENV['GAS_LIMIT'] = '2000000'
     ENV['REDIS_HOST'] = 'redis://127.0.0.1:6379'
     ENV['PRIVATE_KEY'] = '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2'
     ENV['ETHEREUM_HOST'] = 'https://rinkeby.infura.io/pVTvEWYTqXvSRvluzCCe'

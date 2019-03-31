@@ -7,7 +7,7 @@ class Transaction < ApplicationRecord
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)    
     gas_price = client.eth_gas_price['result'].hex.to_i
-    gas_limit = client.eth_get_block_by_number("latest", false)["result"]["gasLimit"].hex.to_i
+    gas_limit = ENV['GAS_LIMIT'].to_i
     contract_address = ENV['CONTRACT_ADDRESS']
     payload = self.transactable.payload
     nonce = self.nonce.to_i
