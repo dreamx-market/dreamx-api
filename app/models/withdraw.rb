@@ -6,7 +6,7 @@ class Withdraw < ApplicationRecord
   has_one :tx, class_name: 'Transaction', as: :transactable
 
   validates :nonce, nonce: true, on: :create
-  validates :withdraw_hash, signature: true
+  validates :withdraw_hash, signature: true, uniqueness: true
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 

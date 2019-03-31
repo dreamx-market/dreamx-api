@@ -60,4 +60,10 @@ class WithdrawTest < ActiveSupport::TestCase
   test "has a transaction" do
     assert_not_nil @withdraw.tx
   end
+
+  test "withdraw_hash must be unique" do
+    new_withdraw = Withdraw.new({ :withdraw_hash => @withdraw.withdraw_hash })
+    assert_not new_withdraw.valid?
+    assert new_withdraw.errors.messages[:withdraw_hash].include?('has already been taken')
+  end
 end

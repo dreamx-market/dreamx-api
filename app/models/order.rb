@@ -6,7 +6,7 @@ class Order < ApplicationRecord
 	validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
 	validates :nonce, nonce: true, on: :create
-  validates :order_hash, signature: true
+  validates :order_hash, signature: true, uniqueness: true
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }, on: :update
 
 	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :volume_must_be_greater_than_minimum, :filled_must_not_exceed_give_amount
