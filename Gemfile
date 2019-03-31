@@ -53,3 +53,5 @@ gem 'eth', :git => 'https://github.com/odintrade/ruby-eth.git'
 gem 'ethereum.rb', :git => 'https://github.com/hieudoan2609/ethereum.rb.git'
 
 gem 'whenever', require: false
+
+gem 'redis', '~> 4.1'
