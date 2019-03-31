@@ -32,11 +32,11 @@ class Withdraw < ApplicationRecord
   end
 
   def r
-    '0x' + signature[2..65]
+    Eth::Utils.hex_to_bin('0x' + signature[2..65])
   end
 
   def s
-    '0x' + signature[66..-3]
+    Eth::Utils.hex_to_bin('0x' + signature[66..-3])
   end
 
   def withdraw_hash_must_be_valid

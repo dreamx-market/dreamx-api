@@ -56,5 +56,6 @@ module NinjatradeApi
     ENV['CHART_DATUM_EXPIRY_15M'] = 20.days.to_s
     ENV['CHART_DATUM_EXPIRY_1H'] = 90.days.to_s
     ENV['TRANSACTION_CONFIRMATIONS'] = '12'
+    ENV['POSTPONE_BROADCASTING'] = 'false'
   end
 end

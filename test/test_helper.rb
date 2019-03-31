@@ -94,6 +94,7 @@ class ActiveSupport::TestCase
       :amount => params[:amount],
       :nonce => Withdraw.last ? Withdraw.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
     }
+    withdraw[:nonce] = params[:nonce] || withdraw[:nonce]
     withdraw[:withdraw_hash] = Withdraw.calculate_hash(withdraw)
     withdraw[:signature] = sign_message(withdraw[:account_address], withdraw[:withdraw_hash])
     return withdraw
@@ -143,5 +144,11 @@ class ActiveSupport::TestCase
   def sign_message(account_address, message)
     key = Eth::Key.new priv: accounts[:"#{account_address}"]
     return Eth::Utils.prefix_hex(key.personal_sign(Eth::Utils.hex_to_bin(message)))
+  end
+
+  def sync_nonce
+    client = Ethereum::Singleton.instance
+    key = Eth::Key.new priv: ENV['PRIVATE_KEY'].hex
+    Redis.current.set("nonce", client.get_nonce(key.address))
   end
 end

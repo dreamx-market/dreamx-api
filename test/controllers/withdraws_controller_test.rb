@@ -23,7 +23,7 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   # end
 
   test "should create withdraw and debit balance" do
-    withdraw = generate_withdraw(@withdraw)
+    withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
     before_balances = [
       { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 100000000000000000000, :hold_balance => 0 }
     ]
@@ -47,7 +47,7 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should automatically generate transactions for creation of withdraws" do
-    withdraw = generate_withdraw(@withdraw)
+    withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
 
     assert_difference('Transaction.count') do
       post withdraws_url, params: withdraw, as: :json
