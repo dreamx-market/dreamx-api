@@ -7,7 +7,7 @@ class Withdraw < ApplicationRecord
 
   validates :nonce, nonce: true, on: :create
   validates :withdraw_hash, signature: true
-  validate :amount_must_be_above_minimum, :withdraw_hash_must_be_valid
+  validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :collect_fee_and_debit_balance, :generate_transaction

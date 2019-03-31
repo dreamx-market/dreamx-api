@@ -41,7 +41,7 @@ module NinjatradeApi
 
     # environment variables, can be overridden
     ENV['REDIS_HOST'] = 'redis://127.0.0.1:6379'
-    ENV['PRIVATE_KEY'] = '0xd15b17f51f613d0d89c64c7b629ffff7ae9c19e509afc9518dac1650e9812c18'
+    ENV['PRIVATE_KEY'] = '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2'
     ENV['ETHEREUM_HOST'] = 'https://rinkeby.infura.io/pVTvEWYTqXvSRvluzCCe'
     ENV['CONTRACT_ADDRESS'] = '0x2a0c0dbecc7e4d658f48e01e3fa353f44050c208'
     ENV['MAX_PER_PAGE'] = '1000'

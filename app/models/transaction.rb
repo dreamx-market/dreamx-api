@@ -1,7 +1,7 @@
 class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
 
-  after_create :assign_nonce
+  after_create :assign_next_nonce
 
   def raw
     client = Ethereum::Singleton.instance
@@ -22,16 +22,15 @@ class Transaction < ApplicationRecord
     }
     tx = Eth::Tx.new(args)
     tx.sign key
-    tx.hex
   end
 
   # def broadcast
     
   # end
 
-  private
-
-  def assign_nonce
-    self.update!({ :nonce => Redis.current.incr('nonce') })
+  def assign_next_nonce
+    self.update!({ :nonce => Redis.current.incr('nonce') - 1 })
   end
+
+  private
 end

@@ -9,7 +9,7 @@ one:
   block_hash: null
   block_number: null
   status: pending
-  nonce: 1
+  nonce: 0
   fee: null
 
 two:
@@ -21,5 +21,5 @@ two:
   block_hash: null
   block_number: null
   status: pending
-  nonce: 2
+  nonce: 1
   fee: null
