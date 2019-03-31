@@ -12,7 +12,6 @@ class BroadcastTransactionJobTest < ActiveJob::TestCase
     # assert_not_nil @transaction.gas_limit
     # assert_not_nil @transaction.gas_price
     # assert_not_nil @transaction.transaction_hash
-    # assert_not_nil @transaction.nonce
     # assert_not_nil @transaction.fee
   end
 end
