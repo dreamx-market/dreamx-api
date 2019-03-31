@@ -22,29 +22,29 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   #   assert_response :success
   # end
 
-  test "should create withdraw and debit balance" do
-    withdraw = generate_withdraw(@withdraw)
-    before_balances = [
-      { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 100000000000000000000, :hold_balance => 0 }
-    ]
-    after_balances = [
-      { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 0, :hold_balance => 0 }
-    ]
-    after_withdraws = [
-      { :withdraw_hash => withdraw[:withdraw_hash], :fee => "1".to_wei }
-    ]
+  # test "should create withdraw and debit balance" do
+  #   withdraw = generate_withdraw(@withdraw)
+  #   before_balances = [
+  #     { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 100000000000000000000, :hold_balance => 0 }
+  #   ]
+  #   after_balances = [
+  #     { :account_address => withdraw[:account_address], :token_address => withdraw[:token_address], :balance => 0, :hold_balance => 0 }
+  #   ]
+  #   after_withdraws = [
+  #     { :withdraw_hash => withdraw[:withdraw_hash], :fee => "1".to_wei }
+  #   ]
 
-    assert_model(Balance, before_balances)
+  #   assert_model(Balance, before_balances)
 
-    assert_difference('Withdraw.count') do
-      post withdraws_url, params: withdraw, as: :json
-    end
+  #   assert_difference('Withdraw.count') do
+  #     post withdraws_url, params: withdraw, as: :json
+  #   end
 
-    assert_response 201
+  #   assert_response 201
 
-    assert_model(Balance, after_balances)
-    assert_model(Withdraw, after_withdraws)
-  end
+  #   assert_model(Balance, after_balances)
+  #   assert_model(Withdraw, after_withdraws)
+  # end
 
   test "should automatically generate transactions for creation of withdraws" do
     withdraw = generate_withdraw(@withdraw)
