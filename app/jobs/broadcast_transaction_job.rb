@@ -11,8 +11,7 @@ class BroadcastTransactionJob < ApplicationJob
         :transaction_hash => tx_hash, 
         :status => 'unconfirmed' 
       })
-    rescue Exception => e
-      pp e
+    rescue
     end
   end
 end
