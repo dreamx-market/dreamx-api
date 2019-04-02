@@ -33,7 +33,7 @@ class ChartDatumTest < ActiveSupport::TestCase
   end
 
   test "should aggregate new data" do
-    assert_difference('ChartDatum.count', 2) do
+    assert_difference('ChartDatum.count', markets.length) do
       ChartDatum.aggregate(1.hour)
     end
   end

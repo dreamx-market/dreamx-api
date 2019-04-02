@@ -11,7 +11,7 @@ class BroadcastTransactionJobTest < ActiveJob::TestCase
       { :account_address => accounts[0], :give_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :give_amount => 1000000000000000000, :take_token_address => '0x0000000000000000000000000000000000000000', :take_amount => 1000000000000000000 }
     ])
     # @trades = batch_trade([
-    #   { :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount }
+    #   { :account_address => accounts[1], :order_hash => @orders[0].order_hash, :amount => 700000000000000000 }
     # ])
   end
 
@@ -29,7 +29,7 @@ class BroadcastTransactionJobTest < ActiveJob::TestCase
   #   assert_not_nil transaction.transaction_hash
   # end
 
-  test "broadcast and update a trade transaction" do
-    p @withdraws.length, @orders.length
-  end
+  # test "broadcast and update a trade transaction" do
+  #   p @orders
+  # end
 end

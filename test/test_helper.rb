@@ -67,7 +67,9 @@ class ActiveSupport::TestCase
   def batch_order(orders)
     created = []
     orders.each do |order|
-      created << Order.create(generate_order(order))
+      new_order = Order.new(generate_order(order))
+      assert new_order.save
+      created << new_order
     end
     return created
   end
