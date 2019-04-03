@@ -191,6 +191,8 @@ class Trade < ApplicationRecord
 
     fee_take_balance = Balance.find_by({ :account_address => fee_address, :token_address => order.take_token_address })
     fee_take_balance.credit(maker_fee_amount)
+
+    self.total = self.is_sell ? self.amount : trade_amount_equivalence_in_take_tokens
   end
 
   def balances_must_be_authentic
