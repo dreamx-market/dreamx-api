@@ -2,6 +2,7 @@ class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
 
   before_create :assign_next_nonce
+  after_commit :broadcast
 
   def raw
     client = Ethereum::Singleton.instance
@@ -24,9 +25,13 @@ class Transaction < ApplicationRecord
     tx.sign key
   end
 
-  # def broadcast
-    
-  # end
+  def broadcast
+    if ENV['RAILS_ENV'] == 'test' or self.status != 'pending'
+      return
+    end
+
+    BroadcastTransactionJob.perform_now(self)
+  end
 
   private
 

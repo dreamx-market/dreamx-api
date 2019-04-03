@@ -2,12 +2,7 @@ require 'test_helper'
 
 class BroadcastTransactionJobTest < ActiveJob::TestCase
   setup do
-    ENV['POSTPONE_BROADCASTING'] = 'true'
     sync_nonce
-  end
-
-  teardown do
-    ENV['POSTPONE_BROADCASTING'] = 'false'
   end
 
   test "broadcast and update a withdraw transaction" do
