@@ -1,1 +1,1 @@
-json.extract! trade, :id, :give_token_address, :give_amount, :take_token_address, :take_amount, :order_hash, :uuid, :maker_fee, :taker_fee, :gas_fee, :maker_address, :taker_address, :transaction_hash, :created_at
+json.extract! trade, :id, :give_token_address, :give_amount, :take_token_address, :take_amount, :order_hash, :uuid, :maker_fee, :taker_fee, :maker_address, :taker_address, :transaction_hash, :created_at

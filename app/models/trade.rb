@@ -15,16 +15,8 @@ class Trade < ApplicationRecord
 
   before_create :trade_balances, :generate_transaction
 
-  def gas_fee
-    self.tx ? self.tx.fee : nil
-  end
-
   def transaction_hash
     self.tx ? self.tx.transaction_hash : nil
-  end
-
-  def validate_gas_fee
-    p self
   end
 
   def payload
