@@ -8,7 +8,7 @@ one:
   transaction_hash: null
   block_hash: null
   block_number: null
-  status: pending
+  status: confirmed
   nonce: 0
   fee: null
 
@@ -20,6 +20,6 @@ two:
   transaction_hash: null
   block_hash: null
   block_number: null
-  status: pending
+  status: confirmed
   nonce: 1
   fee: null
