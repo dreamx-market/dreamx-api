@@ -47,4 +47,5 @@ Rails.application.configure do
   # environment variables, can be overridden
   ENV['CONTRACT_ADDRESS'] = '0x8137064a86006670d407c24e191b5a55da5b2889'
   ENV['ETHEREUM_HOST'] = 'http://localhost:8545'
+  ENV['TRANSACTION_CONFIRMATIONS'] = '1'
 end

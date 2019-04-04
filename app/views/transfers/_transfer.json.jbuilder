@@ -1,1 +1,1 @@
-json.extract! transfer, :id, :token_address, :amount, :status, :transaction_hash, :block_hash, :block_number, :created_at
+json.extract! transfer, :id, :token_address, :amount, :transaction_hash, :block_hash, :block_number, :created_at

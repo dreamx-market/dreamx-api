@@ -4,6 +4,23 @@ class Transaction < ApplicationRecord
   before_create :assign_next_nonce
   after_create :broadcast
 
+  def self.confirm_mined_transactions
+    client = Ethereum::Singleton.instance
+    key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
+    @last_confirmed_nonce ||= client.get_nonce(key.address) - 1
+    mined_transactions = self.where.not({ :status => 'confirmed' }).where({ :nonce => 0..@last_confirmed_nonce })
+    mined_transactions.each do |transaction|
+      transaction_receipt = client.eth_get_transaction_by_hash(transaction.transaction_hash)['result']
+      if !transaction_receipt
+        raise 'transaction receipt not found'
+      end
+      block_number = transaction_receipt['blockNumber'].hex
+      block_hash = transaction_receipt['blockHash']
+      gas = transaction_receipt['gas'].hex
+      transaction.update!({ :status => 'confirmed', :block_number => block_number, :block_hash => block_hash, :gas => gas })
+    end
+  end
+
   def raw
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
@@ -57,8 +74,8 @@ class Transaction < ApplicationRecord
   def expired?
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
-    last_confirmed_nonce = client.get_nonce(key.address)
-    return self.nonce.to_i >= last_confirmed_nonce && self.created_at <= 5.minutes.ago
+    @last_confirmed_nonce ||= client.get_nonce(key.address) - 1
+    return self.nonce.to_i >= @last_confirmed_nonce && self.created_at <= 5.minutes.ago
   end
 
   private

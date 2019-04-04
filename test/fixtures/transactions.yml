@@ -10,7 +10,7 @@ one:
   block_number: null
   status: confirmed
   nonce: 0
-  fee: null
+  gas: null
 
 two:
   transactable_type: Trade
@@ -22,4 +22,4 @@ two:
   block_number: null
   status: confirmed
   nonce: 1
-  fee: null
+  gas: null
