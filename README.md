@@ -11,10 +11,33 @@
 
 # Deployment:
 
-* create a postgresql superuser for production environment, add it into config/database.yml
-* duplicate config/application.yml.sample into config/application.yml to set environemnt variables
-* rake db:create
-* rake db:migrate
+https://gorails.com/deploy/ubuntu/18.04
+
+## Potential errors
+
+### Error during cap production deploy: Cannot create extension "citext"
+
+Are you getting the following error when running your Capistrano deployment?
+
+```
+PG::InsufficientPrivilege: ERROR:  permission denied to create extension "citext"
+HINT:  Must be superuser to create this extension.
+: CREATE EXTENSION IF NOT EXISTS "citext"
+```
+
+You will need to temporarily make your database user a superuser.
+
+1. Connect to the server: `$ ssh user@server`
+2. Connect to PostgreSQL as the superuser (not your database user):
+
+    ```
+    $ sudo su postgres
+    $ \psql
+    ```
+3. Make your database user a superuser: `$ alter role your_user superuser;`
+4. Run `cap production deploy` from your local machine. This time it should succeed
+5. Remove superuser from your database user: `$ alter role your_user nosuperuser;`
+6. Leave PostgreSQL shell: `$ \q`
 
 # Running the test suite
 
