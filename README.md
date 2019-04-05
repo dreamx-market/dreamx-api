@@ -11,9 +11,12 @@
 
 # Deployment:
 
-https://gorails.com/deploy/ubuntu/18.04
+* https://gorails.com/deploy/ubuntu/18.04
+* override necessary environment variables
+* on-chain preperation, make sure CONTRACT_ADDRESS is deployed and PRIVATE_KEY is funded
+* deploy scheduled jobs
 
-## Potential errors
+## Errors
 
 ### Error during cap production deploy: Cannot create extension "citext"
 
