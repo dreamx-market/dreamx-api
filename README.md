@@ -1,6 +1,7 @@
 # Dependencies:
 
 * ruby 2.5.1p57
+* bundler 1.16.1
 * postgresql 10.4
 * redis-server 4.0.10
 
