@@ -97,8 +97,32 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  # test "should detect and remove fake coins upon an unsuccessful trade" do
+  test "should detect and remove fake coins upon an unsuccessful trade" do
+    maker_balance = Account.find_by({ :address => accounts[0] }).balance('0x75d417ab3031d592a781e666ee7bfc3381ad33d5')
+    before_maker_balance = maker_balance.balance
+    order = batch_order([
+      { :account_address => accounts[0], :give_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :give_amount => '1'.to_wei, :take_token_address => '0x0000000000000000000000000000000000000000', :take_amount => '1'.to_wei }
+    ]).first
+    trade = batch_trade([
+      { :account_address => accounts[5], :order_hash => order.order_hash, :amount => '1'.to_wei }
+    ]).first
+    transaction = trade.tx
 
+    begin
+      BroadcastTransactionJob.perform_now(transaction)
+    rescue
+      transaction_hash = @client.eth_get_block_by_number('latest', false)['result']['transactions'].first
+      transaction.update!({ :transaction_hash => transaction_hash, :status => 'unconfirmed' })
+    end
 
-  # end
+    assert_changes 'transaction.block_hash and transaction.block_number and transaction.gas' do
+      Transaction.confirm_mined_transactions
+      transaction.reload
+      @balance.reload
+      assert_equal transaction.status, 'failed'
+      assert_equal @balance.balance.to_ether, '0.3'
+      after_maker_balance = maker_balance.reload.balance
+      assert_equal before_maker_balance, after_maker_balance
+    end
+  end
 end
