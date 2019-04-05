@@ -125,3 +125,9 @@ eighteen:
   token_address: "0x0000000000000000000000000000000000000000"
   balance: "1000000000000000000"
   hold_balance: "0"
+
+nineteen:
+  account_address: "0x16e86d3935e8922a9b14c722a97552a202575256"
+  token_address: "0x75d417ab3031d592a781e666ee7bfc3381ad33d5"
+  balance: "0"
+  hold_balance: "0"
