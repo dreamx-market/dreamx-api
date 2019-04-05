@@ -48,4 +48,5 @@ Rails.application.configure do
   ENV['CONTRACT_ADDRESS'] = '0x8137064a86006670d407c24e191b5a55da5b2889'
   ENV['ETHEREUM_HOST'] = 'http://localhost:8545'
   ENV['TRANSACTION_CONFIRMATIONS'] = '0'
+  ENV['REDIS_HOST'] = 'redis://127.0.0.1:6379/2' # use database 2 for test environment
 end
