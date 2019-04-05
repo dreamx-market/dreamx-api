@@ -7,17 +7,27 @@ class Transaction < ApplicationRecord
   def self.confirm_mined_transactions
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
-    @last_confirmed_nonce ||= client.get_nonce(key.address) - 1
-    mined_transactions = self.where.not({ :status => 'confirmed' }).where({ :nonce => 0..@last_confirmed_nonce })
+    last_confirmed_nonce = client.get_nonce(key.address) - 1
+    last_block_number = client.eth_get_block_by_number('latest', false)['result']['number'].hex
+    mined_transactions = self.where({ :status => 'unconfirmed' }).where({ :nonce => 0..last_confirmed_nonce })
+    mined_transactions.length
     mined_transactions.each do |transaction|
-      transaction_receipt = client.eth_get_transaction_by_hash(transaction.transaction_hash)['result']
+      transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
       if !transaction_receipt
         raise 'transaction receipt not found'
       end
       block_number = transaction_receipt['blockNumber'].hex
       block_hash = transaction_receipt['blockHash']
-      gas = transaction_receipt['gas'].hex
-      transaction.update!({ :status => 'confirmed', :block_number => block_number, :block_hash => block_hash, :gas => gas })
+      gas = transaction_receipt['gasUsed'].hex
+      status = transaction_receipt['status'] == '0x1' ? 'confirmed' : 'failed'
+      confirmations_required = ENV['TRANSACTION_CONFIRMATIONS'].to_i
+      if last_block_number - block_number < confirmations_required
+        return
+      end
+      if status == 'failed'
+        transaction.transactable.refund
+      end
+      transaction.update!({ :status => status, :block_number => block_number, :block_hash => block_hash, :gas => gas })
     end
   end
 
@@ -68,14 +78,14 @@ class Transaction < ApplicationRecord
   end
 
   def self.unconfirmed
-    self.where.not({ :status => "confirmed" })
+    self.where({ :status => ["unconfirmed", "pending"] })
   end
 
   def expired?
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
-    @last_confirmed_nonce ||= client.get_nonce(key.address) - 1
-    return self.nonce.to_i >= @last_confirmed_nonce && self.created_at <= 5.minutes.ago
+    last_confirmed_nonce = client.get_nonce(key.address) - 1
+    return self.nonce.to_i >= last_confirmed_nonce && self.created_at <= 5.minutes.ago
   end
 
   private

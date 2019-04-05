@@ -23,3 +23,6 @@ six:
 
 seven:
   address: "0x76446f63C6B7756257B9c7D56cE7dDe29836c203"
+
+eight:
+  address: "0x16e86d3935e8922a9b14c722a97552a202575256"

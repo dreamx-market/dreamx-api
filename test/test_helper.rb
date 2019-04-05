@@ -92,15 +92,18 @@ class ActiveSupport::TestCase
     return created
   end
 
+  def get_transactable_nonce
+    Time.now.to_i * 1000 + Redis.current.incr('transactable_nonce')
+  end
+
   # params { :account_address, :token_address, :amount }
   def generate_withdraw(params)
     withdraw = { 
       :account_address => params[:account_address], 
       :token_address => params[:token_address], 
       :amount => params[:amount],
-      :nonce => Withdraw.last ? Withdraw.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
+      :nonce => get_transactable_nonce,
     }
-    withdraw[:nonce] = params[:nonce] || withdraw[:nonce]
     withdraw[:withdraw_hash] = Withdraw.calculate_hash(withdraw)
     withdraw[:signature] = sign_message(withdraw[:account_address], withdraw[:withdraw_hash])
     return withdraw

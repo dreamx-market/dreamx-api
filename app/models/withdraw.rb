@@ -12,6 +12,19 @@ class Withdraw < ApplicationRecord
 
   before_create :collect_fee_and_debit_balance, :generate_transaction
 
+  def refund
+    exchange = Contract::Exchange.singleton.instance
+    onchain_balance = exchange.call.balances(self.token_address, self.account_address)
+    withdraw_amount = self.amount.to_i
+    difference = withdraw_amount - onchain_balance
+    refund_amount = withdraw_amount - difference
+    self.account.balance(self.token_address).credit(refund_amount)
+  end
+
+  def transaction_hash
+    tx.transaction_hash
+  end
+
   def block_hash
     tx.block_hash
   end
