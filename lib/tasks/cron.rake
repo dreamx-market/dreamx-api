@@ -5,4 +5,8 @@ namespace :cron do
   Transaction.rebroadcast_expired_transactions
   Transaction.confirm_mined_transactions
  end
+
+ task :every_1m => :environment do
+  p 'LOL'
+ end
 end
