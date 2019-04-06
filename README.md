@@ -13,8 +13,7 @@
 
 * https://gorails.com/deploy/ubuntu/18.04
 * override necessary environment variables
-* on-chain preperation, make sure CONTRACT_ADDRESS is deployed and PRIVATE_KEY is funded
-* deploy scheduled jobs
+* double-check, make sure CONTRACT_ADDRESS is deployed, PRIVATE_KEY is funded, ETHEREUM_HOST is pointing to the right network
 
 ## Errors
 
