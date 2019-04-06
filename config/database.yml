@@ -77,4 +77,4 @@ production:
   <<: *default
   database: ninjatrade-api_production
   username: deploy
-  password: <%= ENV['NINJATRADE-API_DATABASE_PASSWORD'] %>
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
