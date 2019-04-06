@@ -39,12 +39,9 @@ module NinjatradeApi
     # pagination
     WillPaginate.per_page = 100
 
-    # environment variables, can be overridden
-    ENV['SECRET_KEY_BASE'] ||= ''
-    ENV['POSTGRES_PASSWORD'] ||= ''
+    # environment variables
     ENV['GAS_LIMIT'] ||= '2000000'
     ENV['REDIS_HOST'] ||= 'redis://127.0.0.1:6379'
-    ENV['PRIVATE_KEY'] ||= '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2'
     ENV['ETHEREUM_HOST'] ||= 'https://ropsten.infura.io/v3/b41fd9db5b3442a5b3be799b1bc91bf0'
     ENV['CONTRACT_ADDRESS'] ||= '0xf06abaa2ff45cd469c2dab6ad9f8848ce12850d1'
     ENV['MAX_PER_PAGE'] ||= '1000'
@@ -59,5 +56,10 @@ module NinjatradeApi
     ENV['CHART_DATUM_EXPIRY_1H'] ||= 90.days.to_s
     ENV['TRANSACTION_CONFIRMATIONS'] ||= '12'
     ENV['POSTPONE_BROADCASTING'] ||= 'false'
+    # sensitive, must be overridden
+    ENV['POSTGRES_USERNAME'] ||= 'deploy'
+    ENV['POSTGRES_PASSWORD'] ||= ''
+    ENV['SECRET_KEY_BASE'] ||= 'bff123f6ea48261cf749ba0a27d2cd5e50ffea689aecac9d696d0c47a1d94614e134c427f7fcb9ef2fa6fee05a5b41cfa4f92b21bcf54b4d41a37af7e614b4e6'
+    ENV['PRIVATE_KEY'] ||= '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2'
   end
 end
