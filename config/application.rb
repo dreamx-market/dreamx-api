@@ -40,7 +40,7 @@ module NinjatradeApi
     WillPaginate.per_page = 100
 
     # environment variables, can be overridden
-    # ENV['SECRET_KEY_BASE'] ||= ''
+    ENV['SECRET_KEY_BASE'] ||= ''
     ENV['POSTGRES_PASSWORD'] ||= ''
     ENV['GAS_LIMIT'] ||= '2000000'
     ENV['REDIS_HOST'] ||= 'redis://127.0.0.1:6379'
