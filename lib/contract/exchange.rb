@@ -14,11 +14,7 @@ module Contract
       @instance.key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
     end
 
-    def deposits(from, to=nil)
-      if from == 0
-        from = 1
-      end
-
+    def deposits(from=1, to=from)
       decoder = Ethereum::Decoder.new
       encoder = Ethereum::Encoder.new
       client = Ethereum::Singleton.instance
@@ -29,18 +25,20 @@ module Contract
       deposit_event_indexed_inputs = deposit_event_inputs.select(&:indexed)
       deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
 
-      filter_id = @instance.new_filter.deposit(
-        {
-          from_block: from,
-          to_block: to || from,
-          topics: []
-        }
-      )
-      deposit_events = @instance.get_filter_logs.deposit(filter_id)
-
+      incoming_transactions = []
       deposit_logs = []
-      deposit_events.each do |event|
-        transaction = client.eth_get_transaction_receipt(event[:transactionHash])
+      (from..to).step(1) do |i|
+        block = client.eth_get_block_by_number(i, true)['result']
+        if block
+          block['transactions'].each do |t|
+            if t['to'] == @instance.address
+              incoming_transactions << t
+            end
+          end
+        end
+      end
+      incoming_transactions.each do |t|
+        transaction = client.eth_get_transaction_receipt(t['hash'])
         transaction['result']['logs'].each do |log|
           deposit_logs << log if log['topics'][0] == deposit_event_signature
         end
