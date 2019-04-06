@@ -36,7 +36,6 @@ module Contract
           topics: []
         }
       )
-
       deposit_events = @instance.get_filter_logs.deposit(filter_id)
 
       deposit_logs = []

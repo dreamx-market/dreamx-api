@@ -11,10 +11,9 @@ class Block < ApplicationRecord
     last_processed_block_number = self.last ? self.last.block_number : 0
     last_block_number = last_processed_block_number
 
-    Integer(last_confirmed_block_number - last_processed_block_number).times do |i|
-      new_block_number = last_processed_block_number + i + 1
-      self.process_block(new_block_number)
-      last_block_number = new_block_number
+    (last_processed_block_number..last_confirmed_block_number).step(1) do |i|
+      self.process_block(i)
+      last_block_number = i
     end
 
     last_block = @client.eth_get_block_by_number(last_block_number, false)
