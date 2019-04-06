@@ -48,7 +48,7 @@ gem 'will_paginate', '~> 3.1', '>= 3.1.6'
 
 gem 'figaro'
 
-gem 'eth', :git => 'https://github.com/odintrade/ruby-eth.git'
+gem 'eth', :git => 'https://github.com/hieudoan2609/ruby-eth.git'
 
 gem 'ethereum.rb', :git => 'https://github.com/hieudoan2609/ethereum.rb.git'
 

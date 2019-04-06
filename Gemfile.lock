@@ -7,7 +7,7 @@ GIT
       digest-sha3 (~> 1.1)
 
 GIT
-  remote: https://github.com/odintrade/ruby-eth.git
+  remote: https://github.com/hieudoan2609/ruby-eth.git
   revision: aac5d904c87836a060074a4483a3f8f0c8e85d79
   specs:
     eth (0.4.10)
