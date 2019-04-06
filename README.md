@@ -12,6 +12,7 @@
 # Deployment:
 
 * https://gorails.com/deploy/ubuntu/18.04
+* start redis at boot `sudo systemctl enable redis-server.service`
 * override necessary environment variables
 * double-check, make sure CONTRACT_ADDRESS is deployed, PRIVATE_KEY is funded, ETHEREUM_HOST is pointing to the right network
 
