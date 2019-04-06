@@ -6,7 +6,7 @@ namespace :cron do
   Transaction.confirm_mined_transactions
  end
 
- task :every_1m => :environment do
-  p 'LOL'
+ task :test => :environment do
+  p 'it works!'
  end
 end
