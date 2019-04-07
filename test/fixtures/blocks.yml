@@ -1,9 +1,4 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# one:
-#   hash: MyString
-#   number: 1
-
-# two:
-#   hash: MyString
-#   number: 1
+one:
+  block_number: 0
