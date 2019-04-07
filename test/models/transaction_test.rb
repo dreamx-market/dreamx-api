@@ -30,6 +30,17 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
+  test "should mark transaction as 'replaced' if nonce has been taken" do
+    withdraw = batch_withdraw([
+      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+    ]).first
+    withdraw.tx.update({ :nonce => 0 })
+
+    Transaction.confirm_mined_transactions
+    withdraw.tx.reload
+    assert_equal(withdraw.tx.status, 'replaced')
+  end
+
   test "should confirm successful transactions" do
     withdraw = batch_withdraw([
       { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }

@@ -9,12 +9,16 @@ class Transaction < ApplicationRecord
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
     last_confirmed_nonce = client.get_nonce(key.address) - 1
     last_block_number = client.eth_get_block_by_number('latest', false)['result']['number'].hex
-    mined_transactions = self.where({ :status => 'unconfirmed' }).where({ :nonce => 0..last_confirmed_nonce })
+    mined_transactions = self.where({ :status => ["unconfirmed", "pending"] }).where({ :nonce => 0..last_confirmed_nonce })
     mined_transactions.length
     mined_transactions.each do |transaction|
-      transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
-      if !transaction_receipt
-        raise 'transaction receipt not found'
+      begin
+        transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
+      rescue
+        if !transaction_receipt
+          transaction.update!({ :status => 'replaced' })
+          return
+        end
       end
       block_number = transaction_receipt['blockNumber'].hex
       block_hash = transaction_receipt['blockHash']
