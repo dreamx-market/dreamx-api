@@ -17,6 +17,7 @@
 * double-check, make sure CONTRACT_ADDRESS is deployed, PRIVATE_KEY is funded, ETHEREUM_HOST is pointing to the right network
 * add domain
 * add ssl certificate https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
+* add tokens & markets
 
 ## Errors
 
