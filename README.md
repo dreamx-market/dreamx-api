@@ -23,11 +23,11 @@
 
 ### Error during cap production deploy:
 
+#### Cannot load such file — bundler/setup
+
 1. Make sure `capistrano-rails` is installed
 
 2. Add to Capfile `require 'capistrano/bundler'`
-
-#### Cannot load such file — bundler/setup
 
 #### Cannot create extension "citext"
 
