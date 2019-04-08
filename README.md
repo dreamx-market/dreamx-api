@@ -29,6 +29,14 @@
 
 2. Add to Capfile `require 'capistrano/bundler'`
 
+```
+require "capistrano/bundler" # Rails needs bundler
+require "capistrano/rails/migrations"
+require "capistrano/passenger"
+require "capistrano/rbenv"
+require "whenever/capistrano"
+```
+
 #### Cannot create extension "citext"
 
 Are you getting the following error when running your Capistrano deployment?
