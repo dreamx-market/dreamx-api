@@ -21,7 +21,15 @@
 
 ## Errors
 
-### Error during cap production deploy: Cannot create extension "citext"
+### Error during cap production deploy:
+
+1. Make sure `capistrano-rails` is installed
+
+2. Add to Capfile `require 'capistrano/bundler'`
+
+#### Cannot load such file — bundler/setup
+
+#### Cannot create extension "citext"
 
 Are you getting the following error when running your Capistrano deployment?
 
