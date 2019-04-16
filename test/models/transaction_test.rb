@@ -75,7 +75,7 @@ class TransactionTest < ActiveSupport::TestCase
       transaction.reload
       @balance.reload
       assert_equal transaction.status, 'failed'
-      assert_equal @balance.balance.to_ether, '0.3' # accounts[5] has 0.3 ether pre-deposited in /chaindata
+      assert_equal @balance.balance.to_ether, '0.0'
     end
   end
 
@@ -102,7 +102,7 @@ class TransactionTest < ActiveSupport::TestCase
       transaction.reload
       @balance.reload
       assert_equal transaction.status, 'failed'
-      assert_equal @balance.balance.to_ether, '0.3'
+      assert_equal @balance.balance.to_ether, '0.0'
       after_taker_balance = taker_balance.reload.balance
       assert_equal before_taker_balance, after_taker_balance
     end
@@ -131,7 +131,7 @@ class TransactionTest < ActiveSupport::TestCase
       transaction.reload
       @balance.reload
       assert_equal transaction.status, 'failed'
-      assert_equal @balance.balance.to_ether, '0.3'
+      assert_equal @balance.balance.to_ether, '0.0'
       after_maker_balance = maker_balance.reload.balance
       assert_equal before_maker_balance, after_maker_balance
     end
