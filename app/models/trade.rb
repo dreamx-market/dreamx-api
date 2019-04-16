@@ -1,5 +1,5 @@
 class Trade < ApplicationRecord
-  # include FraudProtectable
+  include FraudProtectable
 
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
@@ -210,7 +210,7 @@ class Trade < ApplicationRecord
       return
     end
 
-    # validate_balances_integrity(account.balance(order.take_token_address))
+    validate_balances_integrity(account.balance(order.take_token_address))
   end
 
   def order_must_be_open

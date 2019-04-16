@@ -40,6 +40,7 @@ module NinjatradeApi
     WillPaginate.per_page = 100
 
     # environment variables
+    ENV['FRAUD_PROTECTION'] = 'true'
     ENV['GAS_LIMIT'] ||= '2000000'
     ENV['REDIS_HOST'] ||= 'redis://127.0.0.1:6379'
     ENV['ETHEREUM_HOST'] ||= 'https://ropsten.infura.io/v3/b41fd9db5b3442a5b3be799b1bc91bf0'
