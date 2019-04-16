@@ -3,7 +3,7 @@ require 'test_helper'
 class BalanceTest < ActiveSupport::TestCase
   setup do
     @trade = trades(:one)
-    @order = orders(:one)
+    @order = orders(:three)
     @withdraw = withdraws(:one)
     @deposit = deposits(:one)
     @maker = balances(:eight)
@@ -12,17 +12,19 @@ class BalanceTest < ActiveSupport::TestCase
     @take_token = tokens(:two)
   end
 
-  # test "balance cannot be negative" do
-  #   @balance.balance = -1
-  #   assert_not @balance.valid?
-  #   assert_equal @balance.errors.messages[:balance], ["must be greater than or equal to 0"]
-  # end
+  test "balance cannot be negative" do
+    balance = Balance.last
+    balance.balance = -1
+    assert_not balance.valid?
+    assert_equal balance.errors.messages[:balance], ["must be greater than or equal to 0"]
+  end
 
-  # test "hold_balance cannot be negative" do
-  #   @balance.hold_balance = -1
-  #   assert_not @balance.valid?
-  #   assert_equal @balance.errors.messages[:hold_balance], ["must be greater than or equal to 0"]
-  # end
+  test "hold_balance cannot be negative" do
+    balance = Balance.last
+    balance.hold_balance = -1
+    assert_not balance.valid?
+    assert_equal balance.errors.messages[:hold_balance], ["must be greater than or equal to 0"]
+  end
 
   test "when balances are authentic" do
     assert @maker.authentic?
@@ -93,6 +95,20 @@ class BalanceTest < ActiveSupport::TestCase
 
     balance.hold_balance = '1234'
     balance.save(validate: false)
+
+    assert_not balance.authentic?
+    assert_equal balance.fraud, true
+    assert_equal ENV['READONLY'], 'true'
+    # always reset environment variables back to its initial state
+    ENV['READONLY'] = 'false'
+  end
+
+  test "when balance is compromised because of invalid open orders" do
+    balance = @order.account.balance(@order.give_token_address)
+    assert balance.authentic?
+
+    @order.give_amount = @order.give_amount.to_i * 2
+    @order.save(validate: false)
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
