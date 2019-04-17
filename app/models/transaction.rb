@@ -31,6 +31,10 @@ class Transaction < ApplicationRecord
       end
       if status == 'failed'
         transaction.transactable.refund
+
+        if transaction.raw.gas_limit == transaction_receipt['gasUsed'].hex
+          status = "out_of_gas"
+        end
       end
       transaction.update!({ :status => status, :block_number => block_number, :block_hash => block_hash, :gas => gas })
     end

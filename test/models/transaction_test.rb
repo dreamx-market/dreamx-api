@@ -199,10 +199,32 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  # test "should not regenerate replaced transactions if there are still unconfirmed transactions" do
-  #   # set up an unconfirmed transaction in db
-  #   # transaction X is replaced
-  #   # Transaction.broadcast_expired_transactions
-  #   # an unconfirmed transaction is present, trasaction X is unaffected
-  # end
+  test "should not regenerate replaced transactions if there are still unconfirmed transactions" do
+    # set up an unconfirmed transaction in db
+    # transaction X is replaced
+    # Transaction.broadcast_expired_transactions
+    # an unconfirmed transaction is present, trasaction X is unaffected
+  end
+
+  test "should mark failed transactions as out_of_gas if gas used is equal to gas limit" do
+    ENV['GAS_LIMIT'] = '30000'
+
+    withdraw = batch_withdraw([
+      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+    ]).first
+
+    # ganache raises an error upon VM exceptions instead of returning the transaction hash
+    # so we have to ignore the error and update transaction_hash manually
+    begin
+      BroadcastTransactionJob.perform_now(withdraw.tx)
+    rescue
+      transaction_hash = @client.eth_get_block_by_number('latest', false)['result']['transactions'].first
+      withdraw.tx.update!({ :transaction_hash => transaction_hash, :status => 'unconfirmed', :gas_limit => withdraw.tx.raw.gas_limit, :gas_price => withdraw.tx.raw.gas_price })
+    end
+
+    Transaction.confirm_mined_transactions
+    assert_equal(withdraw.reload.tx.status, "out_of_gas")
+
+    ENV['GAS_LIMIT'] = '2000000'
+  end
 end
