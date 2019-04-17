@@ -87,7 +87,9 @@ class ActiveSupport::TestCase
   def batch_withdraw(withdraws)
     created = []
     withdraws.each do |withdraw|
-      created << Withdraw.create(generate_withdraw(withdraw))
+      new_withdraw = Withdraw.new(generate_withdraw(withdraw))
+      assert new_withdraw.save
+      created << new_withdraw
     end
     return created
   end

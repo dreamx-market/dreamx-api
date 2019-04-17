@@ -76,7 +76,7 @@ class Transaction < ApplicationRecord
     unconfirmed_transactions = self.unconfirmed.sort_by { |transaction| transaction.nonce.to_i }
     unconfirmed_transactions.each do |transaction|
       if !transaction.expired?
-        return
+        next
       end
 
       begin
