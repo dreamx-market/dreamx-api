@@ -21,7 +21,7 @@ module NinjatradeApi
   class Application < Rails::Application
     require 'ext/string'
   	require 'ext/integer'
-  	
+
   	config.eager_load_paths << Rails.root.join('lib')
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
@@ -51,7 +51,7 @@ module NinjatradeApi
     ENV['MAKER_FEE_PER_ETHER_IN_WEI'] ||= '1000000000000000' # 0.001 per Ether
     ENV['TAKER_FEE_PER_ETHER_IN_WEI'] ||= '2000000000000000' # 0.002 per Ether
     ENV['FEE_COLLECTOR_ADDRESS'] ||= '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a'
-    ENV['READONLY'] ||= 'false'
+    ENV['READ_ONLY'] ||= 'false'
     ENV['CHART_DATUM_EXPIRY_5M'] ||= 7.days.to_s
     ENV['CHART_DATUM_EXPIRY_15M'] ||= 20.days.to_s
     ENV['CHART_DATUM_EXPIRY_1H'] ||= 90.days.to_s

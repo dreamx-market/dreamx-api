@@ -17,7 +17,8 @@ class Transaction < ApplicationRecord
       rescue
         if !transaction_receipt
           transaction.update!({ :status => 'replaced' })
-          return
+          ENV['READ_ONLY'] = 'true'
+          next
         end
       end
       block_number = transaction_receipt['blockNumber'].hex
@@ -26,7 +27,7 @@ class Transaction < ApplicationRecord
       status = transaction_receipt['status'] == '0x1' ? 'confirmed' : 'failed'
       confirmations_required = ENV['TRANSACTION_CONFIRMATIONS'].to_i
       if last_block_number - block_number < confirmations_required
-        return
+        next
       end
       if status == 'failed'
         transaction.transactable.refund
@@ -67,7 +68,11 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.rebroadcast_expired_transactions
+  def self.broadcast_expired_transactions
+    if (!self.has_unconfirmed_transactions? and self.has_replaced_transactions?)
+      self.regenerate_replaced_transactions
+    end
+
     unconfirmed_transactions = self.unconfirmed.sort_by { |transaction| transaction.nonce.to_i }
     unconfirmed_transactions.each do |transaction|
       if !transaction.expired?
@@ -81,8 +86,51 @@ class Transaction < ApplicationRecord
     end
   end
 
+  def self.regenerate_replaced_transactions
+    self.sync_nonce
+    replaced_transactions = self.replaced.sort_by { |transaction| transaction.nonce.to_i }
+    replaced_transactions.each do |transaction|
+      next_nonce = Redis.current.incr('nonce') - 1
+      transaction.update!({ :nonce => next_nonce, :status => "pending" })
+    end
+    ENV['READ_ONLY'] = 'false'
+  end
+
+  def self.has_unconfirmed_transactions?
+    self.unconfirmed.first ? true : false
+  end
+
+  def self.has_replaced_transactions?
+    self.where({ :status => 'replaced' }).first ? true : false
+  end
+
+  def self.broadcast_pending_transactions
+    pending_transactions = self.pending.sort_by { |transaction| transaction.nonce.to_i }
+    pending_transactions.each do |transaction|
+      begin
+        BroadcastTransactionJob.perform_now(transaction)
+      rescue => e
+        if ENV['RAILS_ENV'] == 'test' and e.to_s == 'VM Exception while processing transaction: revert'
+          # ganache raises an error upon VM exceptions instead of returning the transaction hash
+          # so we have to ignore the error and update transaction_hash manually
+          client = Ethereum::Singleton.instance
+          transaction_hash = client.eth_get_block_by_number('latest', false)['result']['transactions'].first
+          transaction.update!({ :transaction_hash => transaction_hash, :status => 'unconfirmed' })
+        end
+      end
+    end
+  end
+
   def self.unconfirmed
     self.where({ :status => ["unconfirmed", "pending"] })
+  end
+
+  def self.replaced
+    self.where({ :status => ["replaced", "failed"] })
+  end
+
+  def self.pending
+    self.where({ :status => ["pending"] })
   end
 
   def expired?
@@ -96,5 +144,11 @@ class Transaction < ApplicationRecord
 
   def assign_next_nonce
     self.nonce = Redis.current.incr('nonce') - 1
+  end
+
+  def self.sync_nonce
+    client = Ethereum::Singleton.instance
+    key = Eth::Key.new priv: ENV['PRIVATE_KEY'].hex
+    Redis.current.set("nonce", client.get_nonce(key.address))
   end
 end

@@ -56,9 +56,9 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal ENV['READONLY'], 'true'
+    assert_equal ENV['READ_ONLY'], 'true'
     # always reset environment variables back to its initial state
-    ENV['READONLY'] = 'false'
+    ENV['READ_ONLY'] = 'false'
   end
 
   test "when balance is compromised because of invalid withdraws" do
@@ -70,9 +70,9 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal ENV['READONLY'], 'true'
+    assert_equal ENV['READ_ONLY'], 'true'
     # always reset environment variables back to its initial state
-    ENV['READONLY'] = 'false'
+    ENV['READ_ONLY'] = 'false'
   end
 
   test "when balance is compromised because of invalid trades" do
@@ -84,9 +84,9 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal ENV['READONLY'], 'true'
+    assert_equal ENV['READ_ONLY'], 'true'
     # always reset environment variables back to its initial state
-    ENV['READONLY'] = 'false'
+    ENV['READ_ONLY'] = 'false'
   end
 
   test "when balance is compromised because of invalid hold_balance" do
@@ -98,9 +98,9 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal ENV['READONLY'], 'true'
+    assert_equal ENV['READ_ONLY'], 'true'
     # always reset environment variables back to its initial state
-    ENV['READONLY'] = 'false'
+    ENV['READ_ONLY'] = 'false'
   end
 
   test "when balance is compromised because of invalid open orders" do
@@ -112,8 +112,8 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal ENV['READONLY'], 'true'
+    assert_equal ENV['READ_ONLY'], 'true'
     # always reset environment variables back to its initial state
-    ENV['READONLY'] = 'false'
+    ENV['READ_ONLY'] = 'false'
   end
 end
