@@ -43,6 +43,7 @@ class TransactionTest < ActiveSupport::TestCase
     Transaction.confirm_mined_transactions
     withdraw.tx.reload
     assert_equal(withdraw.tx.status, 'replaced')
+    assert_equal(ENV['READ_ONLY'], 'true')
   end
 
   test "should confirm successful transactions" do
