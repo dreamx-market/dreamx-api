@@ -2,10 +2,6 @@ class BroadcastTransactionJob < ApplicationJob
   queue_as :default
 
   def perform(tx)
-    if (Transaction.where({ :status => 'replaced' }).last)
-      return
-    end
-
     client = Ethereum::Singleton.instance
     transaction_hash = client.eth_send_raw_transaction(tx.raw.hex)["result"]
     tx.update!({ 
