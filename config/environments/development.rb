@@ -53,7 +53,7 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   # environment variables, can be overridden
-  ENV['CONTRACT_ADDRESS'] = '0x45717b73011AD0fB45bF70a336563B32873E7b23'
+  ENV['CONTRACT_ADDRESS'] = '0xc50feb05c839780596ef93a91b4b7e170b5c4a95'
   ENV['ETHEREUM_HOST'] = 'https://ropsten.infura.io/v3/b41fd9db5b3442a5b3be799b1bc91bf0'
   ENV['TRANSACTION_CONFIRMATIONS'] = '12'
   ENV['REDIS_HOST'] = 'redis://127.0.0.1:6379/1' # use database 1 for dev environment
