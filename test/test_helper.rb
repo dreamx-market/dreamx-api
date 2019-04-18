@@ -9,6 +9,7 @@ class ActiveSupport::TestCase
 
   teardown do
     revert_blockchain(@snapshot_id)
+    revert_environment_variables
   end
 
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
@@ -181,5 +182,9 @@ class ActiveSupport::TestCase
     client = Ethereum::Singleton.instance
     request = { "jsonrpc": "2.0", "method": "evm_revert", "params": [snapshot_id], "id": 1 }.to_json
     return JSON.parse(client.send_single(request))['result']
+  end
+
+  def revert_environment_variables
+    NinjatradeApi::Application.load_environment_variables(true)
   end
 end
