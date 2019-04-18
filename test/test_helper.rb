@@ -10,6 +10,7 @@ class ActiveSupport::TestCase
   teardown do
     revert_blockchain(@snapshot_id)
     revert_environment_variables
+    Redis.current.flushdb
   end
 
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
