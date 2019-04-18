@@ -3,11 +3,12 @@ class Block < ApplicationRecord
     @client ||= Ethereum::Singleton.instance
     current_block = @client.eth_block_number["result"].hex
 
-    last_confirmed_block_number = current_block - ENV['TRANSACTION_CONFIRMATIONS'].to_i
+    required_confirmations = ENV['TRANSACTION_CONFIRMATIONS'].to_i
+    last_confirmed_block_number = current_block - required_confirmations
     last_processed_block_number = self.last ? self.last.block_number : last_confirmed_block_number
     last_block_number = last_processed_block_number
 
-    if (current_block < 12 or (self.last and self.last.block_number == last_confirmed_block_number))
+    if (current_block < required_confirmations or (self.last and self.last.block_number == last_confirmed_block_number))
       return
     end
 
