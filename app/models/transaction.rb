@@ -10,7 +10,6 @@ class Transaction < ApplicationRecord
     last_confirmed_nonce = client.get_nonce(key.address) - 1
     last_block_number = client.eth_get_block_by_number('latest', false)['result']['number'].hex
     mined_transactions = self.where({ :status => ["unconfirmed", "pending"] }).where({ :nonce => 0..last_confirmed_nonce })
-    mined_transactions.length
     mined_transactions.each do |transaction|
       begin
         transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
@@ -114,12 +113,18 @@ class Transaction < ApplicationRecord
       begin
         BroadcastTransactionJob.perform_now(transaction)
       rescue => e
-        if ENV['RAILS_ENV'] == 'test' and e.to_s == 'VM Exception while processing transaction: revert'
+        if ENV['RAILS_ENV'] == 'test'
           # ganache raises an error upon VM exceptions instead of returning the transaction hash
           # so we have to ignore the error and update transaction_hash manually
-          client = Ethereum::Singleton.instance
-          transaction_hash = client.eth_get_block_by_number('latest', false)['result']['transactions'].first
-          transaction.update!({ :transaction_hash => transaction_hash, :status => 'unconfirmed' })
+          if e.to_s.include?('VM Exception while processing transaction: revert')
+            client = Ethereum::Singleton.instance
+            transaction_hash = client.eth_get_block_by_number('latest', false)['result']['transactions'].first
+            transaction.update!({ :transaction_hash => transaction_hash, :status => 'unconfirmed' })
+          elsif e.to_s.include?("the tx doesn't have the correct nonce")
+            transaction.update!({ :status => 'unconfirmed' })
+          else
+            transaction.update!({ :status => 'undefined' })
+          end
         end
       end
     end

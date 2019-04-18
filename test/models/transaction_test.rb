@@ -172,6 +172,11 @@ class TransactionTest < ActiveSupport::TestCase
 
     Transaction.broadcast_pending_transactions
     Transaction.confirm_mined_transactions
+
+    if (trade.reload.tx.status != 'replaced') or (withdraw2.reload.tx.status != 'failed')
+      debugger
+    end
+
     assert_equal(trade.reload.tx.status, 'replaced')
     assert_equal(withdraw1.reload.tx.status, 'confirmed')
     assert_equal(withdraw2.reload.tx.status, 'failed')
