@@ -43,11 +43,4 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-
-  # environment variables, can be overridden
-  ENV['CONTRACT_ADDRESS'] = '0xf675cf9c811022a8d934df1c96bb8af884dc92ee'
-  ENV['ETHEREUM_HOST'] = 'http://localhost:8545'
-  ENV['TRANSACTION_CONFIRMATIONS'] = '0'
-  ENV['REDIS_HOST'] = 'redis://127.0.0.1:6379/2' # use database 2 for test environment
-  ENV['FRAUD_PROTECTION'] = 'false'
 end

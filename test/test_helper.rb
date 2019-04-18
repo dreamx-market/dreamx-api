@@ -3,6 +3,14 @@ require_relative '../config/environment'
 require 'rails/test_help'
 
 class ActiveSupport::TestCase
+  setup do
+    @snapshot_id = snapshot_blockchain
+  end
+
+  teardown do
+    revert_blockchain(@snapshot_id)
+  end
+
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
@@ -161,5 +169,17 @@ class ActiveSupport::TestCase
     client = Ethereum::Singleton.instance
     key = Eth::Key.new priv: ENV['PRIVATE_KEY'].hex
     Redis.current.set("nonce", client.get_nonce(key.address))
+  end
+
+  def snapshot_blockchain
+    client = Ethereum::Singleton.instance
+    request = { "jsonrpc": "2.0", "method": "evm_snapshot", "params": [], "id": 1 }.to_json
+    return JSON.parse(client.send_single(request))['result']
+  end
+
+  def revert_blockchain(snapshot_id)
+    client = Ethereum::Singleton.instance
+    request = { "jsonrpc": "2.0", "method": "evm_revert", "params": [snapshot_id], "id": 1 }.to_json
+    return JSON.parse(client.send_single(request))['result']
   end
 end

@@ -148,7 +148,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     # A and B's trade is broadcasted, failed and marked as 'replaced'
     # A's withdraw is broadcasted, succeeded and marked as 'confirmed' because he already has the funds
-    # B's withdraw is broadcasted, failed and marked as 'failed'
+    # B's withdraw is broadcasted, failed and marked as 'failed' because he is dependent on the success of the trade
 
     # Transaction.broadcast_expired_transactions
     # A's withdraw is unaffected
