@@ -2,4 +2,4 @@
 
 ## Deposits of non-listed tokens:
 
-* manually list the token and credit their balances for them to withdraw, if it happens too frequently, figure out the root problem and a more effective solution.
+* list the tokens as non-tradable and credit their deposits for them to withdraw, if happens too frequently, figure out a more effective solution
