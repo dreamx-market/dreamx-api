@@ -66,10 +66,6 @@ You will need to temporarily make your database user a superuser.
 * rake ganache:up
 * rake test
 
-# Remaining issues
-
-* scalability of the front-end based matching engine
-
 # Contract deployment
 
 ## Development:
