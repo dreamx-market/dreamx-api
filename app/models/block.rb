@@ -24,4 +24,12 @@ class Block < ApplicationRecord
   def self.process_block(block_number)
     Deposit.aggregate(block_number)
   end
+
+  def self.revert_to_block(block_number)
+    if !self.last
+      return
+    end
+
+    self.last.update!({ :block_number => block_number })
+  end
 end

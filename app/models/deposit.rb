@@ -43,7 +43,11 @@ class Deposit < ApplicationRecord
         :block_hash => deposit['block_hash'],
         :block_number => deposit['block_number']
       }
-      self.create!(new_deposit)
+      begin
+        self.create!(new_deposit)
+      rescue => err
+        logger.debug "Failed to create deposit, received the following error: #{err}"
+      end
     end
   end
 
