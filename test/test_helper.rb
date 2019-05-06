@@ -37,7 +37,7 @@ class ActiveSupport::TestCase
     }
   end
 
-  def accounts
+  def addresses
     private_keys.keys
   end
 
