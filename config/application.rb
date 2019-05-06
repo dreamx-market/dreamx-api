@@ -25,7 +25,7 @@ module NinjatradeApi
         :GAS_LIMIT => '2000000',
         :REDIS_HOST => 'redis://127.0.0.1:6379',
         :ETHEREUM_HOST => 'https://ropsten.infura.io/v3/b41fd9db5b3442a5b3be799b1bc91bf0',
-        :CONTRACT_ADDRESS => '0xc50feb05c839780596ef93a91b4b7e170b5c4a95',
+        :CONTRACT_ADDRESS => '0xc50fEB05C839780596ef93a91b4B7E170B5C4A95',
         :MAX_PER_PAGE => '1000',
         :MAKER_MINIMUM_ETH_IN_WEI => '150000000000000000',
         :TAKER_MINIMUM_ETH_IN_WEI => '50000000000000000',

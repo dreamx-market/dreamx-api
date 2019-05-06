@@ -31,7 +31,7 @@ module Contract
         block = client.eth_get_block_by_number(i, true)['result']
         if block
           block['transactions'].each do |t|
-            if t['to'] == @instance.address
+            if Eth::Utils.format_address(t['to']) == Eth::Utils.format_address(@instance.address)
               incoming_transactions << t
             end
           end
