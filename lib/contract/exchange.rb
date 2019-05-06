@@ -31,6 +31,10 @@ module Contract
         block = client.eth_get_block_by_number(i, true)['result']
         if block
           block['transactions'].each do |t|
+            if !Eth::Utils.valid_address?(t['to'])
+              next
+            end
+
             if t['to'].without_checksum == @instance.address.without_checksum
               incoming_transactions << t
             end
