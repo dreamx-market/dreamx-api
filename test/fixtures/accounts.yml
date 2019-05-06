@@ -7,7 +7,7 @@ one:
   address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
 
 two:
-  address: "0x4E30dBA9762ABa125f5Ab81647eDEbFF9f9DF7a7"
+  address: "0x4e30dba9762aba125f5ab81647edebff9f9df7a7"
 
 three:
   address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
@@ -22,7 +22,7 @@ six:
   address: "0x266a483b876c85fb10c1bd0933e3e64e7ce4ecbb"
 
 seven:
-  address: "0x76446f63C6B7756257B9c7D56cE7dDe29836c203"
+  address: "0x76446f63c6b7756257b9c7d56ce7dde29836c203"
 
 eight:
   address: "0x16e86d3935e8922a9b14c722a97552a202575256"

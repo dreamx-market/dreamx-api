@@ -13,7 +13,7 @@ class Trade < ApplicationRecord
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
   validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
-  before_create :trade_balances, :generate_transaction
+  before_create :remove_checksum, :trade_balances, :generate_transaction
 
   def refund
     exchange = Contract::Exchange.singleton.instance
@@ -230,4 +230,8 @@ class Trade < ApplicationRecord
   def generate_transaction
     self.tx = Transaction.new({ status: 'pending' })
   end  
+
+  def remove_checksum
+    self.account_address = self.account_address.without_checksum
+  end
 end

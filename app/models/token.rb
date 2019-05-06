@@ -3,4 +3,12 @@ class Token < ApplicationRecord
 	validates :address, uniqueness: true
 	validates :name, uniqueness: true
 	validates :symbol, uniqueness: true
+
+  before_create :remove_checksum
+
+  private
+
+  def remove_checksum
+    self.address = self.address.without_checksum
+  end
 end

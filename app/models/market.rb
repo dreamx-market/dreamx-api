@@ -7,6 +7,8 @@ class Market < ApplicationRecord
 
   validates :symbol, presence: true
 
+  before_create :remove_checksum
+
   def average_price(period)
     if (!self.high(period) or !self.low(period))
       return nil
@@ -141,5 +143,12 @@ class Market < ApplicationRecord
     end
 
     return self.chart_data_by(1.hour).last(24).sort_by { |chart_datum| chart_datum.created_at }.first.close
+  end
+
+  private
+
+  def remove_checksum
+    self.base_token_address = self.base_token_address.without_checksum
+    self.quote_token_address = self.quote_token_address.without_checksum
   end
 end

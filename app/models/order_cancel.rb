@@ -10,7 +10,7 @@ class OrderCancel < ApplicationRecord
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid
   validate :balances_must_be_authentic, on: :create
 
-  before_create :cancel_order
+  before_create :remove_checksum, :cancel_order
 
   def order_must_be_open
     if (!self.order)
@@ -58,5 +58,9 @@ class OrderCancel < ApplicationRecord
     end
 
     validate_balances_integrity(self.account.balance(self.order.give_token_address))
+  end
+
+  def remove_checksum
+    self.account_address = self.account_address.without_checksum
   end
 end

@@ -10,7 +10,7 @@ class Withdraw < ApplicationRecord
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
-  before_create :collect_fee_and_debit_balance, :generate_transaction
+  before_create :remove_checksum, :collect_fee_and_debit_balance, :generate_transaction
 
   def refund
     exchange = Contract::Exchange.singleton.instance
@@ -111,5 +111,10 @@ class Withdraw < ApplicationRecord
 
   def generate_transaction
     self.tx = Transaction.new({ status: 'pending' })
+  end
+
+  def remove_checksum
+    self.account_address = self.account_address.without_checksum
+    self.token_address = self.token_address.without_checksum
   end
 end

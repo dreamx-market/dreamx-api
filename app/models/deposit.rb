@@ -8,7 +8,7 @@ class Deposit < ApplicationRecord
   validates :transaction_hash, uniqueness: true, on: :create
   validate :balances_must_be_authentic, on: :create
 
-  before_create :credit_balance
+  before_create :remove_checksum, :credit_balance
 
   private
 
@@ -44,5 +44,10 @@ class Deposit < ApplicationRecord
       }
       self.create!(new_deposit)
     end
+  end
+
+  def remove_checksum
+    self.account_address = self.account_address.without_checksum
+    self.token_address = self.token_address.without_checksum
   end
 end

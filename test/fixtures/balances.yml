@@ -85,13 +85,13 @@ ten:
   hold_balance: "0"
 
 eleven:
-  account_address: "0x76446f63C6B7756257B9c7D56cE7dDe29836c203"
+  account_address: "0x76446f63c6b7756257b9c7d56ce7dde29836c203"
   token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
   balance: "0"
   hold_balance: "50000000000000000000"
 
 twelve:
-  account_address: "0x76446f63C6B7756257B9c7D56cE7dDe29836c203"
+  account_address: "0x76446f63c6b7756257b9c7d56ce7dde29836c203"
   token_address: "0x0000000000000000000000000000000000000000"
   balance: "100000000000000000"
   hold_balance: "400000000000000000"

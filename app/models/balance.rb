@@ -3,6 +3,8 @@ class Balance < ApplicationRecord
 
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
 
+  before_create :remove_checksum
+
   def mark_fraud!
     self.fraud = true
     self.save!
@@ -120,5 +122,12 @@ class Balance < ApplicationRecord
   def spend(amount)
     self.hold_balance = hold_balance.to_i - amount.to_i
     save!
+  end
+
+  private
+
+  def remove_checksum
+    self.account_address = self.account_address.without_checksum
+    self.token_address = self.token_address.without_checksum
   end
 end

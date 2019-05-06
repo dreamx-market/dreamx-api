@@ -41,7 +41,7 @@ four:
   created_at: <%= 1.hour.ago %>
 
 five:
-  account_address: "0x76446f63C6B7756257B9c7D56cE7dDe29836c203"
+  account_address: "0x76446f63c6b7756257b9c7d56ce7dde29836c203"
   token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
   amount: "50000000000000000000"
   status: "pending"
@@ -51,7 +51,7 @@ five:
   created_at: <%= 1.hour.ago %>
 
 six:
-  account_address: "0x76446f63C6B7756257B9c7D56cE7dDe29836c203"
+  account_address: "0x76446f63c6b7756257b9c7d56ce7dde29836c203"
   token_address: "0x0000000000000000000000000000000000000000"
   amount: "500000000000000000"
   status: "pending"
