@@ -32,6 +32,7 @@ class Deposit < ApplicationRecord
     exchange = Contract::Exchange.new
     deposits = exchange.deposits(block_number)
     deposits.each do |deposit|
+      deposit['account'], deposit['token'] = deposit['account'].without_checksum, deposit['token'].without_checksum
       Account.initialize_if_not_exist(deposit['account'], deposit['token'])
       new_deposit = {
         :account_address => deposit['account'],
