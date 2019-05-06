@@ -173,10 +173,6 @@ class TransactionTest < ActiveSupport::TestCase
     Transaction.broadcast_pending_transactions
     Transaction.confirm_mined_transactions
 
-    if (trade.reload.tx.status != 'replaced') or (withdraw2.reload.tx.status != 'failed')
-      debugger
-    end
-
     assert_equal(trade.reload.tx.status, 'replaced')
     assert_equal(withdraw1.reload.tx.status, 'confirmed')
     assert_equal(withdraw2.reload.tx.status, 'failed')
@@ -205,10 +201,34 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "should not regenerate replaced transactions if there are still unconfirmed transactions" do
-    # set up an unconfirmed transaction in db
-    # transaction X is replaced
-    # Transaction.broadcast_expired_transactions
-    # an unconfirmed transaction is present, trasaction X is unaffected
+    withdraw1, replacer = batch_withdraw([
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 },
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+    ])
+    replacer.tx.update({ :nonce => withdraw1.tx.nonce })
+    BroadcastTransactionJob.perform_now(replacer.tx)
+    assert_equal(ENV['READ_ONLY'], 'false')
+
+    Transaction.broadcast_pending_transactions
+    Transaction.confirm_mined_transactions
+
+    assert_equal(withdraw1.reload.tx.status, 'replaced')
+    assert_equal(replacer.reload.tx.status, 'confirmed')
+    assert_equal(ENV['READ_ONLY'], 'true')
+
+    assert_no_changes 'withdraw1.tx.nonce' do
+      # create an unconfirmed transaction
+      withdraw2 = batch_withdraw([
+        { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+      ])
+
+      # manually expire txs so they can be broadcasted, in production, they will likely be expired
+      # already by the time they are re-generated
+      withdraw1.tx.update({ :created_at => 10.minutes.ago })
+      Transaction.broadcast_expired_transactions
+      assert_equal(withdraw1.reload.tx.status, 'replaced')
+      assert_equal(ENV['READ_ONLY'], 'true')
+    end
   end
 
   test "should mark failed transactions as out_of_gas if gas used is equal to gas limit" do
