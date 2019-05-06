@@ -19,8 +19,8 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "should rebroadcast expired transactions" do
     withdraw1, withdraw2 = batch_withdraw([
-      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 },
-      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 30000000000000000 }
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 },
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 30000000000000000 }
     ])
     withdraw1.tx.update({ :created_at => 15.minutes.ago })
     withdraw2.tx.update({ :created_at => 15.minutes.ago })
@@ -36,7 +36,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "should mark transaction as 'replaced' if nonce has been taken" do
     withdraw = batch_withdraw([
-      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
     ]).first
     withdraw.tx.update({ :nonce => 0 })
 
@@ -48,7 +48,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "should confirm successful transactions" do
     withdraw = batch_withdraw([
-      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
     ]).first
     transaction = withdraw.tx
     BroadcastTransactionJob.perform_now(transaction)
@@ -62,7 +62,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "should detect and remove fake coins upon an unsuccessful withdraw" do
     withdraw = batch_withdraw([
-      { :account_address => accounts[5], :token_address => '0x0000000000000000000000000000000000000000', :amount => '1'.to_wei }
+      { :account_address => addresses[5], :token_address => '0x0000000000000000000000000000000000000000', :amount => '1'.to_wei }
     ]).first
     transaction = withdraw.tx
 
@@ -85,13 +85,13 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "should detect and remove fake coins upon an unsuccessful order" do
-    taker_balance = Account.find_by({ :address => accounts[0] }).balance('0x75d417ab3031d592a781e666ee7bfc3381ad33d5')
+    taker_balance = Account.find_by({ :address => addresses[0] }).balance('0x75d417ab3031d592a781e666ee7bfc3381ad33d5')
     before_taker_balance = taker_balance.balance
     order = batch_order([
-      { :account_address => accounts[5], :give_token_address => '0x0000000000000000000000000000000000000000', :give_amount => '1'.to_wei, :take_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :take_amount => '1'.to_wei }
+      { :account_address => addresses[5], :give_token_address => '0x0000000000000000000000000000000000000000', :give_amount => '1'.to_wei, :take_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :take_amount => '1'.to_wei }
     ]).first
     trade = batch_trade([
-      { :account_address => accounts[0], :order_hash => order.order_hash, :amount => '1'.to_wei }
+      { :account_address => addresses[0], :order_hash => order.order_hash, :amount => '1'.to_wei }
     ]).first
     transaction = trade.tx
 
@@ -114,13 +114,13 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "should detect and remove fake coins upon an unsuccessful trade" do
-    maker_balance = Account.find_by({ :address => accounts[0] }).balance('0x75d417ab3031d592a781e666ee7bfc3381ad33d5')
+    maker_balance = Account.find_by({ :address => addresses[0] }).balance('0x75d417ab3031d592a781e666ee7bfc3381ad33d5')
     before_maker_balance = maker_balance.balance
     order = batch_order([
-      { :account_address => accounts[0], :give_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :give_amount => '1'.to_wei, :take_token_address => '0x0000000000000000000000000000000000000000', :take_amount => '1'.to_wei }
+      { :account_address => addresses[0], :give_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :give_amount => '1'.to_wei, :take_token_address => '0x0000000000000000000000000000000000000000', :take_amount => '1'.to_wei }
     ]).first
     trade = batch_trade([
-      { :account_address => accounts[5], :order_hash => order.order_hash, :amount => '1'.to_wei }
+      { :account_address => addresses[5], :order_hash => order.order_hash, :amount => '1'.to_wei }
     ]).first
     transaction = trade.tx
 
@@ -156,15 +156,15 @@ class TransactionTest < ActiveSupport::TestCase
     # B's withdraw is regenerated, broadcasted and confirmed
 
     order = batch_order([
-      { :account_address => accounts[1], :give_token_address => '0x0000000000000000000000000000000000000000', :give_amount => '1'.to_wei, :take_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :take_amount => '1'.to_wei }
+      { :account_address => addresses[1], :give_token_address => '0x0000000000000000000000000000000000000000', :give_amount => '1'.to_wei, :take_token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :take_amount => '1'.to_wei }
     ]).first
     trade = batch_trade([
-      { :account_address => accounts[0], :order_hash => order.order_hash, :amount => '1'.to_wei }
+      { :account_address => addresses[0], :order_hash => order.order_hash, :amount => '1'.to_wei }
     ]).first
     withdraw1, withdraw2, replacer = batch_withdraw([
-      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 },
-      { :account_address => accounts[1], :token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :amount => 999000000000000000 },
-      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 },
+      { :account_address => addresses[1], :token_address => '0x75d417ab3031d592a781e666ee7bfc3381ad33d5', :amount => 999000000000000000 },
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
     ])
     replacer.tx.update({ :nonce => trade.tx.nonce })
     BroadcastTransactionJob.perform_now(replacer.tx)
@@ -215,7 +215,7 @@ class TransactionTest < ActiveSupport::TestCase
     ENV['GAS_LIMIT'] = '30000'
 
     withdraw = batch_withdraw([
-      { :account_address => accounts[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
     ]).first
 
     # ganache raises an error upon VM exceptions instead of returning the transaction hash
