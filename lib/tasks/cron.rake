@@ -6,7 +6,9 @@ namespace :cron do
   Transaction.confirm_mined_transactions
  end
 
- task :test => :environment do
-  p 'it works!'
+ task :a_lengthy_task => :environment do
+  p 'TASK SPAWNED'
+  sleep 180
+  p 'TASK FINISHED'
  end
 end
