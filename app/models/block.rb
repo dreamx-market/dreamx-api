@@ -30,6 +30,8 @@ class Block < ApplicationRecord
   end
 
   def self.process_block(block_number)
+    # the following methods should be able to be called multiple times 
+    # with the same arguments without causing errors
     Deposit.aggregate(block_number)
   end
 
