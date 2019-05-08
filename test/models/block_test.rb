@@ -18,12 +18,4 @@ class BlockTest < ActiveSupport::TestCase
       Block.process_new_confirmed_blocks
     end
   end
-
-  test "process_new_confirmed_blocks should not execute if block 1 is pending" do
-    Block.last.update({ :status => 'pending' })
-    
-    assert_no_changes('Deposit.count') do
-      Block.process_new_confirmed_blocks
-    end
-  end
 end

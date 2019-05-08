@@ -1,13 +1,5 @@
 class Block < ApplicationRecord
   def self.process_new_confirmed_blocks
-    block = self.find_or_initialize_by(:id => 1)
-
-    if block.status == 'pending'
-      return
-    else
-      block.update!(:status => 'pending')
-    end
-
     @client ||= Ethereum::Singleton.instance
     current_block = @client.eth_block_number["result"].hex
 
@@ -26,7 +18,7 @@ class Block < ApplicationRecord
     end
 
     last_block = @client.eth_get_block_by_number(last_block_number, false)
-    block.update!(:status => 'completed', :block_number => last_block["result"]["number"].hex, :block_hash => last_block["result"]["hash"], :parent_hash => last_block["result"]["parentHash"])
+    self.find_or_initialize_by(:id => 1).update!(:block_number => last_block["result"]["number"].hex, :block_hash => last_block["result"]["hash"], :parent_hash => last_block["result"]["parentHash"])
   end
 
   def self.process_block(block_number)

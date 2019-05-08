@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_08_135723) do
+ActiveRecord::Schema.define(version: 2019_04_18_113348) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -38,7 +38,6 @@ ActiveRecord::Schema.define(version: 2019_05_08_135723) do
     t.integer "block_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "status", comment: "completed, pending"
   end
 
   create_table "chart_data", force: :cascade do |t|
