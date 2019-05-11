@@ -70,38 +70,38 @@ class Market < ApplicationRecord
   end
 
   def last_price(period=1.day)
-    @trades_within_period ||= self.trades(period)
-    trades_sorted_by_nonce_asc = @trades_within_period.sort_by { |trade| trade.nonce.to_i }
+    trades_within_period = self.trades(period)
+    trades_sorted_by_nonce_asc = trades_within_period.sort_by { |trade| trade.nonce.to_i }
     return trades_sorted_by_nonce_asc.empty? ? nil : trades_sorted_by_nonce_asc.last.price.to_s
   end
 
   def high(period=1.day)
-    @trades_within_period ||= self.trades(period)
-    trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
+    trades_within_period = self.trades(period)
+    trades_within_period_sorted_by_price_asc = trades_within_period.sort_by { |trade| trade.price }
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.last.price.to_s
   end
 
   def low(period=1.day)
-    @trades_within_period ||= self.trades(period)
-    trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
+    trades_within_period = self.trades(period)
+    trades_within_period_sorted_by_price_asc = trades_within_period.sort_by { |trade| trade.price }
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.first.price.to_s
   end
 
   def lowest_ask
-    @sell_orders_sorted_by_price_asc = self.open_sell_orders.sort_by { |order| order.price }
-    return @sell_orders_sorted_by_price_asc.empty? ? nil : @sell_orders_sorted_by_price_asc.first.price
+    sell_orders_sorted_by_price_asc = self.open_sell_orders.sort_by { |order| order.price }
+    return sell_orders_sorted_by_price_asc.empty? ? nil : sell_orders_sorted_by_price_asc.first.price
   end
 
   def highest_bid
-    @buy_orders_sorted_by_price_asc ||= self.open_buy_orders.sort_by { |order| order.price }
-    return @buy_orders_sorted_by_price_asc.empty? ? nil : @buy_orders_sorted_by_price_asc.last.price
+    buy_orders_sorted_by_price_asc = self.open_buy_orders.sort_by { |order| order.price }
+    return buy_orders_sorted_by_price_asc.empty? ? nil : buy_orders_sorted_by_price_asc.last.price
   end
 
   def volume(period=1.day)
-    @trades_within_period ||= self.trades(period)
+    trades_within_period = self.trades(period)
 
     result = 0
-    @trades_within_period.each do |trade|
+    trades_within_period.each do |trade|
       if trade.is_sell
         result += trade.amount.to_i
       else
@@ -112,10 +112,10 @@ class Market < ApplicationRecord
   end
 
   def quote_volume(period=1.day)
-    @trades_within_period ||= self.trades(period)
+    trades_within_period = self.trades(period)
 
     result = 0
-    @trades_within_period.each do |trade|
+    trades_within_period.each do |trade|
       if trade.is_sell
         result += trade.order.calculate_take_amount(trade.amount)
       else

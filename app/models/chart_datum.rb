@@ -1,7 +1,7 @@
 class ChartDatum < ApplicationRecord
   def self.aggregate(period)
-    @markets ||= Market.all
-    @markets.each do |market|
+    markets = Market.all
+    markets.each do |market|
       open_price = market.chart_data.last ? market.chart_data.last.close : nil
       new_chart_datum = {
         :high => market.high(period) || open_price,
@@ -19,8 +19,8 @@ class ChartDatum < ApplicationRecord
   end
 
   def self.remove_expired
-    @chart_data ||= self.all
-    @chart_data.each do |chart_datum|
+    chart_data = self.all
+    chart_data.each do |chart_datum|
       chart_datum.delete if chart_datum.expired?
     end
   end
