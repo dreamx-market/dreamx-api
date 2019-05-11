@@ -1,5 +1,6 @@
 class Transfer < ApplicationRecord
   def self.find_transfer(params)
+    p params[:account_address]
     @account ||= Account.find_by!({ :address => params[:account_address] })
 
     start_timestamp = params[:start] || 0
