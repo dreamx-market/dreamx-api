@@ -1,1 +1,1 @@
-json.extract! token, :name, :address, :symbol, :decimals
+json.extract! token, :name, :address, :symbol, :decimals, :withdraw_minimum, :withdraw_fee
