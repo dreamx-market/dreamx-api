@@ -33,6 +33,11 @@ class Withdraw < ApplicationRecord
     tx.block_number
   end
 
+  # for :extract in _withdraw in responding to POST requests
+  def type
+    'withdraw'
+  end
+
   def payload
     exchange = Contract::Exchange.singleton
     fun = exchange.instance.parent.functions.select { |fun| fun.name == 'withdraw'}.first
