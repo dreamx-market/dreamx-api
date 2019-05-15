@@ -1,1 +1,1 @@
-json.extract! withdraw, :account_address, :amount, :token_address, :withdraw_hash, :created_at
+json.extract! withdraw, :id, :token_address, :amount, :transaction_hash, :block_hash, :block_number, :created_at
