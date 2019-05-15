@@ -10,6 +10,11 @@ class Deposit < ApplicationRecord
 
   before_create :remove_checksum, :credit_balance
 
+  # to distinguish this model from withdraws when being displayed a mixed collection of transfers
+  def type
+    'deposit'
+  end
+
   private
 
   def credit_balance

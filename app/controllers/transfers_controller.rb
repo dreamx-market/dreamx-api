@@ -43,7 +43,7 @@ class TransfersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_transfer
-      @transfer = Transfer.find_transfer(params)
+      @transfers = Transfer.find_transfers(params)
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

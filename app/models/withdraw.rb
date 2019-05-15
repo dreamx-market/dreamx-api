@@ -33,7 +33,7 @@ class Withdraw < ApplicationRecord
     tx.block_number
   end
 
-  # for :extract in _withdraw in responding to POST requests
+  # to distinguish this model from deposits when being displayed a mixed collection of transfers
   def type
     'withdraw'
   end
