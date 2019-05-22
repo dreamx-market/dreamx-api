@@ -1,7 +1,7 @@
 class MarketOrdersChannel < ApplicationCable::Channel
   def subscribed
-    market = Market.find(params[:id])
-    stream_for market
+    stop_all_streams
+    stream_from "market_orders:#{params[:market_symbol]}"
   end
 
   def unsubscribed
