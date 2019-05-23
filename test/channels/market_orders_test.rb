@@ -1,7 +1,7 @@
 require 'test_helper'
  
-class MarketOrdersTest < ActiveJob::TestCase
-  include ActionCable::TestHelper
+class MarketOrdersTest < ActionCable::TestCase
+  include ActiveJob::TestHelper
   
   setup do
     @order = orders(:one)
@@ -20,5 +20,13 @@ class MarketOrdersTest < ActiveJob::TestCase
         order.save
       end
     end
+
+    # pp ApplicationController.render(partial: 'orders/order', locals: { order: order })
+
+    # assert_broadcast_on("market_orders:#{order.market.symbol}", 1) do
+    #   perform_enqueued_jobs do
+    #     order.save
+    #   end
+    # end
   end
 end
