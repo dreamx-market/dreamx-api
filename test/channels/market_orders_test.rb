@@ -20,13 +20,5 @@ class MarketOrdersTest < ActionCable::TestCase
         order.save
       end
     end
-
-    # pp ApplicationController.render(partial: 'orders/order', locals: { order: order })
-
-    # assert_broadcast_on("market_orders:#{order.market.symbol}", 1) do
-    #   perform_enqueued_jobs do
-    #     order.save
-    #   end
-    # end
   end
 end
