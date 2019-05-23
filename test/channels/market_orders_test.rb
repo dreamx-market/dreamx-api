@@ -2,7 +2,7 @@ require 'test_helper'
  
 class MarketOrdersTest < ActiveJob::TestCase
   include ActionCable::TestHelper
-
+  
   setup do
     @order = orders(:one)
 
@@ -16,7 +16,9 @@ class MarketOrdersTest < ActiveJob::TestCase
     order = Order.new(generate_order(@order))
     
     assert_broadcasts("market_orders:#{order.market.symbol}", 1) do
-      order.save
+      perform_enqueued_jobs do
+        order.save
+      end
     end
   end
 end

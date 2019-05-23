@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class TransactionTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     sync_nonce
     @client = Ethereum::Singleton.instance
@@ -28,7 +30,9 @@ class TransactionTest < ActiveSupport::TestCase
     expired_transaction2 = withdraw2.tx
 
     assert_changes 'expired_transaction1.transaction_hash and expired_transaction2.transaction_hash' do
-      Transaction.broadcast_expired_transactions
+      perform_enqueued_jobs do
+        Transaction.broadcast_expired_transactions
+      end
       expired_transaction1.reload
       expired_transaction2.reload
     end
@@ -170,7 +174,9 @@ class TransactionTest < ActiveSupport::TestCase
     BroadcastTransactionJob.perform_now(replacer.tx)
     assert_equal(ENV['READ_ONLY'], 'false')
 
-    Transaction.broadcast_pending_transactions
+    perform_enqueued_jobs do
+      Transaction.broadcast_pending_transactions
+    end
     Transaction.confirm_mined_transactions
 
     assert_equal(trade.reload.tx.status, 'replaced')
@@ -189,7 +195,9 @@ class TransactionTest < ActiveSupport::TestCase
         transaction.update({ :created_at => 10.minutes.ago })
       end
 
-      Transaction.broadcast_expired_transactions
+      perform_enqueued_jobs do
+        Transaction.broadcast_expired_transactions
+      end
       Transaction.confirm_mined_transactions
       assert_equal(trade.reload.tx.status, 'confirmed')
       assert_equal(withdraw2.reload.tx.status, 'confirmed')

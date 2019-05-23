@@ -33,17 +33,4 @@ class BroadcastTransactionJobTest < ActiveJob::TestCase
     assert_not_nil transaction.gas_price
     assert_not_nil transaction.transaction_hash
   end
-
-  # test "should not broadcast if there has been a replaced transaction" do
-  #   replaced_transaction = transactions(:one)
-  #   replaced_transaction.update({ :status => 'replaced' })
-  
-  #   withdraw = batch_withdraw([
-  #     { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000, :nonce => (Time.now.to_i * 1000).to_s }
-  #   ]).first
-  #   transaction = withdraw.tx
-  #   BroadcastTransactionJob.perform_now(withdraw.tx)
-  #   transaction.reload
-  #   assert_equal transaction.status, 'pending'
-  # end
 end

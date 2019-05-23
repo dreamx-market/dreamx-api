@@ -66,7 +66,7 @@ class Transaction < ApplicationRecord
     end
 
     begin
-      BroadcastTransactionJob.perform_now(self)
+      BroadcastTransactionJob.perform_later(self)
     rescue
     end
   end
@@ -83,7 +83,7 @@ class Transaction < ApplicationRecord
       end
 
       begin
-        BroadcastTransactionJob.perform_now(transaction)
+        BroadcastTransactionJob.perform_later(transaction)
       rescue
       end
     end
@@ -111,7 +111,7 @@ class Transaction < ApplicationRecord
     pending_transactions = self.pending.sort_by { |transaction| transaction.nonce.to_i }
     pending_transactions.each do |transaction|
       begin
-        BroadcastTransactionJob.perform_now(transaction)
+        BroadcastTransactionJob.perform_later(transaction)
       rescue => e
         if ENV['RAILS_ENV'] == 'test'
           # ganache raises an error upon VM exceptions instead of returning the transaction hash

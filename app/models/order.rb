@@ -13,7 +13,7 @@ class Order < ApplicationRecord
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
 	before_create :remove_checksum, :hold_balance
-  after_commit { MarketOrdersRelayJob.perform_now(self) }
+  after_commit { MarketOrdersRelayJob.perform_later(self) }
 
   def v
     signature[-2..signature.length].hex
