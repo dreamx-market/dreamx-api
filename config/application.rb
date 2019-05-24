@@ -103,5 +103,7 @@ module NinjatradeApi
 
     # pagination
     WillPaginate.per_page = 100
+
+    config.action_cable.disable_request_forgery_protection = true
   end
 end
