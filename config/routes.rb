@@ -15,5 +15,5 @@ Rails.application.routes.draw do
   resources :orders, defaults: { format: :json }, param: :order_hash, only: [:index, :show, :create]
   resources :markets, defaults: { format: :json }, only: [:index]
   resources :tokens, defaults: { format: :json }, only: [:index]
-  mount ActionCable.server => '/websocket'
+  mount ActionCable.server => '/cable'
 end

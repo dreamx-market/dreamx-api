@@ -15,7 +15,7 @@ class MarketOrdersTest < ActionCable::TestCase
   test "broadcast message on order creation" do
     order = Order.new(generate_order(@order))
     
-    assert_broadcasts("market_orders:#{order.market.symbol}", 1) do
+    assert_broadcasts("market_orders:#{order.market_symbol}", 1) do
       perform_enqueued_jobs do
         order.save
       end
