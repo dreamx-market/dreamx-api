@@ -15,6 +15,10 @@ class Deposit < ApplicationRecord
     'deposit'
   end
 
+  def account_address
+    self.account.address
+  end
+
   private
 
   def credit_balance

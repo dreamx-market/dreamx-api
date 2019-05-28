@@ -4,6 +4,7 @@ class Balance < ApplicationRecord
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
 
   before_create :remove_checksum
+  after_commit { AccountBalancesRelayJob.perform_later(self) }
 
   def mark_fraud!
     self.fraud = true
