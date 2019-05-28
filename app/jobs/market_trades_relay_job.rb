@@ -3,7 +3,7 @@ class MarketTradesRelayJob < ApplicationJob
 
   def perform(trade)
     locals = { channel: 'MarketTrades', payload: [trade] }
-    json = ApplicationController.render('trades/socket', locals: locals)
+    json = JSON.parse(ApplicationController.render('trades/socket', locals: locals))
     ActionCable.server.broadcast("market_trades:#{trade.market_symbol}", json)
   end
 end

@@ -3,7 +3,7 @@ class AccountOrdersRelayJob < ApplicationJob
 
   def perform(order)
     locals = { channel: 'AccountOrders', payload: [order] }
-    json = ApplicationController.render('orders/socket', locals: locals)
+    json = JSON.parse(ApplicationController.render('orders/socket', locals: locals))
     ActionCable.server.broadcast("account_orders:#{order.account_address}", json)
   end
 end
