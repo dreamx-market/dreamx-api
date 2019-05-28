@@ -9,6 +9,7 @@ class Deposit < ApplicationRecord
   validate :balances_must_be_authentic, on: :create
 
   before_create :remove_checksum, :credit_balance
+  after_commit { AccountTransfersRelayJob.perform_later(self) }
 
   # to distinguish this model from withdraws when being displayed a mixed collection of transfers
   def type
