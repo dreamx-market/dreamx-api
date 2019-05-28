@@ -1,4 +1,6 @@
 class ChartDatum < ApplicationRecord
+  after_commit { MarketChartDataRelayJob.perform_later(self) }
+
   def self.aggregate(period)
     markets = Market.all
     markets.each do |market|

@@ -15,7 +15,7 @@ class MarketTradesTest < ActionCable::TestCase
     ])
   end
 
-  test "broadcast message on order creation" do
+  test "broadcast a message when a new trade is created" do
     trade = Trade.new(generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount }))
     
     assert_broadcasts("market_trades:#{trade.market_symbol}", 1) do

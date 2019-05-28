@@ -12,7 +12,7 @@ class MarketOrdersTest < ActionCable::TestCase
     batch_deposit(deposits)
   end
 
-  test "broadcast message on order creation" do
+  test "broadcast a message when a new order is created" do
     order = Order.new(generate_order(@order))
     
     assert_broadcasts("market_orders:#{order.market_symbol}", 1) do
