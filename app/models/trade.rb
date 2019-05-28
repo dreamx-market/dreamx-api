@@ -14,7 +14,10 @@ class Trade < ApplicationRecord
   validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
   before_create :remove_checksum, :trade_balances, :generate_transaction
-  after_commit { MarketTradesRelayJob.perform_later(self) }
+  after_commit { 
+    MarketTradesRelayJob.perform_later(self) 
+    AccountTradesRelayJob.perform_later(self) 
+  }
 
   def refund
     exchange = Contract::Exchange.singleton.instance
