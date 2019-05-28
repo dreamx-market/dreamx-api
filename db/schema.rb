@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_21_025843) do
+ActiveRecord::Schema.define(version: 2019_05_28_124213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -114,6 +114,15 @@ ActiveRecord::Schema.define(version: 2019_05_21_025843) do
   create_table "tickers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "market_symbol"
+    t.string "last"
+    t.string "high"
+    t.string "low"
+    t.string "lowest_ask"
+    t.string "highest_bid"
+    t.string "percent_change"
+    t.string "base_volume"
+    t.string "quote_volume"
   end
 
   create_table "tokens", force: :cascade do |t|

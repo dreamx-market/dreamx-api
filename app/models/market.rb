@@ -151,4 +151,8 @@ class Market < ApplicationRecord
     self.base_token_address = self.base_token_address.without_checksum
     self.quote_token_address = self.quote_token_address.without_checksum
   end
+
+  # def create_ticker
+
+  # end
 end
