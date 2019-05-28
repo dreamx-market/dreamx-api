@@ -16,4 +16,13 @@ class MarketTest < ActiveSupport::TestCase
   	@market.quote_token_address = @market.base_token_address
   	assert_not @market.valid?
   end
+
+  test "cannot be destroyed" do
+    assert_no_changes('Market.count') do
+      begin
+        @market.delete
+      rescue
+      end
+    end
+  end
 end

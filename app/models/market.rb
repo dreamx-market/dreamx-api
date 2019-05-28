@@ -1,4 +1,6 @@
 class Market < ApplicationRecord
+  include NonDestroyable
+
   has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol'
 	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
@@ -6,6 +8,7 @@ class Market < ApplicationRecord
 	validate :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
 
   before_create :remove_checksum, :assign_symbol, :create_ticker
+  before_destroy :stop_destroy, prepend: true
 
   def average_price(period)
     if (!self.high(period) or !self.low(period))
