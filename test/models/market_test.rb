@@ -16,17 +16,4 @@ class MarketTest < ActiveSupport::TestCase
   	@market.quote_token_address = @market.base_token_address
   	assert_not @market.valid?
   end
-
-  test "symbol must exist" do
-    @market.symbol = nil
-    assert_not @market.valid?
-    assert_equal @market.errors.messages[:symbol], ["can't be blank"]
-  end
-
-  test "symbol must be valid" do
-    assert @market.valid?
-    @market.symbol = "INVALIDBASE_INVALIDQUOTE"
-    assert_not @market.valid?
-    assert_equal @market.errors.messages[:symbol], ["invalid"]
-  end
 end

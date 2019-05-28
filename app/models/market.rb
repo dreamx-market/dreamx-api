@@ -24,23 +24,6 @@ class Market < ApplicationRecord
 		errors.add(:quote_token_address, 'Market already exists') if existing_market
 	end
 
-  # def symbol_must_be_valid
-  #   if !self.symbol
-  #     return
-  #   end
-
-  #   base, quote = self.symbol.split("_")
-  #   base_token = Token.find_by({ :symbol => base })
-  #   quote_token = Token.find_by({ :symbol => quote })
-
-  #   if (
-  #     !base_token or base_token.address != self.base_token_address or
-  #     !quote_token or quote_token.address != self.quote_token_address
-  #   )
-  #     errors.add(:symbol, 'invalid')
-  #   end
-  # end
-
   def open_buy_orders
     return Order.where({ :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).where.not({ status: 'closed' })
   end
