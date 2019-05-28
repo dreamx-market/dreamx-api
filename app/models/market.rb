@@ -3,11 +3,9 @@ class Market < ApplicationRecord
 	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
 	validates_uniqueness_of :base_token_address, scope: [:quote_token_address]
-	validate :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market, :symbol_must_be_valid
+	validate :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
 
-  validates :symbol, presence: true
-
-  before_create :remove_checksum
+  before_create :remove_checksum, :assign_symbol, :create_ticker
 
   def average_price(period)
     if (!self.high(period) or !self.low(period))
@@ -26,22 +24,22 @@ class Market < ApplicationRecord
 		errors.add(:quote_token_address, 'Market already exists') if existing_market
 	end
 
-  def symbol_must_be_valid
-    if !self.symbol
-      return
-    end
+  # def symbol_must_be_valid
+  #   if !self.symbol
+  #     return
+  #   end
 
-    base, quote = self.symbol.split("_")
-    base_token = Token.find_by({ :symbol => base })
-    quote_token = Token.find_by({ :symbol => quote })
+  #   base, quote = self.symbol.split("_")
+  #   base_token = Token.find_by({ :symbol => base })
+  #   quote_token = Token.find_by({ :symbol => quote })
 
-    if (
-      !base_token or base_token.address != self.base_token_address or
-      !quote_token or quote_token.address != self.quote_token_address
-    )
-      errors.add(:symbol, 'invalid')
-    end
-  end
+  #   if (
+  #     !base_token or base_token.address != self.base_token_address or
+  #     !quote_token or quote_token.address != self.quote_token_address
+  #   )
+  #     errors.add(:symbol, 'invalid')
+  #   end
+  # end
 
   def open_buy_orders
     return Order.where({ :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).where.not({ status: 'closed' })
@@ -152,7 +150,11 @@ class Market < ApplicationRecord
     self.quote_token_address = self.quote_token_address.without_checksum
   end
 
-  # def create_ticker
+  def assign_symbol
+    self.symbol = "#{self.base_token.symbol}_#{self.quote_token.symbol}"
+  end
 
-  # end
+  def create_ticker
+    Ticker.create!({ :market_symbol => self.symbol })
+  end
 end

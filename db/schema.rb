@@ -120,9 +120,9 @@ ActiveRecord::Schema.define(version: 2019_05_28_124213) do
     t.string "low"
     t.string "lowest_ask"
     t.string "highest_bid"
-    t.string "percent_change"
-    t.string "base_volume"
-    t.string "quote_volume"
+    t.string "percent_change", default: "0"
+    t.string "base_volume", default: "0"
+    t.string "quote_volume", default: "0"
   end
 
   create_table "tokens", force: :cascade do |t|

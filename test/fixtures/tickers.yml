@@ -4,8 +4,11 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
+one:
+  market_symbol: "ONE_TWO"
+
+two:
+  market_symbol: "ONE_THREE"
+
+three:
+  market_symbol: "ONE_FIVE"

@@ -1,4 +1,6 @@
 class Ticker < ApplicationRecord
+  validates :market_symbol, uniqueness: true
+
   def self.find_by_market_symbol(symbol)
     market = Market.find_by({ :symbol => symbol })
 

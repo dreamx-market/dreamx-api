@@ -13,4 +13,4 @@ two:
 three:
   base_token_address: "0x0000000000000000000000000000000000000000"
   quote_token_address: "0x75d417ab3031d592a781e666ee7bfc3381ad33d5"
-  symbol: "ONE_FOUR"
+  symbol: "ONE_FIVE"
