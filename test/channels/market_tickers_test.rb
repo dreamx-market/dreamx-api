@@ -7,7 +7,7 @@ class MarketTickersTest < ActionCable::TestCase
     @trade = trades(:one)
     @order = orders(:one)
     @order_cancel = order_cancels(:one)
-    @deposits = batch_deposit([
+    batch_deposit([
       { :account_address => @trade.account_address, :token_address => @order.take_token_address, :amount => @trade.amount },
       { :account_address => @order.account_address, :token_address => @order.give_token_address, :amount => @order.give_amount }
     ])
