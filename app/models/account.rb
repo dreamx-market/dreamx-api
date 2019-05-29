@@ -4,7 +4,7 @@ class Account < ApplicationRecord
   has_many :withdraws, foreign_key: 'account_address', primary_key: 'address'
 	validates :address, uniqueness: true
 
-  # before_create :remove_checksum
+  before_create :remove_checksum
 
   def balance(token_address)
     Balance.find_by({ :account_address => self.address, :token_address => token_address })
