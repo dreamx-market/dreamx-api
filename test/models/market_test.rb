@@ -25,4 +25,21 @@ class MarketTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "cannot be updated" do
+    assert_no_changes('@market.symbol') do
+      @market.update({ :symbol => "ABC_123" })
+      @market.reload
+    end
+
+    assert_no_changes('@market.base_token_address') do
+      @market.update({ :base_token_address => "NEW_ADDRESS" })
+      @market.reload
+    end
+
+    assert_no_changes('@market.quote_token_address') do
+      @market.update({ :quote_token_address => "NEW_ADDRESS" })
+      @market.reload
+    end
+  end
 end
