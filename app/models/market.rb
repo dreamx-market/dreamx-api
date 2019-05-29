@@ -110,8 +110,8 @@ class Market < ApplicationRecord
   end
 
   def percent_change_24h
-    if !self.price_previous_24h
-      return 0
+    if !self.price_previous_24h or !self.last_price
+      return 0.to_f
     end
 
     return ((self.last_price.to_f * 100) / self.price_previous_24h.to_f) - 100
