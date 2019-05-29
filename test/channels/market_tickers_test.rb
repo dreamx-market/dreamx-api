@@ -19,8 +19,10 @@ class MarketTickersTest < ActionCable::TestCase
     trade.market.ticker.update_data
 
     assert_broadcasts("market_tickers:#{trade.market_symbol}", 1) do
-      perform_enqueued_jobs do
-        trade.save
+      assert_broadcasts("market_tickers", 1) do
+        perform_enqueued_jobs do
+          trade.save
+        end
       end
     end
   end
@@ -30,8 +32,10 @@ class MarketTickersTest < ActionCable::TestCase
     order.market.ticker.update_data
 
     assert_broadcasts("market_tickers:#{order.market_symbol}", 1) do
-      perform_enqueued_jobs do
-        order.save
+      assert_broadcasts("market_tickers", 1) do
+        perform_enqueued_jobs do
+          order.save
+        end
       end
     end
 
@@ -40,8 +44,10 @@ class MarketTickersTest < ActionCable::TestCase
     new_order_cancel = OrderCancel.new(generate_order_cancel(@order_cancel))
 
     assert_broadcasts("market_tickers:#{new_order_cancel.market_symbol}", 1) do
-      perform_enqueued_jobs do
-        new_order_cancel.save
+      assert_broadcasts("market_tickers", 1) do
+        perform_enqueued_jobs do
+          new_order_cancel.save
+        end
       end
     end
   end

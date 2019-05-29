@@ -5,5 +5,6 @@ class MarketTickersRelayJob < ApplicationJob
     locals = { channel: 'MarketTickers', payload: [ticker] }
     json = JSON.parse(ApplicationController.render('tickers/socket', locals: locals))
     ActionCable.server.broadcast("market_tickers:#{ticker.market_symbol}", json)
+    ActionCable.server.broadcast("market_tickers", json)
   end
 end
