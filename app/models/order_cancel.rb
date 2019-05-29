@@ -11,6 +11,7 @@ class OrderCancel < ApplicationRecord
   validate :balances_must_be_authentic, on: :create
 
   before_create :remove_checksum, :cancel_order
+  after_create :update_ticker
 
   def order_must_be_open
     if (!self.order)
@@ -46,6 +47,14 @@ class OrderCancel < ApplicationRecord
     return result
   end
 
+  def market
+    self.order.market
+  end
+
+  def market_symbol
+    self.market.symbol
+  end
+
   private
 
   def cancel_order
@@ -62,5 +71,9 @@ class OrderCancel < ApplicationRecord
 
   def remove_checksum
     self.account_address = self.account_address.without_checksum
+  end
+
+  def update_ticker
+    self.market.ticker.update_data
   end
 end

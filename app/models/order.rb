@@ -13,6 +13,7 @@ class Order < ApplicationRecord
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
 	before_create :remove_checksum, :hold_balance
+  after_create :update_ticker
   after_commit { 
     MarketOrdersRelayJob.perform_later(self) 
     AccountOrdersRelayJob.perform_later(self)
@@ -170,4 +171,8 @@ class Order < ApplicationRecord
     self.give_token_address = self.give_token_address.without_checksum
     self.take_token_address = self.take_token_address.without_checksum
   end
+
+  def update_ticker
+    self.market.ticker.update_data
+  end  
 end

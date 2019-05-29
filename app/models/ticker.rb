@@ -31,9 +31,7 @@ class Ticker < ApplicationRecord
 
     def build_ticker(market)
       ticker = {
-        :base_token_address => market.base_token_address,
-        :quote_token_address => market.quote_token_address,
-        :symbol => market.symbol,
+        :market_symbol => market.symbol,
         :last => market.last_price ? market.last_price.to_s : nil,
         :high => market.high ? market.high.to_s : nil,
         :low => market.low ? market.low.to_s : nil,
@@ -47,7 +45,8 @@ class Ticker < ApplicationRecord
     end
   end
 
-  def update
-    pp market_data = Ticker.find_by_market_symbol(self.market_symbol)
+  def update_data
+    updated_ticker = Ticker.find_by_market_symbol(self.market_symbol)
+    self.update(updated_ticker)
   end
 end

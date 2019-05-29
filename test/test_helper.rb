@@ -78,7 +78,15 @@ class ActiveSupport::TestCase
     created = []
     orders.each do |order|
       new_order = Order.new(generate_order(order))
-      assert new_order.save
+
+      # TO BE REMOVED
+      if new_order.valid?
+        assert new_order.save
+      else
+        p new_order.errors.messages
+        byebug
+      end
+
       created << new_order
     end
     return created
@@ -104,17 +112,13 @@ class ActiveSupport::TestCase
     return created
   end
 
-  def get_transactable_nonce
-    Time.now.to_i * 1000 + Redis.current.incr('transactable_nonce')
-  end
-
   # params { :account_address, :token_address, :amount }
   def generate_withdraw(params)
     withdraw = { 
       :account_address => params[:account_address], 
       :token_address => params[:token_address], 
       :amount => params[:amount],
-      :nonce => get_transactable_nonce,
+      :nonce => get_action_nonce,
     }
     withdraw[:withdraw_hash] = Withdraw.calculate_hash(withdraw)
     withdraw[:signature] = sign_message(withdraw[:account_address], withdraw[:withdraw_hash])
@@ -129,7 +133,7 @@ class ActiveSupport::TestCase
       :give_amount => params[:give_amount], 
       :take_token_address => params[:take_token_address], 
       :take_amount => params[:take_amount],
-      :nonce => Order.last ? Order.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
+      :nonce => get_action_nonce,
       :expiry_timestamp_in_milliseconds => (7.days.from_now.to_i * 1000).to_s
     }
     order[:order_hash] = Order.calculate_hash(order)
@@ -142,7 +146,7 @@ class ActiveSupport::TestCase
     order_cancel = {
       :order_hash => params[:order_hash],
       :account_address => params[:account_address],
-      :nonce => OrderCancel.last ? OrderCancel.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
+      :nonce => get_action_nonce,
     }
     order_cancel[:cancel_hash] = OrderCancel.calculate_hash(order_cancel)
     order_cancel[:signature] = sign_message(order_cancel[:account_address], order_cancel[:cancel_hash])
@@ -155,7 +159,7 @@ class ActiveSupport::TestCase
       :account_address => params[:account_address],
       :order_hash => params[:order_hash],
       :amount => params[:amount],
-      :nonce => Trade.last ? Trade.last.nonce.to_i + 1 : (Time.now.to_i * 1000).to_s,
+      :nonce => get_action_nonce,
     }
     trade[:trade_hash] = Trade.calculate_hash(trade)
     trade[:signature] = sign_message(trade[:account_address], trade[:trade_hash])
@@ -187,5 +191,9 @@ class ActiveSupport::TestCase
 
   def revert_environment_variables
     NinjatradeApi::Application.load_environment_variables(true)
+  end
+
+  def get_action_nonce
+    Time.now.to_i * 1000 + Redis.current.incr('action_nonce')
   end
 end

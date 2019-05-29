@@ -1,7 +1,7 @@
 class Trade < ApplicationRecord
   include FraudProtectable
 
-	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
+  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
   has_one :tx, class_name: 'Transaction', as: :transactable
 
@@ -14,6 +14,7 @@ class Trade < ApplicationRecord
   validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
   before_create :remove_checksum, :trade_balances, :generate_transaction
+  after_create :update_ticker
   after_commit { 
     MarketTradesRelayJob.perform_later(self) 
     AccountTradesRelayJob.perform_later(self) 
@@ -111,8 +112,12 @@ class Trade < ApplicationRecord
     return self.account_address
   end
 
+  def market
+    return self.order.market
+  end
+
   def market_symbol
-    return self.order.market.symbol
+    return self.market.symbol
   end
 
   def is_sell
@@ -237,5 +242,9 @@ class Trade < ApplicationRecord
 
   def remove_checksum
     self.account_address = self.account_address.without_checksum
+  end
+
+  def update_ticker
+    self.market.ticker.update_data
   end
 end
