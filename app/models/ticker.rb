@@ -29,7 +29,10 @@ class Ticker < ApplicationRecord
   end
 
   def update_data
-    updated_ticker = Ticker.find_by_market_symbol(self.market_symbol)
-    self.update(updated_ticker)
+    ticker = Ticker.find_by_market_symbol(self.market_symbol)
+    self.assign_attributes(ticker)
+    if self.changed?
+      self.save
+    end
   end
 end
