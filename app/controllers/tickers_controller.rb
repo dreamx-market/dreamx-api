@@ -4,7 +4,7 @@ class TickersController < ApplicationController
   # GET /tickers
   # GET /tickers.json
   def index
-    @tickers = Ticker.find_all_and_paginate(params[:page], params[:per_page])
+    @tickers = Ticker.paginate :page => params[:page], :per_page => params[:per_page]
   end
 
   # GET /tickers/1
@@ -43,7 +43,7 @@ class TickersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_ticker
-      @ticker = Ticker.find_by_market_symbol(params[:market_symbol])
+      @ticker = Ticker.find_by({ :market_symbol => params[:market_symbol] })
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

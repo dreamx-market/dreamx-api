@@ -12,23 +12,6 @@ class Ticker < ApplicationRecord
       return build_ticker(market)
     end
 
-    def find_all_and_paginate(page, per_page)
-      markets = Market.paginate(:page => page, :per_page => per_page)
-
-      paginated_tickers = {
-        :total_entries => markets.total_entries,
-        :current_page => Integer(markets.current_page),
-        :per_page => markets.per_page,
-        :records => []
-      }
-
-      markets.each do |market|
-        paginated_tickers[:records].push(build_ticker(market))
-      end
-
-      return paginated_tickers
-    end
-
     def build_ticker(market)
       ticker = {
         :market_symbol => market.symbol,
