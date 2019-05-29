@@ -1,6 +1,8 @@
 class Ticker < ApplicationRecord
   validates :market_symbol, uniqueness: true
 
+  after_commit { MarketTickersRelayJob.perform_later(self) }
+
   class << self
     def find_by_market_symbol(symbol)
       market = Market.find_by({ :symbol => symbol })
@@ -35,4 +37,6 @@ class Ticker < ApplicationRecord
       self.save
     end
   end
+
+  private
 end
