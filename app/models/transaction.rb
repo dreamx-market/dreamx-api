@@ -2,7 +2,7 @@ class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
 
   before_create :assign_next_nonce
-  after_create :broadcast
+  after_create_commit :broadcast
 
   def self.confirm_mined_transactions
     client = Ethereum::Singleton.instance
