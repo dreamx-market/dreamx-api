@@ -14,11 +14,11 @@ class Transaction < ApplicationRecord
       begin
         transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
       rescue
-        if !transaction_receipt
-          transaction.update!({ :status => 'replaced' })
-          ENV['READ_ONLY'] = 'true'
-          next
-        end
+      end
+      if !transaction_receipt
+        transaction.update!({ :status => 'replaced' })
+        ENV['READ_ONLY'] = 'true'
+        next
       end
       block_number = transaction_receipt['blockNumber'].hex
       block_hash = transaction_receipt['blockHash']
