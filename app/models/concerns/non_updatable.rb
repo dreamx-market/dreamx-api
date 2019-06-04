@@ -2,14 +2,16 @@ module NonUpdatable
   extend ActiveSupport::Concern
 
   included do
-    @@immutable_attrs = []
+    @@immutable_attrs ||= {}
 
     def self.non_updatable_attrs *attrs
-      @@immutable_attrs.concat attrs
+      model_name = self.name
+      @@immutable_attrs[model_name] = attrs
     end
 
     def immutable_attributes_cannot_be_updated
-      @@immutable_attrs.each do |attr|
+      model_name = self.class.name
+      @@immutable_attrs[model_name].each do |attr|
         if self.changed.include?(attr.to_s)
           errors.add(attr, 'Is immutable')
         end

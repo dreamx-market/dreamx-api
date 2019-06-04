@@ -1,8 +1,8 @@
 class Market < ApplicationRecord
   include NonDestroyable
   include NonUpdatable
-
   non_updatable_attrs :symbol, :base_token_address, :quote_token_address
+  validate :immutable_attributes_cannot_be_updated, on: :update
 
   has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_one :ticker, class_name: 'Ticker', foreign_key: 'market_symbol', primary_key: 'symbol'
@@ -10,7 +10,6 @@ class Market < ApplicationRecord
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
 	validates_uniqueness_of :base_token_address, scope: [:quote_token_address]
 	validate :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
-  validate :immutable_attributes_cannot_be_updated, on: :update
 
   before_create :remove_checksum, :assign_symbol, :create_ticker
 
