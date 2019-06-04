@@ -13,6 +13,10 @@ class Market < ApplicationRecord
 
   before_create :remove_checksum, :assign_symbol, :create_ticker
 
+  # def self.delete_all
+  #   raise 'Method has been disabled'
+  # end
+
   def average_price(period)
     if (!self.high(period) or !self.low(period))
       return nil

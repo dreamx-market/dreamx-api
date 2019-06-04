@@ -17,10 +17,37 @@ class MarketTest < ActiveSupport::TestCase
   	assert_not @market.valid?
   end
 
-  test "cannot be destroyed" do
+  test "delete method is disabled" do
     assert_no_changes('Market.count') do
       begin
         @market.delete
+      rescue
+      end
+    end
+  end
+
+  test "destroy method is disabled" do
+    assert_no_changes('Market.count') do
+      begin
+        @market.destroy
+      rescue
+      end
+    end
+  end
+
+  test "delete_all method is disabled" do
+    assert_no_changes('Market.count') do
+      begin
+        Market.delete_all
+      rescue
+      end
+    end
+  end
+
+  test "destroy_all method is disabled" do
+    assert_no_changes('Market.count') do
+      begin
+        Market.delete_all
       rescue
       end
     end

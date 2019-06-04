@@ -1,11 +1,23 @@
 module NonDestroyable
   extend ActiveSupport::Concern
 
-  def destroy
-    raise 'This record cannot be deleted'
-  end
+  included do
+    class << self
+      def delete_all
+        raise 'Method has been disabled'
+      end
 
-  def delete
-    self.destroy
+      def destroy_all
+        self.delete_all
+      end
+    end
+
+    def destroy
+      raise 'Method has been disabled'
+    end
+
+    def delete
+      self.destroy
+    end
   end
 end
