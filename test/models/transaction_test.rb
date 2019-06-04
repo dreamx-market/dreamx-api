@@ -260,4 +260,25 @@ class TransactionTest < ActiveSupport::TestCase
 
     ENV['GAS_LIMIT'] = '2000000'
   end
+
+  test "regenerated transactions should have their hashes reset to nil and their status reset to pending" do
+    # broadcast a transaction, update its status and hash
+    withdraw = batch_withdraw([
+      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
+    ])[0]
+    transaction = withdraw.tx
+    BroadcastTransactionJob.perform_now(transaction)
+    transaction.reload
+    assert_not_nil transaction.transaction_hash
+    assert transaction.status, "unconfirmed"
+
+    # manually mark it as replaced
+    transaction.update({ :status => 'replaced' })
+
+    # hash and status should be reset after regeneration
+    Transaction.regenerate_replaced_transactions
+    transaction.reload
+    assert_nil transaction.transaction_hash
+    assert transaction.status, "pending"
+  end
 end

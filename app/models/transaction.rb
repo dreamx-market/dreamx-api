@@ -94,7 +94,7 @@ class Transaction < ApplicationRecord
     replaced_transactions = self.replaced.sort_by { |transaction| transaction.nonce.to_i }
     replaced_transactions.each do |transaction|
       next_nonce = Redis.current.incr('nonce') - 1
-      transaction.update!({ :nonce => next_nonce, :status => "pending" })
+      transaction.update!({ :nonce => next_nonce, :status => "pending", :transaction_hash => nil })
     end
     ENV['READ_ONLY'] = 'false'
   end
