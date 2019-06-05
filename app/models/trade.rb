@@ -15,10 +15,6 @@ class Trade < ApplicationRecord
 
   before_create :remove_checksum, :trade_balances, :generate_transaction
   after_create :update_ticker
-  after_commit { 
-    MarketTradesRelayJob.perform_later(self) 
-    AccountTradesRelayJob.perform_later(self) 
-  }
 
   def refund
     exchange = Contract::Exchange.singleton.instance
