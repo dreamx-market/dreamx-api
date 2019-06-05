@@ -3,6 +3,7 @@ class Transaction < ApplicationRecord
 
   before_create :assign_next_nonce
   after_create_commit :broadcast
+  after_commit :relay_account_transactable, on: [:create, :update]
 
   def self.confirm_mined_transactions
     client = Ethereum::Singleton.instance
@@ -160,4 +161,18 @@ class Transaction < ApplicationRecord
     key = Eth::Key.new priv: ENV['PRIVATE_KEY'].hex
     Redis.current.set("nonce", client.get_nonce(key.address))
   end
+
+  def relay_account_transactable
+    if self.transactable_type == 'Trade'
+      AccountTradesRelayJob.perform_later(self.transactable)
+    elsif self.transactable_type == 'Withdraw'
+      AccountTransfersRelayJob.perform_later(self.transactable)
+    else
+      raise 'Invalid transactable type'
+    end
+  end
+
+  # def relay_market_transactable
+    
+  # end
 end

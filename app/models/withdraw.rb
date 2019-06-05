@@ -11,7 +11,6 @@ class Withdraw < ApplicationRecord
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :remove_checksum, :collect_fee_and_debit_balance, :generate_transaction
-  after_commit { AccountTransfersRelayJob.perform_later(self) }
 
   def refund
     exchange = Contract::Exchange.singleton.instance
@@ -23,7 +22,7 @@ class Withdraw < ApplicationRecord
   end
 
   def transaction_hash
-    tx.transaction_hash
+    self.tx.transaction_hash
   end
 
   def block_hash
