@@ -23,24 +23,18 @@ class AccountTransfersTest < ActionCable::TestCase
     end
   end
 
-  test "broadcast a message when a new withdrawal is created" do
-    new_withdraw = Withdraw.new(generate_withdraw(@withdraw))
+  test "broadcast a message when a new withdrawal is created and when its transaction is broadcasted" do
+    new_withdraw = Withdraw.new(generate_withdraw({ :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }))
 
     assert_broadcasts("account_transfers:#{new_withdraw.account_address}", 1) do
       perform_enqueued_jobs do
         new_withdraw.save
       end
     end
-  end
 
-  test "broadcast a message when a withdrawal's transaction is broadcasted" do
-    withdraw = batch_withdraw([
-      { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
-    ])[0]
-
-    assert_broadcasts("account_transfers:#{withdraw.account_address}", 1) do
+    assert_broadcasts("account_transfers:#{new_withdraw.account_address}", 1) do
       perform_enqueued_jobs do
-        BroadcastTransactionJob.perform_now(withdraw.tx)
+        BroadcastTransactionJob.perform_now(new_withdraw.tx)
       end
     end
   end
