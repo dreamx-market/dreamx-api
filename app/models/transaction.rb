@@ -9,17 +9,23 @@ class Transaction < ApplicationRecord
   def self.confirm_mined_transactions
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
-    last_confirmed_nonce = client.get_nonce(key.address) - 1
+    last_onchain_nonce = client.get_nonce(key.address) - 1
     last_block_number = client.eth_get_block_by_number('latest', false)['result']['number'].hex
-    mined_transactions = self.where({ :status => ["unconfirmed", "pending"] }).where({ :nonce => 0..last_confirmed_nonce })
+    mined_transactions = self.where({ :status => ["unconfirmed", "pending"] }).where({ :nonce => 0..last_onchain_nonce })
     mined_transactions.each do |transaction|
       begin
-        transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
+        onchain_transaction = client.eth_get_transaction_by_hash(transaction.transaction_hash)['result']
       rescue
       end
-      if !transaction_receipt
+      if !onchain_transaction
+        # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
         transaction.update!({ :status => 'replaced' })
         ENV['READ_ONLY'] = 'true'
+        next
+      end
+      transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
+      if !transaction_receipt
+        # transaction_receipt hasn't been available, skip
         next
       end
       block_number = transaction_receipt['blockNumber'].hex
@@ -74,11 +80,11 @@ class Transaction < ApplicationRecord
   end
 
   def self.broadcast_expired_transactions
-    if (!self.has_unconfirmed_transactions? and self.has_replaced_transactions?)
+    if (!self.has_unconfirmed_and_pending_transactions? and self.has_replaced_transactions?)
       self.regenerate_replaced_transactions
     end
 
-    unconfirmed_transactions = self.unconfirmed.sort_by { |transaction| transaction.nonce.to_i }
+    unconfirmed_transactions = self.unconfirmed_and_pending.sort_by { |transaction| transaction.nonce.to_i }
     unconfirmed_transactions.each do |transaction|
       if !transaction.expired?
         next
@@ -101,8 +107,8 @@ class Transaction < ApplicationRecord
     ENV['READ_ONLY'] = 'false'
   end
 
-  def self.has_unconfirmed_transactions?
-    self.unconfirmed.first ? true : false
+  def self.has_unconfirmed_and_pending_transactions?
+    self.unconfirmed_and_pending.first ? true : false
   end
 
   def self.has_replaced_transactions?
@@ -132,7 +138,7 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.unconfirmed
+  def self.unconfirmed_and_pending
     self.where({ :status => ["unconfirmed", "pending"] })
   end
 
