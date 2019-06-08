@@ -9,13 +9,25 @@ class Market < ApplicationRecord
 	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
 	validates_uniqueness_of :base_token_address, scope: [:quote_token_address]
-	validate :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
+	validate :status_must_be_active_or_disabled, :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
 
   before_create :remove_checksum, :assign_symbol, :create_ticker
 
-  # def self.delete_all
-  #   raise 'Method has been disabled'
-  # end
+  def enable
+    self.update!({ :status => 'active' })
+  end
+
+  def disable
+    self.update!({ :status => 'disabled' })
+  end
+
+  def status_must_be_active_or_disabled
+    valid_states = ['active', 'disabled']
+
+    if (!valid_states.include?(self.status))
+      errors.add(:status, 'Must be active or disabled')
+    end
+  end
 
   def average_price(period)
     if (!self.high(period) or !self.low(period))

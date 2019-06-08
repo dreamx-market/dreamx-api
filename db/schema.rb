@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_28_124213) do
+ActiveRecord::Schema.define(version: 2019_06_08_124609) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 2019_05_28_124213) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "symbol"
+    t.string "status", default: "disabled", comment: "active, disabled"
     t.index ["base_token_address"], name: "index_markets_on_base_token_address"
     t.index ["quote_token_address"], name: "index_markets_on_quote_token_address"
   end

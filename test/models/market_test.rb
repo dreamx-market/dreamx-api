@@ -69,4 +69,33 @@ class MarketTest < ActiveSupport::TestCase
       @market.reload
     end
   end
+
+  test "newly created markets are disabled by default" do
+    market = Market.create({ :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x8137064a86006670d407c24e191b5a55da5b2889" })
+    assert_equal market.status, 'disabled'
+  end
+
+  test "market status can only be 'active' or 'disabled'" do
+    market = Market.new({ :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x8137064a86006670d407c24e191b5a55da5b2889" })
+
+    market.status = 'disabled'
+    assert market.valid?
+
+    market.status = 'active'
+    assert market.valid?
+
+    market.status = 'ABC123'
+    assert_not market.valid?
+  end
+
+  test "enable and disable market" do
+    market = Market.create({ :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x8137064a86006670d407c24e191b5a55da5b2889" })
+    assert_equal market.status, 'disabled'
+
+    market.enable
+    assert_equal market.status, 'active'
+
+    market.disable
+    assert_equal market.status, 'disabled'
+  end
 end
