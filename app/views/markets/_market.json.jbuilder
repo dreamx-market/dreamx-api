@@ -1,3 +1,5 @@
+json.symbol market.symbol
+json.status market.status
 json.base_token do
 	json.extract! market.base_token, :name, :symbol, :decimals, :address
 end
