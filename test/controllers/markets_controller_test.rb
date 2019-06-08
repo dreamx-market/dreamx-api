@@ -5,8 +5,11 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
     @market = markets(:one)
   end
 
-  test "should get index" do
+  test "should get index, disabled markets shouldn't be included" do
+    Market.last.disable
+
     get markets_url, as: :json
+    assert_equal json["records"].length, Market.count - 1
     assert_response :success
   end
 

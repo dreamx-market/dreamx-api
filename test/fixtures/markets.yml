@@ -3,14 +3,17 @@
 one:
   base_token_address: "0x0000000000000000000000000000000000000000"
   quote_token_address: "0x21921361bab476be44c0655256a2f4281bfcf07d"
+  status: "active"
   symbol: "ONE_TWO"
 
 two:
   base_token_address: "0x0000000000000000000000000000000000000000"
   quote_token_address: "0x12459c951127e0c374ff9105dda097662a027093"
+  status: "active"
   symbol: "ONE_THREE"
 
 three:
   base_token_address: "0x0000000000000000000000000000000000000000"
   quote_token_address: "0x75d417ab3031d592a781e666ee7bfc3381ad33d5"
+  status: "active"
   symbol: "ONE_FIVE"
