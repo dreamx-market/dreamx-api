@@ -76,9 +76,38 @@ class OrderTest < ActiveSupport::TestCase
     assert_equal @order.errors.messages[:filled], ["must not exceed give_amount"]
   end
 
-  test "status can only be open, closed or partially_filed" do
+  test "status can only be open, closed or partially_filled" do
     @order.status = 'INVALID'
     assert_not @order.valid?
     assert_equal @order.errors.messages[:status], ["must be open, closed or partially_filled"]
+  end
+
+  test "cannot be created if market is disabled" do
+    # we have invalid existing orders that cannot be cancelled
+    @order.market.open_orders.destroy_all
+    @order.market.disable
+    new_order = Order.new(:account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount, :take_token_address => @order.take_token_address, :take_amount => @order.take_amount, :nonce => 0, :expiry_timestamp_in_milliseconds => @order.expiry_timestamp_in_milliseconds, :order_hash => @order.order_hash, :signature => @order.signature)
+    assert_not new_order.valid?
+    assert_equal new_order.errors.messages[:market], ['has been disabled']
+  end
+
+  test "automatically cancelled and refunded when market is disabled" do
+    # we have invalid existing orders that cannot be cancelled
+    @order.market.open_orders.destroy_all
+    deposit_data = [
+      { :account_address => @order.account_address, :token_address => @order.give_token_address, :amount => @order.give_amount }
+    ]
+    batch_deposit(deposit_data)
+    original_balance = @order.account.balance(@order.give_token_address).balance
+
+    new_order = Order.create(generate_order(@order))
+    before_cancel_balance = @order.account.balance(@order.give_token_address).balance
+    assert_not_equal original_balance, before_cancel_balance
+
+    new_order.market.disable
+    new_order.reload
+    after_cancel_balance = @order.account.balance(@order.give_token_address).balance
+    assert_equal original_balance, after_cancel_balance
+    assert_equal new_order.status, 'closed'
   end
 end

@@ -10,7 +10,7 @@ class Trade < ApplicationRecord
   validates_presence_of VALIDATABLE_ATTRS
 	validates :nonce, nonce: true, on: :create
   validates :trade_hash, signature: true, uniqueness: true
-  validate :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
+  validate :market_must_be_active, :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
   validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
 
   before_create :remove_checksum, :trade_balances, :generate_transaction
@@ -242,5 +242,11 @@ class Trade < ApplicationRecord
 
   def update_ticker
     self.market.ticker.update_data
+  end
+
+  def market_must_be_active
+    if self.market.disabled?
+      self.errors.add(:market, 'has been disabled')
+    end
   end
 end

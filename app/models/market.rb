@@ -13,12 +13,21 @@ class Market < ApplicationRecord
 
   before_create :remove_checksum, :assign_symbol, :create_ticker
 
+  def disabled?
+    return self.status == 'disabled' ? true : false
+  end
+
   def enable
     self.update!({ :status => 'active' })
   end
 
   def disable
-    self.update!({ :status => 'disabled' })
+    ActiveRecord::Base.transaction do
+      self.open_orders.each do |order|
+        order.cancel
+      end
+      self.update!({ :status => 'disabled' })
+    end
   end
 
   def status_must_be_active_or_disabled
@@ -45,6 +54,10 @@ class Market < ApplicationRecord
 		existing_market = Market.find_by(:base_token_address => quote_token_address, :quote_token_address => base_token_address)
 		errors.add(:quote_token_address, 'Market already exists') if existing_market
 	end
+
+  def open_orders
+    return self.open_buy_orders.or(self.open_sell_orders)
+  end
 
   def open_buy_orders
     return Order.where({ :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).where.not({ status: 'closed' })

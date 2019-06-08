@@ -63,7 +63,12 @@ class TradeTest < ActiveSupport::TestCase
     assert_equal new_trade.errors.messages[:order], ['must be open', 'must have sufficient volume']
   end
 
-  test "has a transaction" do
-    assert_not_nil @trade.tx
+  test "cannot be created if market has been disabled" do
+    # we have invalid existing orders that cannot be cancelled
+    @trade.market.open_orders.destroy_all
+    @trade.market.disable
+    new_trade = Trade.new({ :account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount })
+    assert_not new_trade.valid?
+    assert_equal new_trade.errors.messages[:market], ['has been disabled']
   end
 end

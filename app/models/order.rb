@@ -10,7 +10,7 @@ class Order < ApplicationRecord
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }, on: :update
 
 	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :volume_must_be_greater_than_minimum, :filled_must_not_exceed_give_amount
-  validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
+  validate :market_must_be_active, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
 	before_create :remove_checksum, :hold_balance
   after_create :update_ticker
@@ -175,4 +175,10 @@ class Order < ApplicationRecord
   def update_ticker
     self.market.ticker.update_data
   end  
+
+  def market_must_be_active
+    if self.market.disabled?
+      self.errors.add(:market, 'has been disabled')
+    end
+  end
 end

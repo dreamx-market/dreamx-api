@@ -98,4 +98,11 @@ class MarketTest < ActiveSupport::TestCase
     market.disable
     assert_equal market.status, 'disabled'
   end
+
+  test "open_orders include both sell and buy orders" do
+    sell_orders_count = @market.open_sell_orders.length
+    buy_orders_count = @market.open_buy_orders.length
+    total_count = @market.open_orders.length
+    assert_equal total_count, sell_orders_count + buy_orders_count
+  end
 end
