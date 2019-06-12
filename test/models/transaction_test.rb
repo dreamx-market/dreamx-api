@@ -12,7 +12,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   teardown do
-    ENV['READ_ONLY'] = 'false'
+    Config.set('read_only', 'false')
   end
 
   test "has transactable" do
@@ -47,7 +47,7 @@ class TransactionTest < ActiveSupport::TestCase
     Transaction.confirm_mined_transactions
     withdraw.tx.reload
     assert_equal(withdraw.tx.status, 'replaced')
-    assert_equal(ENV['READ_ONLY'], 'true')
+    assert_equal(Config.get['read_only'], 'true')
   end
 
   test "should mark transaction as 'replaced' if transaction hash can't be found and nonce has been taken" do
@@ -60,7 +60,7 @@ class TransactionTest < ActiveSupport::TestCase
     Transaction.confirm_mined_transactions
     withdraw.tx.reload
     assert_equal(withdraw.tx.status, 'replaced')
-    assert_equal(ENV['READ_ONLY'], 'true')
+    assert_equal(Config.get['read_only'], 'true')
   end
 
   test "should confirm successful transactions" do
@@ -185,7 +185,7 @@ class TransactionTest < ActiveSupport::TestCase
     ])
     replacer.tx.update({ :nonce => trade.tx.nonce })
     BroadcastTransactionJob.perform_now(replacer.tx)
-    assert_equal(ENV['READ_ONLY'], 'false')
+    assert_equal(Config.get['read_only'], 'false')
 
     perform_enqueued_jobs do
       Transaction.broadcast_pending_transactions
@@ -196,7 +196,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal(withdraw1.reload.tx.status, 'confirmed')
     assert_equal(withdraw2.reload.tx.status, 'failed')
     assert_equal(replacer.reload.tx.status, 'confirmed')
-    assert_equal(ENV['READ_ONLY'], 'true')
+    assert_equal(Config.get['read_only'], 'true')
 
     assert_no_changes 'replacer.tx.nonce' do
     assert_no_changes 'withdraw1.tx.nonce' do
@@ -214,7 +214,7 @@ class TransactionTest < ActiveSupport::TestCase
       Transaction.confirm_mined_transactions
       assert_equal(trade.reload.tx.status, 'confirmed')
       assert_equal(withdraw2.reload.tx.status, 'confirmed')
-      assert_equal(ENV['READ_ONLY'], 'false')
+      assert_equal(Config.get['read_only'], 'false')
     end
     end
     end
@@ -228,14 +228,14 @@ class TransactionTest < ActiveSupport::TestCase
     ])
     replacer.tx.update({ :nonce => withdraw1.tx.nonce })
     BroadcastTransactionJob.perform_now(replacer.tx)
-    assert_equal(ENV['READ_ONLY'], 'false')
+    assert_equal(Config.get['read_only'], 'false')
 
     Transaction.broadcast_pending_transactions
     Transaction.confirm_mined_transactions
 
     assert_equal(withdraw1.reload.tx.status, 'replaced')
     assert_equal(replacer.reload.tx.status, 'confirmed')
-    assert_equal(ENV['READ_ONLY'], 'true')
+    assert_equal(Config.get['read_only'], 'true')
 
     assert_no_changes 'withdraw1.tx.nonce' do
       # create an unconfirmed transaction
@@ -248,7 +248,7 @@ class TransactionTest < ActiveSupport::TestCase
       withdraw1.tx.update({ :created_at => 10.minutes.ago })
       Transaction.broadcast_expired_transactions
       assert_equal(withdraw1.reload.tx.status, 'replaced')
-      assert_equal(ENV['READ_ONLY'], 'true')
+      assert_equal(Config.get['read_only'], 'true')
     end
   end
 

@@ -32,7 +32,6 @@ module NinjatradeApi
         :MAKER_FEE_PER_ETHER_IN_WEI => '1000000000000000', # 0.001 per Ether
         :TAKER_FEE_PER_ETHER_IN_WEI => '2000000000000000', # 0.002 per Ether
         :FEE_COLLECTOR_ADDRESS => '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a',
-        :READ_ONLY => 'false',
         :CHART_DATUM_EXPIRY_5M => 7.days.to_s,
         :CHART_DATUM_EXPIRY_15M => 20.days.to_s,
         :CHART_DATUM_EXPIRY_1H => 90.days.to_s,
@@ -60,6 +59,18 @@ module NinjatradeApi
       }
     end
 
+    def redis_config_variables
+      return {
+        :read_only => 'false',
+      }
+    end
+
+    def load_redis_config_variables(override = false)
+      client = Redis.current
+      config = client.get('config')
+      client.set('config', redis_config_variables.to_json)
+    end
+
     def load_environment_variables(override = false)
       self.environment_variables.each do |key, value|
         if override
@@ -83,6 +94,7 @@ module NinjatradeApi
     end
 
     self.load_environment_variables
+    self.load_redis_config_variables
 
     require 'ext/string'
   	require 'ext/integer'

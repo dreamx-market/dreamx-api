@@ -14,7 +14,7 @@ class Balance < ApplicationRecord
   def authentic?
     if !(balance_authentic? and hold_balance_authentic?)
       self.mark_fraud!
-      ENV['READ_ONLY'] = 'true'
+      Config.set('read_only', 'true')
     end
 
     return (balance_authentic? and hold_balance_authentic?)

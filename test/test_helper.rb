@@ -11,6 +11,7 @@ class ActiveSupport::TestCase
     revert_blockchain(@snapshot_id)
     revert_environment_variables
     Redis.current.flushdb
+    Rails.application.load_redis_config_variables
   end
 
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.

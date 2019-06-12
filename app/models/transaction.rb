@@ -20,7 +20,7 @@ class Transaction < ApplicationRecord
       if !onchain_transaction
         # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
         transaction.update!({ :status => 'replaced' })
-        ENV['READ_ONLY'] = 'true'
+        Config.set('read_only', 'true')
         next
       end
       transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
@@ -104,7 +104,7 @@ class Transaction < ApplicationRecord
       next_nonce = Redis.current.incr('nonce') - 1
       transaction.update!({ :nonce => next_nonce, :status => "pending", :transaction_hash => nil })
     end
-    ENV['READ_ONLY'] = 'false'
+    Config.set('read_only', 'false')
   end
 
   def self.has_unconfirmed_and_pending_transactions?
