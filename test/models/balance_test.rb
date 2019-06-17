@@ -56,7 +56,7 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal Config.get['read_only'], 'true'
+    assert_equal Config.get('read_only'), 'true'
     # always reset environment variables back to its initial state
     Config.set('read_only', 'false')
   end
@@ -70,7 +70,7 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal Config.get['read_only'], 'true'
+    assert_equal Config.get('read_only'), 'true'
     # always reset environment variables back to its initial state
     Config.set('read_only', 'false')
   end
@@ -84,7 +84,7 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal Config.get['read_only'], 'true'
+    assert_equal Config.get('read_only'), 'true'
     # always reset environment variables back to its initial state
     Config.set('read_only', 'false')
   end
@@ -98,7 +98,7 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal Config.get['read_only'], 'true'
+    assert_equal Config.get('read_only'), 'true'
     # always reset environment variables back to its initial state
     Config.set('read_only', 'false')
   end
@@ -112,7 +112,7 @@ class BalanceTest < ActiveSupport::TestCase
 
     assert_not balance.authentic?
     assert_equal balance.fraud, true
-    assert_equal Config.get['read_only'], 'true'
+    assert_equal Config.get('read_only'), 'true'
     # always reset environment variables back to its initial state
     Config.set('read_only', 'false')
   end

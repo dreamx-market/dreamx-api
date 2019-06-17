@@ -8,7 +8,7 @@ class ApplicationController < ActionController::API
   end
 
   def check_if_readonly
-    if Config.get['read_only'] === 'true'
+    if Config.get('read_only') === 'true'
       render json: "service is under maintainence", status: :service_unavailable
       return
     end

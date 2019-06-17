@@ -70,8 +70,11 @@ module NinjatradeApi
     end
 
     def load_redis_config_variables(override = false)
-      client = Redis.current
-      config = Config.get
+      begin
+        config = JSON.parse(Redis.current.get('config'))
+      rescue JSON::ParserError, TypeError
+        config = {}
+      end
       self.redis_config_variables.each do |key, value|
         if (override)
           config[key.to_s] = value.to_s
@@ -79,7 +82,7 @@ module NinjatradeApi
           config[key.to_s] ||= value.to_s
         end
       end
-      client.set('config', config.to_json)
+      Redis.current.set('config', config.to_json)
     end
 
     def load_environment_variables(override = false)
