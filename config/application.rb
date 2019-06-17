@@ -19,6 +19,10 @@ Bundler.require(*Rails.groups)
 
 module NinjatradeApi
   class Application < Rails::Application
+    require 'ext/string'
+    require 'ext/integer'
+    require 'config'
+
     def environment_variables
       return {
         :FRAUD_PROTECTION => 'true',
@@ -61,14 +65,21 @@ module NinjatradeApi
 
     def redis_config_variables
       return {
-        :read_only => 'false',
+        :read_only => 'false'
       }
     end
 
-    def load_redis_config_variables
+    def load_redis_config_variables(override = false)
       client = Redis.current
-      config = client.get('config')
-      client.set('config', redis_config_variables.to_json)
+      config = Config.get
+      self.redis_config_variables.each do |key, value|
+        if (override)
+          config[key.to_s] = value.to_s
+        else
+          config[key.to_s] ||= value.to_s
+        end
+      end
+      client.set('config', config.to_json)
     end
 
     def load_environment_variables(override = false)
@@ -95,9 +106,6 @@ module NinjatradeApi
 
     self.load_environment_variables
     self.load_redis_config_variables
-
-    require 'ext/string'
-  	require 'ext/integer'
 
   	config.eager_load_paths << Rails.root.join('lib')
     # Initialize configuration defaults for originally generated Rails version.

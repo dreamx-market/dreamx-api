@@ -1,8 +1,12 @@
 class Config
   class << self
     def get
-      config = Redis.current.get('config')
-      JSON.parse(config)
+      begin
+        config = Redis.current.get('config')
+        return JSON.parse(config)
+      rescue JSON::ParserError, TypeError
+        return {}
+      end
     end
 
     def set(key, value)
