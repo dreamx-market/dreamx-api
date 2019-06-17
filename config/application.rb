@@ -65,7 +65,7 @@ module NinjatradeApi
       }
     end
 
-    def load_redis_config_variables(override = false)
+    def load_redis_config_variables
       client = Redis.current
       config = client.get('config')
       client.set('config', redis_config_variables.to_json)
