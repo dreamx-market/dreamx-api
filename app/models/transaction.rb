@@ -143,7 +143,7 @@ class Transaction < ApplicationRecord
   end
 
   def self.replaced
-    self.where({ :status => ["replaced", "failed"] })
+    self.where({ :status => ["replaced"] })
   end
 
   def self.pending
