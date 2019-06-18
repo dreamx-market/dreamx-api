@@ -22,12 +22,23 @@ class TradesController < ApplicationController
   # POST /trades
   # POST /trades.json
   def create
-    @trade = Trade.new(trade_params)
-
-    if @trade.save
-      render :show, status: :created, location: @trade
-    else
-      serialize_active_record_validation_error @trade.errors.messages
+    begin
+      @trades = []
+      ActiveRecord::Base.transaction do
+        trades_params.each do |trade_param|
+          trade = Trade.create!(trade_param)
+          @trades.push(trade)
+        end
+      end
+      render :show, status: :created
+    rescue ActiveRecord::RecordInvalid
+      trades_errors = []
+      trades_params.each do |trade_param|
+        trade = Trade.new(trade_param)
+        trade.valid?
+        trades_errors.push(trade.errors.messages)
+      end
+      serialize_active_record_validation_error trades_errors
     end
   end
 
@@ -54,7 +65,9 @@ class TradesController < ApplicationController
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def trade_params
-      params.require(:trade).permit(:account_address, :order_hash, :amount, :nonce, :trade_hash, :signature, :uuid)
+    def trades_params
+      params.require('_json').map do |p|
+        p.permit(:account_address, :order_hash, :amount, :nonce, :trade_hash, :signature, :uuid)
+      end
     end
 end

@@ -76,7 +76,7 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     assert_model_nil(Trade, after_trade_trades)
 
     assert_difference('Trade.count') do
-      post trades_url, params: trade, as: :json
+      post trades_url, params: [trade], as: :json
     end
 
     assert_response 201
@@ -90,27 +90,32 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     trade = generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount })
 
     assert_difference('Transaction.count') do
-      post trades_url, params: trade, as: :json
+      post trades_url, params: [trade], as: :json
     end
 
     assert_response 201
   end
 
-  # test "should show trade" do
-  #   get trade_url(@trade), as: :json
-  #   assert_response :success
-  # end
+  test "should batch trade" do
+    trades = []
+    3.times do
+      trades << generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount.to_i / 3 })
+    end
 
-  # test "should update trade" do
-  #   patch trade_url(@trade), params: { trade: { account_address: @trade.account_address, amount: @trade.amount, nonce: @trade.nonce, order_hash: @trade.order_hash, signature: @trade.signature, trade_hash: @trade.trade_hash, uuid: @trade.uuid } }, as: :json
-  #   assert_response 200
-  # end
+    assert_difference('Trade.count', 3) do
+      post trades_url, params: trades, as: :json
+    end
+  end
 
-  # test "should destroy trade" do
-  #   assert_difference('Trade.count', -1) do
-  #     delete trade_url(@trade), as: :json
-  #   end
+  test "should rollback batch trade if a trade failed to save" do
+    trades = []
+    3.times do
+      trades << generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount.to_i / 3 })
+    end
+    trades.last[:signature] = 'INVALID'
 
-  #   assert_response 204
-  # end
+    assert_no_difference('Trade.count') do
+      post trades_url, params: trades, as: :json
+    end
+  end
 end

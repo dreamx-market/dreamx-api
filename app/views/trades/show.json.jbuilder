@@ -1,1 +1,1 @@
-json.partial! "trades/trade", trade: @trade
+json.records @trades, partial: "trades/trade", as: :trade
