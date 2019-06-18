@@ -130,6 +130,22 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
   # test "should rollback if there are errors" do
   # end
 
-  # test "should display validation errors" do
-  # end
+  test "should display validation errors" do
+    order_cancels = []
+    @orders.each do |order|
+      order_cancels.push(generate_order_cancel({ :order_hash => order.order_hash, :account_address => order.account_address }))
+    end
+    order_cancels[0][:account_address] = 'INVALID'
+    order_cancels[1][:order_hash] = 'INVALID'
+    order_cancels[2][:signature] = 'INVALID'
+
+    post order_cancels_url, params: order_cancels, as: :json
+    order_one_error = json["validation_errors"][0].select { |error| error['field'] === 'account' }[0]['reason']
+    order_two_error = json["validation_errors"][1].select { |error| error['field'] === 'order' }[0]['reason']
+    order_three_error = json["validation_errors"][2].select { |error| error['field'] === 'signature' }[0]['reason']
+
+    assert_equal order_one_error, ['must exist']
+    assert_equal order_two_error, ['must exist']
+    assert_equal order_three_error, ['invalid']
+  end
 end

@@ -34,9 +34,19 @@ class ApplicationController < ActionController::API
 
 		def serialize_active_record_validation_error(errors)
 			serialized = []
-    	errors.each do |key, array|
-    		serialized << { :field => key, :reason => array }
-    	end
+      if errors.is_a?(Array)
+        errors.each do |record|
+          record_errors = []
+          record.each do |key, reasons|
+            record_errors << { :field => key, :reason => reasons }
+          end
+          serialized << record_errors
+        end
+      else
+      	errors.each do |key, reasons|
+      		serialized << { :field => key, :reason => reasons }
+      	end
+      end
     	raise Error::ValidationError.new(serialized)
 		end
 end
