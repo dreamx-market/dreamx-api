@@ -16,11 +16,13 @@ class OrderCancelsController < ApplicationController
   # POST /order_cancels
   # POST /order_cancels.json
   def create
-    @order_cancels = []
     begin
-      order_cancels_params.each do |order_cancel_param|
-        order_cancel = OrderCancel.create!(order_cancel_param)
-        @order_cancels.push(order_cancel)
+      @order_cancels = []
+      ActiveRecord::Base.transaction do
+        order_cancels_params.each do |order_cancel_param|
+          order_cancel = OrderCancel.create!(order_cancel_param)
+          @order_cancels.push(order_cancel)
+        end
       end
       render :show, status: :created
     rescue ActiveRecord::RecordInvalid

@@ -127,9 +127,6 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
     assert_model(Order, after_cancel_orders)
   end
 
-  # test "should rollback if there are errors" do
-  # end
-
   test "should display validation errors" do
     order_cancels = []
     @orders.each do |order|
@@ -147,5 +144,17 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
     assert_equal order_one_error, ['must exist']
     assert_equal order_two_error, ['must exist']
     assert_equal order_three_error, ['invalid']
+  end
+
+  test "should rollback if there are errors" do
+    order_cancels = []
+    @orders.each do |order|
+      order_cancels.push(generate_order_cancel({ :order_hash => order.order_hash, :account_address => order.account_address }))
+    end
+    order_cancels.last[:signature] = 'INVALID'
+
+    assert_no_changes('OrderCancel.count') do
+      post order_cancels_url, params: order_cancels, as: :json
+    end
   end
 end
