@@ -11,9 +11,13 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
 
     deposit_data = [
       { :account_address => @order.account_address, :token_address => @order.give_token_address, :amount => @order.give_amount },
+      { :account_address => @order.account_address, :token_address => @order.give_token_address, :amount => @order.give_amount },
+      { :account_address => @order.account_address, :token_address => @order.give_token_address, :amount => @order.give_amount },
       { :account_address => @trade.account_address, :token_address => @order.take_token_address, :amount => @order.take_amount }
     ]
     order_data = [
+      { :account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount, :take_token_address => @order.take_token_address, :take_amount => @order.take_amount },
+      { :account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount, :take_token_address => @order.take_token_address, :take_amount => @order.take_amount },
       { :account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount, :take_token_address => @order.take_token_address, :take_amount => @order.take_amount }
     ]
     @deposits = batch_deposit(deposit_data)
@@ -24,20 +28,15 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
     ENV['CONTRACT_ADDRESS'] = @OLD_CONTRACT_ADDRESS
   end
 
-  # test "should get index" do
-  #   get order_cancels_url, as: :json
-  #   assert_response :success
-  # end
-
   test "should create order_cancel and refund" do
     @order_cancel.order_hash = @orders[0].order_hash
-    order_cancel = generate_order_cancel(@order_cancel)
+    order_cancel = [generate_order_cancel(@order_cancel)]
 
     before_cancel_balances = [
-      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 100000000000000000000, :hold_balance => 100000000000000000000 }
+      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 100000000000000000000, :hold_balance => 300000000000000000000 }
     ]
     after_cancel_balances = [
-      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 200000000000000000000, :hold_balance => 0 }
+      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 200000000000000000000, :hold_balance => 200000000000000000000 }
     ]
     before_cancel_orders = [
       { :order_hash => @orders[0].order_hash, :status => "open" }
@@ -61,7 +60,7 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
 
   test "should cancel a partially filled order and refund" do
     @order_cancel.order_hash = @orders[0].order_hash
-    order_cancel = generate_order_cancel(@order_cancel)
+    order_cancel = [generate_order_cancel(@order_cancel)]
 
     trade_data = [
       { **@trade.as_json.symbolize_keys, :order_hash => @orders[0].order_hash, :amount => @trade.amount.to_i / 2 }
@@ -69,10 +68,10 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
     trades = batch_trade(trade_data)
 
     before_cancel_balances = [
-      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 100000000000000000000, :hold_balance => 50000000000000000000 }
+      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 100000000000000000000, :hold_balance => 250000000000000000000 }
     ]
     after_cancel_balances = [
-      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 150000000000000000000, :hold_balance => 0 }
+      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 150000000000000000000, :hold_balance => 200000000000000000000 }
     ]
     before_cancel_orders = [
       { :order_hash => @orders[0].order_hash, :status => "partially_filled" }
@@ -94,21 +93,43 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
     assert_model(Order, after_cancel_orders)
   end
 
-  # test "should show order_cancel" do
-  #   get order_cancel_url(@order_cancel), as: :json
-  #   assert_response :success
+  test "should batch cancel" do
+    order_cancels = []
+    @orders.each do |order|
+      order_cancels.push(generate_order_cancel({ :order_hash => order.order_hash, :account_address => order.account_address }))
+    end
+
+    before_cancel_balances = [
+      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 100000000000000000000, :hold_balance => 300000000000000000000 }
+    ]
+    after_cancel_balances = [
+      { :account_address => @orders[0].account_address, :token_address => @orders[0].give_token_address, :balance => 400000000000000000000, :hold_balance => 0 }
+    ]
+    before_cancel_orders = [
+      { :order_hash => @orders[0].order_hash, :status => "open" },
+      { :order_hash => @orders[1].order_hash, :status => "open" },
+      { :order_hash => @orders[2].order_hash, :status => "open" }
+    ]
+    after_cancel_orders = [
+      { :order_hash => @orders[0].order_hash, :status => "closed" },
+      { :order_hash => @orders[1].order_hash, :status => "closed" },
+      { :order_hash => @orders[2].order_hash, :status => "closed" }
+    ]
+
+    assert_model(Balance, before_cancel_balances)
+    assert_model(Order, before_cancel_orders)
+
+    assert_changes('OrderCancel.count') do
+      post order_cancels_url, params: order_cancels, as: :json
+    end
+
+    assert_model(Balance, after_cancel_balances)
+    assert_model(Order, after_cancel_orders)
+  end
+
+  # test "should rollback if there are errors" do
   # end
 
-  # test "should update order_cancel" do
-  #   patch order_cancel_url(@order_cancel), params: { order_cancel: { account_address: @order_cancel.account_address, cancel_hash: @order_cancel.cancel_hash, nonce: @order_cancel.nonce, order_hash: @order_cancel.order_hash, signature: @order_cancel.signature } }, as: :json
-  #   assert_response 200
-  # end
-
-  # test "should destroy order_cancel" do
-  #   assert_difference('OrderCancel.count', -1) do
-  #     delete order_cancel_url(@order_cancel), as: :json
-  #   end
-
-  #   assert_response 204
+  # test "should display validation errors" do
   # end
 end

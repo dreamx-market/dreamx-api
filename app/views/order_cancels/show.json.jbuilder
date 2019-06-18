@@ -1,1 +1,1 @@
-json.partial! "order_cancels/order_cancel", order_cancel: @order_cancel
+json.records @order_cancels, partial: "order_cancels/order_cancel", as: :order_cancel

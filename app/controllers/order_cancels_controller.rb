@@ -16,12 +16,16 @@ class OrderCancelsController < ApplicationController
   # POST /order_cancels
   # POST /order_cancels.json
   def create
-    @order_cancel = OrderCancel.new(order_cancel_params)
+    @order_cancels = []
 
-    if @order_cancel.save
-      render :show, status: :created, location: @order_cancel
-    else
-      serialize_active_record_validation_error @order_cancel.errors.messages
+    begin
+      order_cancels_params.each do |order_cancel_param|
+        order_cancel = OrderCancel.create!(order_cancel_param)
+        @order_cancels.push(order_cancel)
+      end
+      render :show, status: :created
+    rescue
+      render json: "failed to create, please check your payload", status: :unprocessable_entity
     end
   end
 
@@ -48,7 +52,9 @@ class OrderCancelsController < ApplicationController
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def order_cancel_params
-      params.require(:order_cancel).permit(:order_hash, :account_address, :nonce, :cancel_hash, :signature)
+    def order_cancels_params
+      params.require('_json').map do |p|
+        p.permit(:order_hash, :account_address, :nonce, :cancel_hash, :signature)
+      end
     end
 end
