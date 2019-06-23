@@ -12,6 +12,11 @@ class Balance < ApplicationRecord
   end
 
   def authentic?
+    fee_address = ENV['FEE_COLLECTOR_ADDRESS']
+    if (fee_address == self.account_address)
+      return true
+    end
+
     if !(balance_authentic? and hold_balance_authentic?)
       self.mark_fraud!
       Config.set('read_only', 'true')
