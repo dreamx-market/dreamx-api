@@ -223,7 +223,7 @@ class Trade < ApplicationRecord
   end
 
   def order_must_be_open
-    if self.order.status === 'closed'
+    if self.order.status == 'closed'
       self.errors.add(:order, 'must be open')
     end
   end

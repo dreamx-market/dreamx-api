@@ -137,9 +137,9 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
     order_cancels[2][:signature] = 'INVALID'
 
     post order_cancels_url, params: order_cancels, as: :json
-    order_one_error = json["validation_errors"][0].select { |error| error['field'] === 'account' }[0]['reason']
-    order_two_error = json["validation_errors"][1].select { |error| error['field'] === 'order' }[0]['reason']
-    order_three_error = json["validation_errors"][2].select { |error| error['field'] === 'signature' }[0]['reason']
+    order_one_error = json["validation_errors"][0].select { |error| error['field'] == 'account' }[0]['reason']
+    order_two_error = json["validation_errors"][1].select { |error| error['field'] == 'order' }[0]['reason']
+    order_three_error = json["validation_errors"][2].select { |error| error['field'] == 'signature' }[0]['reason']
 
     assert_equal order_one_error, ['must exist']
     assert_equal order_two_error, ['must exist']

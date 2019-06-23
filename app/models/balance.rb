@@ -27,11 +27,11 @@ class Balance < ApplicationRecord
 
   def balance_authentic?
     calculated_balance = total_deposited.to_i + total_traded.to_i - hold_balance.to_i - total_withdrawn.to_i
-    return calculated_balance.to_i === balance.to_i
+    return calculated_balance.to_i == balance.to_i
   end
 
   def hold_balance_authentic?
-    return total_volume_held_in_open_orders.to_i === hold_balance.to_i
+    return total_volume_held_in_open_orders.to_i == hold_balance.to_i
   end
 
   def open_orders
