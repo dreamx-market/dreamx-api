@@ -154,7 +154,7 @@ class Order < ApplicationRecord
       volume = self.give_amount.to_i
     end
 
-    minimum_volume = self.is_sell ? ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i : ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i
+    minimum_volume = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i
     errors.add(attribute, "must be greater than #{minimum_volume}") unless volume >= minimum_volume
   end
 

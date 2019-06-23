@@ -105,13 +105,13 @@ class OrderTest < ActiveSupport::TestCase
     assert_equal new_order.status, 'closed'
   end
 
-  test "sell volume must be greater than minimum" do
-    @order.take_amount = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i - 1
+  test "sell orders volume must be greater than minimum" do
+    @order.take_amount = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i - 1
     assert_not @order.valid?
-    assert_equal @order.errors.messages[:take_amount], ["must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}"]
+    assert_equal @order.errors.messages[:take_amount], ["must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}"]
   end
 
-  test "buy volume must be greater than minimum" do
+  test "buy orders volume must be greater than minimum" do
     give_token_address = @order.give_token_address
     take_token_address = @order.take_token_address
     @order.give_token_address = take_token_address
