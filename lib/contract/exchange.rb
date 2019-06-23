@@ -10,7 +10,7 @@ module Contract
 
     def initialize
       @abi = JSON.parse(File.read("#{__dir__}/artifacts/Exchange.json"))["abi"]
-      @instance = Ethereum::Contract.create(name: "Exchange", address: ENV['CONTRACT_ADDRESS'], abi: @abi)
+      @instance = Ethereum::Contract.create(name: "Exchange", address: ENV['CONTRACT_ADDRESS'].without_checksum, abi: @abi)
       @instance.key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
     end
 

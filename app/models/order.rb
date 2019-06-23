@@ -116,7 +116,7 @@ class Order < ApplicationRecord
 
   # params { :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry }
   def self.calculate_hash(params)
-    exchange_address = ENV['CONTRACT_ADDRESS']
+    exchange_address = ENV['CONTRACT_ADDRESS'].without_checksum
     begin
       encoder = Ethereum::Encoder.new
       encoded_give_amount = encoder.encode("uint", params[:give_amount].to_i)

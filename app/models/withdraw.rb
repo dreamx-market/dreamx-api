@@ -66,7 +66,7 @@ class Withdraw < ApplicationRecord
 
   # params { :account_address, :token_address, :amount, :nonce }
   def self.calculate_hash(params)
-    exchange_address = ENV['CONTRACT_ADDRESS']
+    exchange_address = ENV['CONTRACT_ADDRESS'].without_checksum
     begin
       encoder = Ethereum::Encoder.new
       encoded_amount = encoder.encode("uint", params[:amount].to_i)

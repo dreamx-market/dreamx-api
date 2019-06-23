@@ -36,7 +36,7 @@ class OrderCancel < ApplicationRecord
 
   # params { :order_hash, :account_address, :nonce }
   def self.calculate_hash(params)
-    exchange_address = ENV['CONTRACT_ADDRESS']
+    exchange_address = ENV['CONTRACT_ADDRESS'].without_checksum
     begin
       encoder = Ethereum::Encoder.new
       encoded_nonce = encoder.encode("uint", params[:nonce].to_i)

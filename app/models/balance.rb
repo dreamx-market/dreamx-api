@@ -12,7 +12,7 @@ class Balance < ApplicationRecord
   end
 
   def authentic?
-    fee_address = ENV['FEE_COLLECTOR_ADDRESS']
+    fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
     if (fee_address == self.account_address)
       return true
     end

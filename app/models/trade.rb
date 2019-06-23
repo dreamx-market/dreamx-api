@@ -145,7 +145,7 @@ class Trade < ApplicationRecord
 
   # params { :account_address, :order_hash, :amount, :nonce }
   def self.calculate_hash(params)
-    exchange_address = ENV['CONTRACT_ADDRESS']
+    exchange_address = ENV['CONTRACT_ADDRESS'].without_checksum
     begin
       encoder = Ethereum::Encoder.new
       encoded_amount = encoder.encode("uint", params[:amount].to_i)
@@ -177,7 +177,7 @@ class Trade < ApplicationRecord
     one_ether = formatter.to_wei(1)
     maker_address = order.account_address
     taker_address = account_address
-    fee_address = ENV['FEE_COLLECTOR_ADDRESS']
+    fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
     maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
     trade_amount_equivalence_in_take_tokens = order.calculate_take_amount(amount)

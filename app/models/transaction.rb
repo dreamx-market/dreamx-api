@@ -52,7 +52,7 @@ class Transaction < ApplicationRecord
     key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
     gas_price = client.eth_gas_price['result'].hex.to_i
     gas_limit = ENV['GAS_LIMIT'].to_i
-    contract_address = ENV['CONTRACT_ADDRESS']
+    contract_address = ENV['CONTRACT_ADDRESS'].without_checksum
     payload = self.transactable.payload
     nonce = self.nonce.to_i
     args = {

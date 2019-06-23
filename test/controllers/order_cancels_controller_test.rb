@@ -2,7 +2,7 @@ require 'test_helper'
 
 class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @OLD_CONTRACT_ADDRESS = ENV['CONTRACT_ADDRESS']
+    @OLD_CONTRACT_ADDRESS = ENV['CONTRACT_ADDRESS'].without_checksum
     ENV['CONTRACT_ADDRESS'] = '0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a'
 
     @order_cancel = order_cancels(:one)

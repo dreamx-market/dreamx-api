@@ -2,7 +2,7 @@ require 'test_helper'
 
 class OrdersControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @old_contract_address = ENV['CONTRACT_ADDRESS']
+    @old_contract_address = ENV['CONTRACT_ADDRESS'].without_checksum
     ENV['CONTRACT_ADDRESS'] = "0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a"
 
     @order = orders(:one)
