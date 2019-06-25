@@ -46,4 +46,10 @@ class OrderCancelTest < ActiveSupport::TestCase
     assert_not @order_cancel.valid?
     assert_equal @order_cancel.errors.messages[:signature], ["invalid"]
   end
+
+  test "should display order validation errors" do
+    @order_cancel.order.signature = 'INVALID'
+    @order_cancel.valid?
+    assert_equal @order_cancel.errors.messages[:order], ["Signature invalid"]
+  end
 end

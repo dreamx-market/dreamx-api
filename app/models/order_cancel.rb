@@ -7,7 +7,7 @@ class OrderCancel < ApplicationRecord
   validates :nonce, nonce: true, on: :create
   validates :cancel_hash, signature: true
 
-  validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid
+  validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid, :order_must_be_valid
   validate :balances_must_be_authentic, on: :create
 
   before_create :remove_checksum, :cancel_order
@@ -75,5 +75,13 @@ class OrderCancel < ApplicationRecord
 
   def update_ticker
     self.market.ticker.update_data
+  end
+
+  def order_must_be_valid
+    if self.order && !self.order.valid?
+      self.order.errors.full_messages.each do |msg|
+        errors.add(:order, msg)
+      end
+    end
   end
 end
