@@ -18,6 +18,14 @@ class Order < ApplicationRecord
     MarketOrdersRelayJob.perform_later(self) 
     AccountOrdersRelayJob.perform_later(self)
   }
+  after_rollback :mark_balance_as_fraud_if_inauthentic
+
+  def mark_balance_as_fraud_if_inauthentic
+    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
+      self.balance.mark_fraud!
+      Config.set('read_only', 'true')
+    end
+  end
 
   def has_sufficient_remaining_volume?
     if (self.is_sell) then

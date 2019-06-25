@@ -12,6 +12,14 @@ class OrderCancel < ApplicationRecord
 
   before_create :remove_checksum, :cancel_order
   after_create :update_ticker
+  after_rollback :mark_balance_as_fraud_if_inauthentic
+
+  def mark_balance_as_fraud_if_inauthentic
+    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
+      self.balance.mark_fraud!
+      Config.set('read_only', 'true')
+    end
+  end
 
   def order_must_be_open
     if (!self.order)

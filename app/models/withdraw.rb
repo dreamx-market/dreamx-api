@@ -11,6 +11,14 @@ class Withdraw < ApplicationRecord
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :remove_checksum, :collect_fee_and_debit_balance, :generate_transaction
+  after_rollback :mark_balance_as_fraud_if_inauthentic
+
+  def mark_balance_as_fraud_if_inauthentic
+    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
+      self.balance.mark_fraud!
+      Config.set('read_only', 'true')
+    end
+  end
 
   def refund
     exchange = Contract::Exchange.singleton.instance
@@ -19,6 +27,10 @@ class Withdraw < ApplicationRecord
     difference = withdraw_amount - onchain_balance
     refund_amount = withdraw_amount - difference
     self.account.balance(self.token_address).credit(refund_amount)
+  end
+
+  def balance
+    self.account.balance(self.token_address)
   end
 
   def transaction_hash

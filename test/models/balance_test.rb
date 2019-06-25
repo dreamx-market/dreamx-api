@@ -55,10 +55,6 @@ class BalanceTest < ActiveSupport::TestCase
     @deposit.save(validate: false)
 
     assert_not balance.authentic?
-    assert_equal balance.fraud, true
-    assert_equal Config.get('read_only'), 'true'
-    # always reset environment variables back to its initial state
-    Config.set('read_only', 'false')
   end
 
   test "when balance is compromised because of invalid withdraws" do
@@ -69,10 +65,6 @@ class BalanceTest < ActiveSupport::TestCase
     @withdraw.save(validate: false)
 
     assert_not balance.authentic?
-    assert_equal balance.fraud, true
-    assert_equal Config.get('read_only'), 'true'
-    # always reset environment variables back to its initial state
-    Config.set('read_only', 'false')
   end
 
   test "when balance is compromised because of invalid trades" do
@@ -83,10 +75,6 @@ class BalanceTest < ActiveSupport::TestCase
     @trade.save(validate: false)
 
     assert_not balance.authentic?
-    assert_equal balance.fraud, true
-    assert_equal Config.get('read_only'), 'true'
-    # always reset environment variables back to its initial state
-    Config.set('read_only', 'false')
   end
 
   test "when balance is compromised because of invalid hold_balance" do
@@ -97,10 +85,6 @@ class BalanceTest < ActiveSupport::TestCase
     balance.save(validate: false)
 
     assert_not balance.authentic?
-    assert_equal balance.fraud, true
-    assert_equal Config.get('read_only'), 'true'
-    # always reset environment variables back to its initial state
-    Config.set('read_only', 'false')
   end
 
   test "when balance is compromised because of invalid open orders" do
@@ -111,10 +95,6 @@ class BalanceTest < ActiveSupport::TestCase
     @order.save(validate: false)
 
     assert_not balance.authentic?
-    assert_equal balance.fraud, true
-    assert_equal Config.get('read_only'), 'true'
-    # always reset environment variables back to its initial state
-    Config.set('read_only', 'false')
   end
 
   test "fee balances should always be authentic" do

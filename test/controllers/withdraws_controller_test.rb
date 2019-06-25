@@ -51,14 +51,13 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
     assert_response 201
   end
 
-  # test "mark balance as fraudulent if it is unauthentic" do
-  #   ENV['FRAUD_PROTECTION'] = 'true'
-  #   withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
-  #   balance = @withdraw.account.balance(@withdraw.token_address)
-  #   balance.update({ :hold_balance => '123' })
-  #   post withdraws_url, params: withdraw, as: :json
-  #   pp balance.reload
-  #   # assert_equal balance.reload.fraud, true
-  #   ENV['FRAUD_PROTECTION'] = 'false'
-  # end
+  test "mark balance as fraudulent if it is unauthentic" do
+    ENV['FRAUD_PROTECTION'] = 'true'
+    withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
+    balance = @withdraw.account.balance(@withdraw.token_address)
+    balance.update({ :hold_balance => '123' })
+    post withdraws_url, params: withdraw, as: :json
+    assert_equal balance.reload.fraud, true
+    ENV['FRAUD_PROTECTION'] = 'false'
+  end
 end

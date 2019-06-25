@@ -10,6 +10,14 @@ class Deposit < ApplicationRecord
 
   before_create :remove_checksum, :credit_balance
   after_commit { AccountTransfersRelayJob.perform_later(self) }
+  after_rollback :mark_balance_as_fraud_if_inauthentic
+
+  def mark_balance_as_fraud_if_inauthentic
+    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
+      self.balance.mark_fraud!
+      Config.set('read_only', 'true')
+    end
+  end
 
   # to distinguish this model from withdraws when being displayed a mixed collection of transfers
   def type
@@ -28,6 +36,10 @@ class Deposit < ApplicationRecord
     end
 
     self.account.balance(self.token_address).credit(self.amount)
+  end
+
+  def balance
+    self.account.balance(self.token_address)
   end
 
   def balances_must_be_authentic

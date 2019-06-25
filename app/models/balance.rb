@@ -17,11 +17,6 @@ class Balance < ApplicationRecord
       return true
     end
 
-    if !(balance_authentic? and hold_balance_authentic?)
-      self.mark_fraud!
-      Config.set('read_only', 'true')
-    end
-
     return (balance_authentic? and hold_balance_authentic?)
   end
 
