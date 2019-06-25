@@ -17,11 +17,6 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
     ENV['CONTRACT_ADDRESS'] = @old_contract_address
   end
 
-  # test "should get index" do
-  #   get withdraws_url, as: :json
-  #   assert_response :success
-  # end
-
   test "should create withdraw and debit balance" do
     withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
     before_balances = [
@@ -56,21 +51,14 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
     assert_response 201
   end
 
-  # test "should show withdraw" do
-  #   get withdraw_url(@withdraw), as: :json
-  #   assert_response :success
-  # end
-
-  # test "should update withdraw" do
-  #   patch withdraw_url(@withdraw), params: { withdraw: { account_address: @withdraw.account_address, amount: @withdraw.amount, nonce: @withdraw.nonce, signature: @withdraw.signature, token_address: @withdraw.token_address, withdraw_hash: @withdraw.withdraw_hash } }, as: :json
-  #   assert_response 200
-  # end
-
-  # test "should destroy withdraw" do
-  #   assert_difference('Withdraw.count', -1) do
-  #     delete withdraw_url(@withdraw), as: :json
-  #   end
-
-  #   assert_response 204
+  # test "mark balance as fraudulent if it is unauthentic" do
+  #   ENV['FRAUD_PROTECTION'] = 'true'
+  #   withdraw = generate_withdraw({ :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount })
+  #   balance = @withdraw.account.balance(@withdraw.token_address)
+  #   balance.update({ :hold_balance => '123' })
+  #   post withdraws_url, params: withdraw, as: :json
+  #   pp balance.reload
+  #   # assert_equal balance.reload.fraud, true
+  #   ENV['FRAUD_PROTECTION'] = 'false'
   # end
 end
