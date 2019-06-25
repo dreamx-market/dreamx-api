@@ -105,19 +105,15 @@ class OrderTest < ActiveSupport::TestCase
     assert_equal new_order.status, 'closed'
   end
 
-  test "sell orders volume must be greater than minimum" do
-    @order.take_amount = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i - 1
-    assert_not @order.valid?
-    assert_equal @order.errors.messages[:take_amount], ["must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}"]
+  test "sell orders volume must be greater than minimum on create" do
+    new_sell_order = Order.new(:account_address => @order.account_address, :give_token_address => @order.give_token_address, :give_amount => @order.give_amount, :take_token_address => @order.take_token_address, :take_amount => ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i - 1, :nonce => 0, :expiry_timestamp_in_milliseconds => @order.expiry_timestamp_in_milliseconds, :order_hash => @order.order_hash, :signature => @order.signature)
+    assert_not new_sell_order.valid?
+    assert_equal new_sell_order.errors.messages[:take_amount], ["must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}"]
   end
 
-  test "buy orders volume must be greater than minimum" do
-    give_token_address = @order.give_token_address
-    take_token_address = @order.take_token_address
-    @order.give_token_address = take_token_address
-    @order.take_token_address = give_token_address
-    @order.give_amount = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i - 1
-    assert_not @order.valid?
-    assert_equal @order.errors.messages[:give_amount], ["must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}"]
+  test "buy orders volume must be greater than minimum on create" do
+    new_buy_order = Order.new(:account_address => @order.account_address, :give_token_address => @order.take_token_address, :give_amount => ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i - 1, :take_token_address => @order.give_token_address, :take_amount => ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i - 1, :nonce => 0, :expiry_timestamp_in_milliseconds => @order.expiry_timestamp_in_milliseconds, :order_hash => @order.order_hash, :signature => @order.signature)
+    assert_not new_buy_order.valid?
+    assert_equal new_buy_order.errors.messages[:give_amount], ["must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}"]
   end
 end
