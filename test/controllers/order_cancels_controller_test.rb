@@ -157,8 +157,4 @@ class OrderCancelsControllerTest < ActionDispatch::IntegrationTest
       post order_cancels_url, params: order_cancels, as: :json
     end
   end
-
-  # test "should cancel orders with volume lower than minimum" do
-    
-  # end
 end
