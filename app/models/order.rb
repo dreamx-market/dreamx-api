@@ -19,6 +19,18 @@ class Order < ApplicationRecord
     AccountOrdersRelayJob.perform_later(self)
   }
 
+  def has_sufficient_remaining_volume?
+    if (self.is_sell) then
+      attribute = :take_amount
+      remaining_volume = self.take_amount.to_i - self.calculate_take_amount(self.filled.to_i)
+    else
+      attribute = :give_amount
+      remaining_volume = self.give_amount.to_i - self.filled.to_i
+    end
+    minimum_volume = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i
+    return remaining_volume >= minimum_volume
+  end
+
   def v
     signature[-2..signature.length].hex
   end
@@ -39,8 +51,12 @@ class Order < ApplicationRecord
     return self.market.symbol
   end
 
-  def calculate_take_amount(fill_amount)
-    (fill_amount.to_i * self.take_amount.to_i) / self.give_amount.to_i
+  def calculate_give_amount(take_amount)
+    take_amount.to_i * self.take_amount.to_i / self.give_amount.to_i
+  end
+
+  def calculate_take_amount(give_amount)
+    give_amount.to_i * self.take_amount.to_i / self.give_amount.to_i
   end
 
   def price
@@ -59,7 +75,7 @@ class Order < ApplicationRecord
     self.filled = self.filled.to_i + amount.to_i
     self.fee = self.fee.to_i + fee.to_i
 
-    if self.filled.to_i == self.give_amount.to_i then
+    if self.filled.to_i == self.give_amount.to_i or !self.has_sufficient_remaining_volume? then
       self.status = 'closed'
     else
       self.status = 'partially_filled'

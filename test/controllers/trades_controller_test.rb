@@ -163,4 +163,37 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
       assert_not_nil taker_give_balance
     end
   end
+
+  test "should close sell order after trade if remaining volume doesnt meet taker minimum" do
+    order = @orders[0]
+    trade = generate_trade({ :account_address => @trade.account_address, :order_hash => order.order_hash, :amount => "91".to_wei })
+
+    assert_equal order.reload.status, 'open'
+
+    assert_difference('Trade.count') do
+      post trades_url, params: [trade], as: :json
+      assert_response 201
+      assert_equal order.reload.status, 'closed'
+    end
+  end
+
+  test "should close buy order after trade if remaining volume doesnt meet taker minimum" do
+    deposits = batch_deposit([
+      { :account_address => @order.account_address, :token_address => @order.give_token_address, :amount => "1".to_wei },
+      { :account_address => @order.account_address, :token_address => @order.take_token_address, :amount => "1".to_wei }
+    ])
+    orders = batch_order([
+      { :account_address => @order.account_address, :give_token_address => @order.take_token_address, :give_amount => "1".to_wei, :take_token_address => @order.give_token_address, :take_amount => "1".to_wei }
+    ])
+    trade = generate_trade({ :account_address => @order.account_address, :order_hash => orders[0].order_hash, :amount => "0.96".to_wei })
+
+    assert_not orders[0].is_sell
+    assert_equal orders[0].reload.status, 'open'
+
+    assert_difference('Trade.count') do
+      post trades_url, params: [trade], as: :json
+      assert_response 201
+      assert_equal orders[0].reload.status, 'closed'
+    end
+  end
 end
