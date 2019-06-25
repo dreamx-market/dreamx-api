@@ -107,6 +107,24 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "should display validation errors when trying to trade a closed order" do
+    order = @orders[0]
+    order_cancel = generate_order_cancel({ :order_hash => order.order_hash, :account_address => order.account_address })
+    trade = generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @orders[0].give_amount })
+
+    assert_difference('OrderCancel.count') do
+      post order_cancels_url, params: [order_cancel], as: :json
+      assert_equal order.reload.status, 'closed'
+      assert_response 201
+    end
+
+    assert_no_difference('Trade.count') do
+      post trades_url, params: [trade], as: :json
+      assert_equal json['validation_errors'][0], [{"field"=>"order", "reason"=>["must be open"]}]
+      assert_response 422
+    end
+  end
+
   test "should rollback batch trade if a trade failed to save" do
     trades = []
     3.times do

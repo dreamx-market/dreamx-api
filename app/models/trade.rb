@@ -231,14 +231,18 @@ class Trade < ApplicationRecord
   end
 
   def order_must_be_open
-    if self.order.status == 'closed'
-      self.errors.add(:order, 'must be open')
+    if self.order
+      if self.order.status == 'closed'
+        self.errors.add(:order, 'must be open')
+      end
     end
   end
 
   def order_must_have_sufficient_volume
-    if self.order.give_amount.to_i < (self.order.filled.to_i + self.amount.to_i)
-      self.errors.add(:order, 'must have sufficient volume')
+    if self.order
+      if self.order.give_amount.to_i < (self.order.filled.to_i + self.amount.to_i)
+        self.errors.add(:order, 'must have sufficient volume')
+      end
     end
   end
 
@@ -257,8 +261,10 @@ class Trade < ApplicationRecord
   end
 
   def market_must_be_active
-    if self.market.disabled?
-      self.errors.add(:market, 'has been disabled')
+    if self.order
+      if self.market.disabled?
+        self.errors.add(:market, 'has been disabled')
+      end
     end
   end
 end
