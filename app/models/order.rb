@@ -187,7 +187,7 @@ class Order < ApplicationRecord
       return
     end
     
-    # validate_balances_integrity(self.account.balance(self.give_token_address))
+    validate_balances_integrity(self.account.balance(self.give_token_address))
   end
 
   def remove_checksum
