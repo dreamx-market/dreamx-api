@@ -109,7 +109,7 @@ class Trade < ApplicationRecord
   end
 
   def take_amount
-    return self.order.calculate_take_amount(self.amount)
+    return self.order.calculate_take_amount(self.amount).to_s
   end
 
   def maker_address
