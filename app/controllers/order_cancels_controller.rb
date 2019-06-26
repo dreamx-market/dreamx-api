@@ -16,7 +16,16 @@ class OrderCancelsController < ApplicationController
   # POST /order_cancels
   # POST /order_cancels.json
   def create
-    begin
+    order_cancels_errors = []
+    order_cancels_params.each do |order_cancel_param|
+      order_cancel = OrderCancel.new(order_cancel_param)
+      order_cancel.valid?
+      if !order_cancel.errors.messages.empty?
+        order_cancels_errors.push(order_cancel.errors.messages)
+      end
+    end
+
+    if order_cancels_errors.empty?
       @order_cancels = []
       ActiveRecord::Base.transaction do
         order_cancels_params.each do |order_cancel_param|
@@ -25,13 +34,7 @@ class OrderCancelsController < ApplicationController
         end
       end
       render :show, status: :created
-    rescue ActiveRecord::RecordInvalid
-      order_cancels_errors = []
-      order_cancels_params.each do |order_cancel_param|
-        order_cancel = OrderCancel.new(order_cancel_param)
-        order_cancel.valid?
-        order_cancels_errors.push(order_cancel.errors.messages)
-      end
+    else
       serialize_active_record_validation_error order_cancels_errors
     end
   end
