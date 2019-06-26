@@ -1,5 +1,5 @@
 class Order < ApplicationRecord
-  # include FraudProtectable
+  include FraudProtectable
   
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
   
@@ -25,6 +25,10 @@ class Order < ApplicationRecord
       self.balance.mark_fraud!
       Config.set('read_only', 'true')
     end
+  end
+
+  def balance
+    self.account.balance(self.give_token_address)
   end
 
   def has_sufficient_remaining_volume?

@@ -19,6 +19,10 @@ class Deposit < ApplicationRecord
     end
   end
 
+  def balance
+    self.account.balance(self.token_address)
+  end
+
   # to distinguish this model from withdraws when being displayed a mixed collection of transfers
   def type
     'deposit'
@@ -36,10 +40,6 @@ class Deposit < ApplicationRecord
     end
 
     self.account.balance(self.token_address).credit(self.amount)
-  end
-
-  def balance
-    self.account.balance(self.token_address)
   end
 
   def balances_must_be_authentic

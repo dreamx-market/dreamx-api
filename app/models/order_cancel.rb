@@ -21,6 +21,10 @@ class OrderCancel < ApplicationRecord
     end
   end
 
+  def balance
+    self.account.balance(self.order.give_token_address)
+  end
+
   def order_must_be_open
     if (!self.order)
       return

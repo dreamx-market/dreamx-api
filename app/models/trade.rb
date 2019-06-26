@@ -24,6 +24,10 @@ class Trade < ApplicationRecord
     end
   end
 
+  def balance
+    self.account.balance(self.order.take_token_address)
+  end
+
   def refund
     exchange = Contract::Exchange.singleton.instance
     maker_balance = self.order.account.balance(self.order.give_token_address)

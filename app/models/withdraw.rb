@@ -19,6 +19,10 @@ class Withdraw < ApplicationRecord
       Config.set('read_only', 'true')
     end
   end
+  
+  def balance
+    self.account.balance(self.token_address)
+  end
 
   def refund
     exchange = Contract::Exchange.singleton.instance
@@ -27,10 +31,6 @@ class Withdraw < ApplicationRecord
     difference = withdraw_amount - onchain_balance
     refund_amount = withdraw_amount - difference
     self.account.balance(self.token_address).credit(refund_amount)
-  end
-
-  def balance
-    self.account.balance(self.token_address)
   end
 
   def transaction_hash
