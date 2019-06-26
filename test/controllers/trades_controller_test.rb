@@ -44,6 +44,13 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "get market-specific trades" do
+    get trades_url({ :market_symbol => 'ONE_THREE' }), as: :json
+    assert_equal json['records'].length, 0
+    get trades_url({ :market_symbol => 'ONE_TWO' }), as: :json
+    assert_equal json['records'].length, 1
+  end
+
   test "filtering trades by an account should return both its maker and taker trades" do
     # should return all trades where @trade.account_address is either the maker or taker
     # should not return another_person's trade
