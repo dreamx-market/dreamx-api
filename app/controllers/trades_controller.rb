@@ -22,25 +22,25 @@ class TradesController < ApplicationController
   # POST /trades
   # POST /trades.json
   def create
-    @trades = []
-    ActiveRecord::Base.transaction do
-      trades_params.each do |trade_param|
-        begin
+    begin
+      @trades = []
+      ActiveRecord::Base.transaction do
+        trades_params.each do |trade_param|
           trade = Trade.create!(trade_param)
-        rescue ActiveRecord::RecordInvalid
-          logger.info 'RESCUED'
-          trades_errors = []
-          trades_params.each do |trade_param|
-            trade = Trade.new(trade_param)
-            trade.valid?
-            trades_errors.push(trade.errors.messages)
-          end
-          serialize_active_record_validation_error trades_errors
+          @trades.push(trade)
         end
-        @trades.push(trade)
       end
+      render :show, status: :created
+    rescue
+      logger.info 'RESCUED'
+      trades_errors = []
+      trades_params.each do |trade_param|
+        trade = Trade.new(trade_param)
+        trade.valid?
+        trades_errors.push(trade.errors.messages)
+      end
+      serialize_active_record_validation_error trades_errors
     end
-    render :show, status: :created
   end
 
   # # PATCH/PUT /trades/1
