@@ -40,6 +40,31 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get index" do
     get trades_url, as: :json
+    assert_equal json['records'].length, 1
+    assert_response :success
+  end
+
+  test "filtering trades by an account should return both its maker and taker trades" do
+    # should return all trades where @trade.account_address is either the maker or taker
+    # should not return another_person's trade
+    give_token_address = "0x0000000000000000000000000000000000000000"
+    take_token_address = "0x21921361bab476be44c0655256a2f4281bfcf07d"
+    amount = "1".to_wei
+    another_person = addresses[2]
+    deposits = batch_deposit([
+      { :account_address => @trade.account_address, :token_address => give_token_address, :amount => amount },
+      { :account_address => @order.account_address, :token_address => take_token_address, :amount => amount },
+      { :account_address => another_person, :token_address => @orders[0].take_token_address, :amount => @orders[0].take_amount }
+    ])
+    orders = batch_order([
+      { :account_address => @trade.account_address, :give_token_address => give_token_address, :give_amount => amount, :take_token_address => take_token_address, :take_amount => amount }
+    ])
+    trades = batch_trade([
+      { :account_address => @order.account_address, :order_hash => orders[0].order_hash, :amount => orders[0].give_amount },
+      { :account_address => another_person, :order_hash => @orders[0].order_hash, :amount => @orders[0].give_amount }
+    ])
+    get trades_url({ :account_address => @trade.account_address }), as: :json
+    assert_equal json['records'].length, 2
     assert_response :success
   end
 

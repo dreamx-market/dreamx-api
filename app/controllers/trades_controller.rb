@@ -6,8 +6,13 @@ class TradesController < ApplicationController
   # GET /trades.json
   def index
     start_timestamp = params[:start] || 0
-    end_timestamp = params[:end] || Time.current
-    @trades = Trade.where(extract_filters_from_query_params([ :account_address ])).where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
+    end_timestamp = params[:end] || Time.current + 1.second # + 1 second to include trades created at this exact moment
+    filters = extract_filters_from_query_params([ :account_address ])
+    if filters.empty?
+      @trades = Trade.where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
+    else
+      @trades = Trade.joins(:order).where({ :trades => extract_filters_from_query_params([ :account_address ]) }).or(Trade.joins(:order).where({ :orders => extract_filters_from_query_params([ :account_address ]) })).where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
+    end
     if (params[:market_symbol])
       @trades = @trades.select { |trade|  trade.market_symbol == params[:market_symbol] }
     end
