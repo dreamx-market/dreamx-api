@@ -227,7 +227,7 @@ class Trade < ApplicationRecord
   end
 
   def balances_must_be_authentic
-    if (self.account or self.order)
+    if (!self.account or !self.order)
       return
     end
 
