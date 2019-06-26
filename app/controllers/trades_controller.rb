@@ -31,8 +31,7 @@ class TradesController < ApplicationController
         end
       end
       render :show, status: :created
-    rescue
-      logger.info 'RESCUED'
+    rescue ActiveRecord::RecordInvalid
       trades_errors = []
       trades_params.each do |trade_param|
         trade = Trade.new(trade_param)
