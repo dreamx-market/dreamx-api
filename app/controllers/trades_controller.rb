@@ -19,10 +19,17 @@ class TradesController < ApplicationController
   def show
   end
 
-  # POST /trades
-  # POST /trades.json
   def create
-    begin
+    trades_errors = []
+    trades_params.each do |trade_param|
+      trade = Trade.new(trade_param)
+      trade.valid?
+      if !trade.errors.messages.empty?
+        trades_errors.push(trade.errors.messages)
+      end
+    end
+
+    if trades_errors.empty?
       @trades = []
       ActiveRecord::Base.transaction do
         trades_params.each do |trade_param|
@@ -31,13 +38,7 @@ class TradesController < ApplicationController
         end
       end
       render :show, status: :created
-    rescue ActiveRecord::RecordInvalid
-      trades_errors = []
-      trades_params.each do |trade_param|
-        trade = Trade.new(trade_param)
-        trade.valid?
-        trades_errors.push(trade.errors.messages)
-      end
+    else
       serialize_active_record_validation_error trades_errors
     end
   end
