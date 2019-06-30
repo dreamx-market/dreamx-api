@@ -46,7 +46,7 @@ class ChartDataController < ApplicationController
       start_timestamp = params[:start] || 0
       end_timestamp = params[:end] || Time.current
       period = params[:period] || 1.hour.to_i
-      @chart_data = ChartDatum.where({ :market_symbol => params[:market_symbol], :period => period, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
+      @chart_data = ChartDatum.where({ :market_symbol => params[:market_symbol], :period => period, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) }).order(:created_at)
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
