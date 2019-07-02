@@ -17,6 +17,7 @@
   * SERVER_PRIVATE_KEY
   * CONTRACT_ADDRESS
   * FEE_COLLECTOR_ADDRESS
+  * ETHEREUM_HOST (if deploying to main net)
 * start redis at boot `sudo systemctl enable redis-server.service`
 * double-check, make sure CONTRACT_ADDRESS is deployed, PRIVATE_KEY is funded, ETHEREUM_HOST is pointing to the right network
 * add domain
