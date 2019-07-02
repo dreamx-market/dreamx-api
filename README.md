@@ -35,7 +35,7 @@
 * double-check, make sure CONTRACT_ADDRESS is not checksummed and deployed, SERVER_PRIVATE_KEY is funded, FEE_COLLECTOR_ADDRESS is not checksummed and is the right address, ETHEREUM_HOST is pointing to the right network
 * add domain
 * add ssl certificate https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
-* add tokens & markets by running `rake db:seed`
+* add tokens & markets by running `bundle exec rake db:seed RAILS_ENV=production`
 
 ## Errors
 
