@@ -24,12 +24,12 @@
     4. Run `cap production deploy` from your local machine
     5. Remove superuser from your database user: `$ alter role your_user nosuperuser;`
     6. Leave PostgreSQL shell: `$ \q`
-* required environment variables:
-  * POSTGRES_PASSWORD
-  * SERVER_PRIVATE_KEY
-  * CONTRACT_ADDRESS
-  * FEE_COLLECTOR_ADDRESS
-  * ETHEREUM_HOST (if deploying to main net)
+  * environment variables that must be set before `cap production deploy`:
+    * POSTGRES_PASSWORD
+    * SERVER_PRIVATE_KEY
+    * CONTRACT_ADDRESS
+    * FEE_COLLECTOR_ADDRESS
+    * ETHEREUM_HOST (if deploying to main net)
 * start redis at boot `sudo systemctl enable redis-server.service`
 * double-check, make sure CONTRACT_ADDRESS is not checksummed and deployed, SERVER_PRIVATE_KEY is funded, FEE_COLLECTOR_ADDRESS is not checksummed and is the right address, ETHEREUM_HOST is pointing to the right network
 * add domain
