@@ -11,7 +11,19 @@
 
 # Deployment:
 
-* https://gorails.com/deploy/ubuntu/18.04
+* follow https://gorails.com/deploy/ubuntu/18.04
+  * when you run `createdb`, the database name must match with the one specified in database.yml
+  * you will need to temporarily make your database user a superuser to avoid PG::InsufficientPrivilege on the first deployment:
+    1. Connect to the server: `$ ssh user@server`
+    2. Connect to PostgreSQL as the superuser (not your database user):
+      ```
+      $ sudo su postgres
+      $ \psql
+      ```
+    3. Make your database user a superuser: `$ alter role your_user superuser;`
+    4. Run `cap production deploy` from your local machine
+    5. Remove superuser from your database user: `$ alter role your_user nosuperuser;`
+    6. Leave PostgreSQL shell: `$ \q`
 * required environment variables:
   * POSTGRES_PASSWORD
   * SERVER_PRIVATE_KEY
@@ -41,30 +53,6 @@ require "capistrano/passenger"
 require "capistrano/rbenv"
 require "whenever/capistrano"
 ```
-
-#### Cannot create extension "citext"
-
-Are you getting the following error when running your Capistrano deployment?
-
-```
-PG::InsufficientPrivilege: ERROR:  permission denied to create extension "citext"
-HINT:  Must be superuser to create this extension.
-: CREATE EXTENSION IF NOT EXISTS "citext"
-```
-
-You will need to temporarily make your database user a superuser.
-
-1. Connect to the server: `$ ssh user@server`
-2. Connect to PostgreSQL as the superuser (not your database user):
-
-    ```
-    $ sudo su postgres
-    $ \psql
-    ```
-3. Make your database user a superuser: `$ alter role your_user superuser;`
-4. Run `cap production deploy` from your local machine. This time it should succeed
-5. Remove superuser from your database user: `$ alter role your_user nosuperuser;`
-6. Leave PostgreSQL shell: `$ \q`
 
 # Running the test suite
 
