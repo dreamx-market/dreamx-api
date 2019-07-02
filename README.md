@@ -63,5 +63,7 @@ You will need to temporarily make your database user a superuser.
 
 # Running the test suite
 
+* clone this repo
+* `bundle`
 * rake ganache:up
 * rake test
