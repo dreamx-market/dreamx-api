@@ -12,6 +12,7 @@
 # Deployment:
 
 * follow https://gorails.com/deploy/ubuntu/18.04
+  * set `server_name` in `/etc/nginx/sites-enabled/myapp` to your specific domain for the certbot
   * when you run `createdb`, the database name must match with the one specified in database.yml
   * you will need to temporarily make your database user a superuser to avoid PG::InsufficientPrivilege on the first deployment:
     1. Connect to the server: `$ ssh user@server`
