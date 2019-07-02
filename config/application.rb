@@ -17,7 +17,7 @@ require "rails/test_unit/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module NinjatradeApi
+module DreamxApi
   class Application < Rails::Application
     require 'ext/string'
     require 'ext/integer'

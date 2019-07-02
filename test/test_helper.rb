@@ -191,7 +191,7 @@ class ActiveSupport::TestCase
   end
 
   def revert_environment_variables
-    NinjatradeApi::Application.load_environment_variables(true)
+    DreamxApi::Application.load_environment_variables(true)
   end
 
   def get_action_nonce

@@ -1,8 +1,8 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.11.0"
 
-set :application, "ninjatrade-api"
-set :repo_url, "git@github.com:hieudoan2609/ninjatrade-api.git"
+set :application, "dreamx-api"
+set :repo_url, "git@github.com:hieudoan2609/dreamx-api.git"
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
