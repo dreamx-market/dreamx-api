@@ -14,7 +14,7 @@
 * https://gorails.com/deploy/ubuntu/18.04
 * required environment variables:
   * POSTGRES_PASSWORD
-  * BROADCAST_PRIVATE_KEY
+  * SERVER_PRIVATE_KEY
   * CONTRACT_ADDRESS
   * FEE_COLLECTOR_ADDRESS
 * start redis at boot `sudo systemctl enable redis-server.service`

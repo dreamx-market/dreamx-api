@@ -1,4 +1,4 @@
-key = Eth::Key.new(priv: ENV['BROADCAST_PRIVATE_KEY'].hex)
+key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
 Ethereum::Singleton.client = :http
 Ethereum::Singleton.host = ENV['ETHEREUM_HOST']
 Ethereum::Singleton.default_account = key.address
