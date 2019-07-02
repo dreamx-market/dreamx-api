@@ -12,3 +12,26 @@
 # 	{ :symbol => "TRX", :decimals => 8, :address => "0xf59fad2879fb8380ffa6049a48abf9c9959b3b5c", :name => "Tron" }
 # ]
 # currencies.each { |currency| Currency.create currency }
+
+networks = { "1" => "mainnet", "42" => "kovan", "3" => "ropsten", "4" => "rinkeby" }
+tokens = []
+markets = []
+
+if (networks[Eth.chain_id.to_s] == "mainnet")
+  # TODO: implement mainnet seeds
+end
+
+if (networks[Eth.chain_id.to_s] == "ropsten")
+  tokens = [
+    { :name => "One", :address => "0xe62cc4212610289d7374f72c2390a40e78583350", :symbol => "ONE", :decimals => "18", :withdraw_minimum => "20000000000000000", :withdraw_fee => "10000000000000000" },
+    { :name => "Two", :address => "0x629c21172f58df81585fbc53f50cc601e90e031d", :symbol => "TWO", :decimals => "18", :withdraw_minimum => "20000000000000000", :withdraw_fee => "10000000000000000" },
+    { :name => "Ethereum", :address => "0x0000000000000000000000000000000000000000", :symbol => "ETH", :decimals => "18", :withdraw_minimum => "20000000000000000", :withdraw_fee => "10000000000000000" }
+  ]
+  markets = [
+    { :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0xe62cc4212610289d7374f72c2390a40e78583350", :status => "active" },
+    { :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x629c21172f58df81585fbc53f50cc601e90e031d", :status => "active" }
+  ]
+end
+
+Token.create(tokens)
+Market.create(markets)
