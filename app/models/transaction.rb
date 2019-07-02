@@ -8,7 +8,7 @@ class Transaction < ApplicationRecord
 
   def self.confirm_mined_transactions
     client = Ethereum::Singleton.instance
-    key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
+    key = Eth::Key.new(priv: ENV['BROADCAST_PRIVATE_KEY'].hex)
     last_onchain_nonce = client.get_nonce(key.address) - 1
     last_block_number = client.eth_get_block_by_number('latest', false)['result']['number'].hex
     mined_transactions = self.where({ :status => ["unconfirmed", "pending"] }).where({ :nonce => 0..last_onchain_nonce })
@@ -49,7 +49,7 @@ class Transaction < ApplicationRecord
 
   def raw
     client = Ethereum::Singleton.instance
-    key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
+    key = Eth::Key.new(priv: ENV['BROADCAST_PRIVATE_KEY'].hex)
     gas_price = client.eth_gas_price['result'].hex.to_i
     gas_limit = ENV['GAS_LIMIT'].to_i
     contract_address = ENV['CONTRACT_ADDRESS'].without_checksum
@@ -152,7 +152,7 @@ class Transaction < ApplicationRecord
 
   def expired?
     client = Ethereum::Singleton.instance
-    key = Eth::Key.new(priv: ENV['PRIVATE_KEY'].hex)
+    key = Eth::Key.new(priv: ENV['BROADCAST_PRIVATE_KEY'].hex)
     last_confirmed_nonce = client.get_nonce(key.address) - 1
     return self.nonce.to_i >= last_confirmed_nonce && self.created_at <= 5.minutes.ago
   end
@@ -165,7 +165,7 @@ class Transaction < ApplicationRecord
 
   def self.sync_nonce
     client = Ethereum::Singleton.instance
-    key = Eth::Key.new priv: ENV['PRIVATE_KEY'].hex
+    key = Eth::Key.new priv: ENV['BROADCAST_PRIVATE_KEY'].hex
     Redis.current.set("nonce", client.get_nonce(key.address))
   end
 

@@ -35,7 +35,6 @@ module DreamxApi
         :TAKER_MINIMUM_ETH_IN_WEI => '50000000000000000',
         :MAKER_FEE_PER_ETHER_IN_WEI => '1000000000000000', # 0.001 per Ether
         :TAKER_FEE_PER_ETHER_IN_WEI => '2000000000000000', # 0.002 per Ether
-        :FEE_COLLECTOR_ADDRESS => '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a',
         :CHART_DATUM_EXPIRY_5M => 7.days.to_s,
         :CHART_DATUM_EXPIRY_15M => 20.days.to_s,
         :CHART_DATUM_EXPIRY_1H => 90.days.to_s,
@@ -43,7 +42,8 @@ module DreamxApi
         :POSTGRES_USERNAME => 'deploy',
         :POSTGRES_PASSWORD => '',
         :SECRET_KEY_BASE => 'bff123f6ea48261cf749ba0a27d2cd5e50ffea689aecac9d696d0c47a1d94614e134c427f7fcb9ef2fa6fee05a5b41cfa4f92b21bcf54b4d41a37af7e614b4e6',
-        :PRIVATE_KEY => '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2'
+        :BROADCAST_PRIVATE_KEY => '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2',
+        :FEE_COLLECTOR_ADDRESS => '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a',
       }
     end
 
