@@ -31,7 +31,7 @@
   * FEE_COLLECTOR_ADDRESS
   * ETHEREUM_HOST (if deploying to main net)
 * start redis at boot `sudo systemctl enable redis-server.service`
-* double-check, make sure CONTRACT_ADDRESS is deployed, PRIVATE_KEY is funded, ETHEREUM_HOST is pointing to the right network
+* double-check, make sure CONTRACT_ADDRESS is not checksummed and deployed, SERVER_PRIVATE_KEY is funded, FEE_COLLECTOR_ADDRESS is not checksummed and is the right address, ETHEREUM_HOST is pointing to the right network
 * add domain
 * add ssl certificate https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
 * add tokens & markets
