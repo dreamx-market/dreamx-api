@@ -12,12 +12,12 @@
 # Deployment:
 
 * https://gorails.com/deploy/ubuntu/18.04
-* start redis at boot `sudo systemctl enable redis-server.service`
 * required environment variables:
   * POSTGRES_PASSWORD
   * BROADCAST_PRIVATE_KEY
   * CONTRACT_ADDRESS
   * FEE_COLLECTOR_ADDRESS
+* start redis at boot `sudo systemctl enable redis-server.service`
 * double-check, make sure CONTRACT_ADDRESS is deployed, PRIVATE_KEY is funded, ETHEREUM_HOST is pointing to the right network
 * add domain
 * add ssl certificate https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
