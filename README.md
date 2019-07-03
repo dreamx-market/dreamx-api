@@ -26,6 +26,7 @@
     5. Remove superuser from your database user: `$ alter role your_user nosuperuser;`
     6. Leave PostgreSQL shell: `$ \q`
   * environment variables that must be set before `cap production deploy`:
+    * POSTGRES_USERNAME
     * POSTGRES_PASSWORD
     * SERVER_PRIVATE_KEY
     * CONTRACT_ADDRESS
@@ -36,6 +37,8 @@
 * add domain
 * add ssl certificate https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
 * add tokens & markets by running `bundle exec rake db:seed RAILS_ENV=production`
+* automated daily backup: https://github.com/hieudoan2609/dreamx-api-backup
+* log rotation: https://gorails.com/guides/rotating-rails-production-logs-with-logrotate
 
 ## Errors
 
