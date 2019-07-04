@@ -95,10 +95,6 @@ class Transaction < ApplicationRecord
       rescue
       end
     end
-
-    # DEBUGGING
-    unconfirmed_ids = unconfirmed_transactions.map { |t| t.id }
-    logger.debug "rebroadcasted the following transactions: #{unconfirmed_ids}"
   end
 
   def self.regenerate_replaced_transactions
@@ -108,11 +104,6 @@ class Transaction < ApplicationRecord
       next_nonce = Redis.current.incr('nonce') - 1
       transaction.update!({ :nonce => next_nonce, :status => "pending", :transaction_hash => nil })
     end
-
-    # DEBUGGING
-    replaced_ids = replaced_transactions.map { |t| t.id }
-    logger.debug "regenerated the following transactions: #{replaced_ids}"
-
     Config.set('read_only', 'false')
   end
 
