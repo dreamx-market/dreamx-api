@@ -95,6 +95,8 @@ class Transaction < ApplicationRecord
       rescue
       end
     end
+
+    pp 'Performed Transaction.broadcast_expired_transactions'
   end
 
   def self.regenerate_replaced_transactions
