@@ -16,6 +16,7 @@ class BroadcastTransactionJobTest < ActiveJob::TestCase
     assert_not_nil transaction.gas_limit
     assert_not_nil transaction.gas_price
     assert_not_nil transaction.transaction_hash
+    assert_not_nil transaction.broadcasted_at
   end
 
   test "broadcast and update a trade transaction" do
@@ -32,5 +33,6 @@ class BroadcastTransactionJobTest < ActiveJob::TestCase
     assert_not_nil transaction.gas_limit
     assert_not_nil transaction.gas_price
     assert_not_nil transaction.transaction_hash
+    assert_not_nil transaction.broadcasted_at
   end
 end

@@ -151,10 +151,15 @@ class Transaction < ApplicationRecord
   end
 
   def expired?
+    if (!self.broadcasted_at)
+      return true
+    end
+
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
     last_confirmed_nonce = client.get_nonce(key.address) - 1
-    return self.nonce.to_i >= last_confirmed_nonce && self.created_at <= 5.minutes.ago
+    # only unconfirmed transactions can expire
+    return self.nonce.to_i > last_confirmed_nonce && self.broadcasted_at <= 5.minutes.ago
   end
 
   private

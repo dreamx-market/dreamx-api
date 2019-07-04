@@ -24,8 +24,6 @@ class TransactionTest < ActiveSupport::TestCase
       { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 },
       { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 30000000000000000 }
     ])
-    withdraw1.tx.update({ :created_at => 15.minutes.ago })
-    withdraw2.tx.update({ :created_at => 15.minutes.ago })
     expired_transaction1 = withdraw1.tx
     expired_transaction2 = withdraw2.tx
 
@@ -205,7 +203,6 @@ class TransactionTest < ActiveSupport::TestCase
       # manually expire txs so they can be broadcasted, in production, they will likely be expired
       # already by the time they are re-generated
       Transaction.replaced.each do |transaction|
-        transaction.update({ :created_at => 10.minutes.ago })
       end
 
       perform_enqueued_jobs do
@@ -245,7 +242,6 @@ class TransactionTest < ActiveSupport::TestCase
 
       # manually expire txs so they can be broadcasted, in production, they will likely be expired
       # already by the time they are re-generated
-      withdraw1.tx.update({ :created_at => 10.minutes.ago })
       Transaction.broadcast_expired_transactions
       assert_equal(withdraw1.reload.tx.status, 'replaced')
       assert_equal(Config.get('read_only'), 'true')

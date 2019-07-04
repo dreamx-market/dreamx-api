@@ -8,7 +8,8 @@ class BroadcastTransactionJob < ApplicationJob
       :gas_limit => tx.raw.gas_limit, 
       :gas_price => tx.raw.gas_price, 
       :transaction_hash => transaction_hash, 
-      :status => 'unconfirmed' 
+      :status => 'unconfirmed',
+      :broadcasted_at => Time.now
     })
   end
 end
