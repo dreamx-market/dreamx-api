@@ -128,5 +128,7 @@ module DreamxApi
     WillPaginate.per_page = 100
 
     config.action_cable.disable_request_forgery_protection = true
+
+    config.active_job.queue_adapter = :sucker_punch
   end
 end
