@@ -6,6 +6,19 @@ class Balance < ApplicationRecord
   before_create :remove_checksum
   after_commit { AccountBalancesRelayJob.perform_later(self) }
 
+  class << self
+    def has_unauthentic_balance?
+      self.all.each do |b|
+        if !b.authentic?
+          return true
+          break
+        end
+      end
+
+      return false
+    end
+  end
+
   def mark_fraud!
     self.fraud = true
     self.save!
