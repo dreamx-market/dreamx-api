@@ -91,7 +91,6 @@ class Transaction < ApplicationRecord
       end
 
       begin
-        logger.debug "enqueing transaction##{transaction.id}"
         BroadcastTransactionJob.perform_later(transaction)
       rescue
       end

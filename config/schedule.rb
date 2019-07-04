@@ -11,9 +11,6 @@ end
 
 every 5.minutes do
   rake_with_lock "chart:aggregate_5m"
-  # rake_with_lock "block:process_new_confirmed_blocks"
-  # rake_with_lock "transaction:broadcast_expired_transactions"
-  # rake_with_lock "transaction:confirm_mined_transactions"
 end
 
 every 15.minutes do
