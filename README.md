@@ -37,6 +37,7 @@
 * add domain
 * add ssl certificate https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
 * add tokens & markets by running `bundle exec rake db:seed RAILS_ENV=production`
+* run `Transaction.sync_nonce` to make sure off-chain nonce is in sync with the current on-chain nonce of `SERVER_PRIVATE_KEY`
 * automated daily backup: https://github.com/hieudoan2609/dreamx-api-backup
 * log rotation: https://gorails.com/guides/rotating-rails-production-logs-with-logrotate
 
