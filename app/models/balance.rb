@@ -7,11 +7,10 @@ class Balance < ApplicationRecord
   after_commit { AccountBalancesRelayJob.perform_later(self) }
 
   class << self
-    def has_unauthentic_balance?
+    def has_unauthentic_balances?
       self.all.each do |b|
         if !b.authentic?
           return true
-          break
         end
       end
 

@@ -103,4 +103,16 @@ class BalanceTest < ActiveSupport::TestCase
     fee_balance.credit(10)
     assert fee_balance.authentic?
   end
+
+  test "has no unauthentic balances" do
+    Balance.delete_all
+    assert_not Balance.has_unauthentic_balances?
+  end
+
+  test "has unauthentic balances" do
+    Balance.delete_all
+    balance = Balance.create({ :account_address => "0x16e86d3935e8922a9b14c722a97552a202575256", :token_address => "0x0000000000000000000000000000000000000000", :balance => "0", :hold_balance => "0" })
+    balance.update({ :hold_balance => "100" })
+    assert Balance.has_unauthentic_balances?
+  end
 end
