@@ -46,7 +46,7 @@ class Transaction < ApplicationRecord
       transaction.update!({ :status => status, :block_number => block_number, :block_hash => block_hash, :gas => gas })
     end
 
-    pp 'Performed Transaction.confirm_mined_transactions'
+    logger.info 'Performed Transaction.confirm_mined_transactions'
   end
 
   def raw
@@ -98,7 +98,7 @@ class Transaction < ApplicationRecord
       end
     end
 
-    pp 'Performed Transaction.broadcast_expired_transactions'
+    logger.info 'Performed Transaction.broadcast_expired_transactions'
   end
 
   def self.regenerate_replaced_transactions
