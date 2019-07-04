@@ -45,6 +45,8 @@ class Transaction < ApplicationRecord
       end
       transaction.update!({ :status => status, :block_number => block_number, :block_hash => block_hash, :gas => gas })
     end
+
+    pp 'Performed Transaction.confirm_mined_transactions'
   end
 
   def raw
