@@ -63,17 +63,4 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     get order_url(@order.order_hash), as: :json
     assert_response :success
   end
-
-  # test "should update order" do
-  #   patch order_url(@order), params: { order: { account: @order.account, expiryTimestampInMilliseconds: @order.expiryTimestampInMilliseconds, giveAmount: @order.giveAmount, giveTokenAddress: @order.giveTokenAddress, nonce: @order.nonce, orderHash: @order.orderHash, signature: @order.signature, takeAmount: @order.takeAmount, takeTokenAddress: @order.takeTokenAddress } }, as: :json
-  #   assert_response 200
-  # end
-
-  # test "should destroy order" do
-  #   assert_difference('Order.count', -1) do
-  #     delete order_url(@order), as: :json
-  #   end
-
-  #   assert_response 204
-  # end
 end

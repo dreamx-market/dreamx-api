@@ -92,12 +92,11 @@ class Order < ApplicationRecord
     self.fee = self.fee.to_i + fee.to_i
 
     if self.filled.to_i == self.give_amount.to_i or !self.has_sufficient_remaining_volume? then
-      self.status = 'closed'
+      self.cancel
     else
       self.status = 'partially_filled'
+      self.save!
     end
-
-    self.save!
   end
 
   def cancel
