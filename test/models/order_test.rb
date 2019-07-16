@@ -118,7 +118,7 @@ class OrderTest < ActiveSupport::TestCase
   end
 
  test "calculate_take_amount and calculate_give_amount should handle overly-specific amounts" do
-  order = Order.new(:give_token_address => @order.give_token_address, :give_amount => "195738239776775570", :take_token_address => @order.take_token_address, :take_amount => "59744193591648150")
+  order = Order.new(:give_amount => 195738239776775570, :take_amount => 59744193591648150)
   take_amount = order.calculate_give_amount(50000000000000000)
   give_amount = order.calculate_take_amount(take_amount)
   assert_equal take_amount, 163813609331349736
