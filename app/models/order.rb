@@ -64,15 +64,13 @@ class Order < ApplicationRecord
   end
 
   def calculate_take_amount(give_amount)
-    give_amount = Money.new(give_amount)
-    take_amount = give_amount * self.take_amount.to_i / self.give_amount.to_i
-    return take_amount.fractional
+    take_amount = give_amount.to_i * self.take_amount.to_i / self.give_amount.to_i
+    return take_amount
   end
 
   def calculate_give_amount(take_amount)
-    take_amount = Money.new(take_amount)
-    give_amount = take_amount * self.give_amount.to_i / self.take_amount.to_i
-    return give_amount.fractional
+    give_amount = take_amount.to_i * self.give_amount.to_i / self.take_amount.to_i
+    return give_amount
   end
 
   def price

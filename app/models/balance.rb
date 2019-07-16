@@ -70,44 +70,44 @@ class Balance < ApplicationRecord
   end
 
   def total_traded
-    total = Money.new(0)
+    total = 0
     closed_and_partially_filled_sell_orders.each do |order|
-      total -= Money.new(order.filled.to_i)
+      total -= order.filled.to_i
     end
     closed_and_partially_filled_buy_orders.each do |order|
-      total += Money.new((order.calculate_take_amount(order.filled).to_i - order.fee.to_i))
+      total += (order.calculate_take_amount(order.filled).to_i - order.fee.to_i)
     end
     sell_trades.each do |trade|
-      total -= Money.new(trade.order.calculate_take_amount(trade.amount))
+      total -= trade.order.calculate_take_amount(trade.amount)
     end
     buy_trades.each do |trade|
-      total += Money.new((trade.amount.to_i - trade.fee.to_i))
+      total += (trade.amount.to_i - trade.fee.to_i)
     end
-    return total.fractional
+    return total
   end
 
   def total_deposited
-    total = Money.new(0)
+    total = 0
     deposits.each do |deposit|
-      total += Money.new(deposit.amount.to_i)
+      total += deposit.amount.to_i
     end
-    return total.fractional
+    return total
   end
 
   def total_withdrawn
-    total = Money.new(0)
+    total = 0
     withdraws.each do |withdraw|
-      total += Money.new(withdraw.amount.to_i)
+      total += withdraw.amount.to_i
     end
-    return total.fractional
+    return total
   end
 
   def total_volume_held_in_open_orders
-    total = Money.new(0)
+    total = 0
     self.open_orders.each do |order|
-      total += Money.new((order.give_amount.to_i - order.filled.to_i))
+      total += (order.give_amount.to_i - order.filled.to_i)
     end
-    return total.fractional
+    return total
   end
 
   def credit(amount)
