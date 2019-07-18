@@ -68,11 +68,6 @@ class Order < ApplicationRecord
     return take_amount
   end
 
-  def calculate_give_amount(take_amount)
-    give_amount = take_amount.to_i * self.give_amount.to_i / self.take_amount.to_i
-    return give_amount
-  end
-
   def price
     if (is_sell)
       (self.take_amount.to_f / self.give_amount.to_f)
