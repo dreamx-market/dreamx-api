@@ -15,4 +15,5 @@ take_amount = 50000000000000000
 calculated_give_amount = calculate_give_amount(take_amount, total_give, total_take)
 calculated_take_amount = calculate_take_amount(calculated_give_amount, total_give, total_take)
 
-pp calculated_give_amount ,calculated_take_amount
+pp calculated_give_amount
+pp calculated_take_amount
