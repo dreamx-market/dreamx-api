@@ -42,6 +42,7 @@ five:
   withdraw_minimum: "20000000000000000"
   withdraw_fee: "10000000000000000"
 
+# this token must be without a market fixture, adding a market fixture for this token will break some tests
 six:
   name: Six
   address: "0x7cca38cdd9a1dde0750fb3825c7e4d2395f25259"
