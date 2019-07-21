@@ -76,7 +76,7 @@ class MarketTest < ActiveSupport::TestCase
   end
 
   test "market status can only be 'active' or 'disabled'" do
-    market = Market.new({ :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x8137064a86006670d407c24e191b5a55da5b2889" })
+    market = Market.new({ :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x7cca38cdd9a1dde0750fb3825c7e4d2395f25259" })
 
     market.status = 'disabled'
     assert market.valid?
@@ -89,7 +89,7 @@ class MarketTest < ActiveSupport::TestCase
   end
 
   test "enable and disable market" do
-    market = Market.create({ :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x8137064a86006670d407c24e191b5a55da5b2889" })
+    market = Market.create({ :base_token_address => "0x0000000000000000000000000000000000000000", :quote_token_address => "0x7cca38cdd9a1dde0750fb3825c7e4d2395f25259" })
     assert_equal market.status, 'disabled'
 
     market.enable

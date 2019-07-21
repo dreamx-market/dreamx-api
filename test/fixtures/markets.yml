@@ -17,3 +17,9 @@ three:
   quote_token_address: "0x75d417ab3031d592a781e666ee7bfc3381ad33d5"
   status: "active"
   symbol: "ONE_FIVE"
+
+four:
+  base_token_address: "0x0000000000000000000000000000000000000000"
+  quote_token_address: "0x8137064a86006670d407c24e191b5a55da5b2889"
+  status: "active"
+  symbol: "ONE_FOUR"

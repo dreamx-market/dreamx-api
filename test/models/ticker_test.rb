@@ -15,7 +15,7 @@ class TickerTest < ActiveSupport::TestCase
   end
 
   test "automatically created on market creations" do
-    market = Market.create({ :base_token_address => @token_one.address, :quote_token_address => @token_three.address })
+    market = Market.create({ :base_token_address => @token_one.address, :quote_token_address => "0x7cca38cdd9a1dde0750fb3825c7e4d2395f25259" })
     assert_not_nil Ticker.find_by({ :market_symbol => market.symbol })
   end
 

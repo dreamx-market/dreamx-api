@@ -2,7 +2,6 @@ require 'test_helper'
 
 class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    sync_nonce
     @withdraw = withdraws(:one)
     deposits = [
       { :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount }
@@ -55,6 +54,8 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should be consistent with on-chain balance" do
+    sync_nonce
+
     balance = balances(:twenty)
     fee_balance = balances(:fee_four)
     deposits = [

@@ -60,8 +60,8 @@ class Trade < ApplicationRecord
     fill_amount = amount.to_i
     maker_nonce = order.nonce.to_i
     taker_nonce = nonce.to_i
-    maker_fee = self.maker_fee.to_i
-    taker_fee = fee.to_i
+    maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI'].to_i
+    taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI'].to_i
     expiry = order.expiry_timestamp_in_milliseconds.to_i
     maker_v = order.v
     maker_r = order.r

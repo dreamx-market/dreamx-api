@@ -137,3 +137,9 @@ twenty:
   token_address: "0x8137064a86006670d407c24e191b5a55da5b2889"
   balance: "0"
   hold_balance: "0"
+
+twenty_one:
+  account_address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
+  token_address: "0x8137064a86006670d407c24e191b5a55da5b2889"
+  balance: "0"
+  hold_balance: "0"

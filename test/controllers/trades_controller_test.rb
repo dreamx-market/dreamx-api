@@ -2,15 +2,6 @@ require 'test_helper'
 
 class TradesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @OLD_CONTRACT_ADDRESS = ENV['CONTRACT_ADDRESS'].without_checksum
-    @OLD_FEE_COLLECTOR_ADDRESS = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
-    @OLD_MAKER_FEE_PERCENTAGE = ENV['MAKER_FEE_PERCENTAGE']
-    @OLD_TAKER_FEE_PERCENTAGE = ENV['TAKER_FEE_PERCENTAGE']
-    ENV['CONTRACT_ADDRESS'] = '0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a'
-    ENV['FEE_COLLECTOR_ADDRESS'] = '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a'
-    ENV['MAKER_FEE_PERCENTAGE'] = '0.1'
-    ENV['TAKER_FEE_PERCENTAGE'] = '0.2'
-
     @trade = trades(:one)
     @order = orders(:one)
     @fee_account = Account.find_by({ :address => ENV['FEE_COLLECTOR_ADDRESS'].without_checksum })
@@ -29,13 +20,6 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     @taker_take_balance = @trade.account.balance(@order.take_token_address)
     @fee_give_balance = @fee_account.balance(@order.give_token_address)
     @fee_take_balance = @fee_account.balance(@order.take_token_address)
-  end
-
-  teardown do
-    ENV['CONTRACT_ADDRESS'] = @OLD_CONTRACT_ADDRESS
-    ENV['FEE_COLLECTOR_ADDRESS'] = @OLD_FEE_COLLECTOR_ADDRESS
-    ENV['MAKER_FEE_PERCENTAGE'] = @OLD_MAKER_FEE_PERCENTAGE
-    ENV['TAKER_FEE_PERCENTAGE'] = @OLD_TAKER_FEE_PERCENTAGE
   end
 
   test "should get index" do
@@ -261,5 +245,72 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     end
 
     ENV['FRAUD_PROTECTION'] = 'false'
+  end
+
+  test "should be consistent with on-chain balances" do
+    give_token = tokens(:one)
+    take_token = tokens(:four)
+    give_amount = 195738239776775570
+    take_amount = 59744193591648150
+    fill_amount = 163813609331349736
+
+    # syncing maker's give balance
+    maker_give_balance = balances(:four)
+    batch_withdraw([
+      { :account_address => maker_give_balance.account_address, :token_address => maker_give_balance.token_address, :amount => maker_give_balance.balance }
+    ])
+    batch_deposit([
+      { :account_address => maker_give_balance.account_address, :token_address => maker_give_balance.token_address, :amount => maker_give_balance.onchain_balance }
+    ])
+
+    # maker's take balance doesn't need syncing because they are both 0
+    maker_take_balance = balances(:twenty_one)
+
+    # syncing taker's give balance
+    taker_give_balance = balances(:two)
+    batch_withdraw([
+      { :account_address => taker_give_balance.account_address, :token_address => taker_give_balance.token_address, :amount => taker_give_balance.balance }
+    ])
+    batch_deposit([
+      { :account_address => taker_give_balance.account_address, :token_address => taker_give_balance.token_address, :amount => taker_give_balance.onchain_balance }
+    ])
+
+    # syncing taker's take balance
+    taker_take_balance = balances(:twenty)
+    batch_deposit([
+      { :account_address => taker_take_balance.account_address, :token_address => taker_take_balance.token_address, :amount => taker_take_balance.onchain_balance }
+    ])
+
+    # syncing make fee collector's balance
+    fee_give_balance = balances(:fee_one)
+    fee_give_balance.debit(fee_give_balance.balance)
+    fee_give_balance.credit(fee_give_balance.onchain_balance)
+
+    # syncing take fee collector's balance
+    fee_take_balance = balances(:fee_four)
+    fee_take_balance.debit(fee_take_balance.balance)
+    fee_take_balance.credit(fee_take_balance.onchain_balance)
+
+    # before trade assertions
+    assert_equal maker_give_balance.reload.balance, maker_give_balance.onchain_balance
+    assert_equal maker_take_balance.reload.balance, maker_take_balance.onchain_balance
+    assert_equal taker_give_balance.reload.balance, taker_give_balance.onchain_balance
+    assert_equal taker_take_balance.reload.balance, taker_take_balance.onchain_balance
+    assert_equal fee_give_balance.reload.balance, fee_give_balance.onchain_balance
+    assert_equal fee_take_balance.reload.balance, fee_take_balance.onchain_balance
+
+    # trade
+    sync_nonce
+    order = Order.create(generate_order({ :account_address => maker_give_balance.account_address, :give_token_address => maker_give_balance.token_address, :give_amount => give_amount, :take_token_address => taker_take_balance.token_address, :take_amount => take_amount }))
+    trade = Trade.create(generate_trade({ :account_address => taker_take_balance.account_address, :order_hash => order.order_hash, :amount => fill_amount }))
+    BroadcastTransactionJob.perform_now(trade.tx)
+
+    # after trade assertions
+    assert_equal maker_give_balance.reload.balance, maker_give_balance.onchain_balance
+    assert_equal maker_take_balance.reload.balance, maker_take_balance.onchain_balance
+    assert_equal taker_give_balance.reload.balance, taker_give_balance.onchain_balance
+    assert_equal taker_take_balance.reload.balance, taker_take_balance.onchain_balance
+    assert_equal fee_give_balance.reload.balance, fee_give_balance.onchain_balance
+    assert_equal fee_take_balance.reload.balance, fee_take_balance.onchain_balance
   end
 end

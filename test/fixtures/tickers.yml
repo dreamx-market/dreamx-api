@@ -12,3 +12,6 @@ two:
 
 three:
   market_symbol: "ONE_FIVE"
+
+four:
+  market_symbol: "ONE_FOUR"
