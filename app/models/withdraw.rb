@@ -53,7 +53,7 @@ class Withdraw < ApplicationRecord
   def payload
     exchange = Contract::Exchange.singleton
     fun = exchange.instance.parent.functions.select { |fun| fun.name == 'withdraw'}.first
-    args = [token_address, amount.to_i, account_address, fee.to_i]
+    args = [token_address, amount.to_i, account_address, self.token.withdraw_fee.to_i]
     exchange.instance.parent.call_payload(fun, args)
   end
 
@@ -114,8 +114,10 @@ class Withdraw < ApplicationRecord
   private
 
   def collect_fee_and_debit_balance
+    fee_collector_balance = Balance.fee_collector(self.token_address)
     self.fee = (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
     self.account.balance(self.token_address).debit(self.amount)
+    fee_collector_balance.credit(self.fee)
   end
 
   def balances_must_be_authentic

@@ -2,19 +2,12 @@ require 'test_helper'
 
 class WithdrawsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @old_contract_address = ENV['CONTRACT_ADDRESS'].without_checksum
-    ENV['CONTRACT_ADDRESS'] = "0x4ef6474f40bf5c9dbc013efaac07c4d0cb17219a"
-
+    sync_nonce
     @withdraw = withdraws(:one)
-
     deposits = [
       { :account_address => @withdraw.account_address, :token_address => @withdraw.token_address, :amount => @withdraw.amount }
     ]
     batch_deposit(deposits)
-  end
-
-  teardown do
-    ENV['CONTRACT_ADDRESS'] = @old_contract_address
   end
 
   test "should create withdraw and debit balance" do
@@ -59,5 +52,23 @@ class WithdrawsControllerTest < ActionDispatch::IntegrationTest
     post withdraws_url, params: withdraw, as: :json
     assert_equal balance.reload.fraud, true
     ENV['FRAUD_PROTECTION'] = 'false'
+  end
+
+  test "should be consistent with on-chain balance" do
+    balance = balances(:twenty)
+    fee_balance = balances(:fee_four)
+    deposits = [
+      { :account_address => balance.account_address, :token_address => balance.token_address, :amount => balance.onchain_balance }
+    ]
+    batch_deposit(deposits)
+
+    assert_equal balance.reload.balance, balance.onchain_balance
+    assert_equal fee_balance.reload.balance, fee_balance.onchain_balance
+
+    withdraw = Withdraw.create(generate_withdraw({ :account_address => balance.account_address, :token_address => balance.token_address, :amount => balance.balance }))
+    BroadcastTransactionJob.perform_now(withdraw.tx)
+
+    assert_equal balance.reload.balance, balance.onchain_balance
+    assert_equal fee_balance.reload.balance, fee_balance.onchain_balance
   end
 end

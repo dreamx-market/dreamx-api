@@ -6,13 +6,15 @@ class Account < ApplicationRecord
 
   before_create :remove_checksum
 
-  def balance(token_address)
-    Balance.find_by({ :account_address => self.address, :token_address => token_address })
+  class << self
+    def initialize_if_not_exist(account_address, token_address)
+      self.create({ :address => account_address })
+      Balance.create({ :account_address => account_address, :token_address => token_address })
+    end
   end
 
-  def self.initialize_if_not_exist(account_address, token_address)
-    self.create({ :address => account_address })
-    Balance.create({ :account_address => account_address, :token_address => token_address })
+  def balance(token_address)
+    Balance.find_by({ :account_address => self.address, :token_address => token_address })
   end
 
   private

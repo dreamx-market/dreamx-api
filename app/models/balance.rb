@@ -16,6 +16,18 @@ class Balance < ApplicationRecord
 
       return false
     end
+
+    def fee_collector(token_address)
+      fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
+      Account.initialize_if_not_exist(fee_address, token_address)
+      self.find_by({ :account_address => fee_address, :token_address => token_address })
+    end
+  end
+
+  def onchain_balance
+    exchange = Contract::Exchange.singleton.instance
+    onchain_balance = exchange.call.balances(self.token_address, self.account_address)
+    return onchain_balance.to_s
   end
 
   def mark_fraud!
