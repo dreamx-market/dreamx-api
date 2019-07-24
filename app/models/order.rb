@@ -1,6 +1,7 @@
 class Order < ApplicationRecord
   include FraudProtectable
-  
+
+  has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
   
 	validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
