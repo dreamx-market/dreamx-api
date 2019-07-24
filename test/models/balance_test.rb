@@ -115,4 +115,19 @@ class BalanceTest < ActiveSupport::TestCase
     balance.update({ :hold_balance => "100" })
     assert Balance.has_unauthentic_balances?
   end
+
+  test "total_traded is calculated correctly for buy orders with multiple trades" do
+    maker = @taker
+    taker = @maker
+    deposits = batch_deposit([
+      { :account_address => maker.account_address, :token_address => maker.token_address, :amount => "1".to_wei },
+      { :account_address => taker.account_address, :token_address => taker.token_address, :amount => "1".to_wei }
+    ])
+    order = Order.create(generate_order({ :account_address => maker.account_address, :give_token_address => maker.token_address, :give_amount => "51753042574917310", :take_token_address => taker.token_address, :take_amount => "157876344711646175" }))
+    trades = batch_trade([
+      { :account_address => taker.account_address, :order_hash => order.order_hash, :amount => "19043091019761810" },
+      { :account_address => taker.account_address, :order_hash => order.order_hash, :amount => "32709951555155500" }
+    ])
+    assert_equal maker.reload.balance.to_i, maker.total_deposited.to_i + maker.total_traded.to_i
+  end
 end
