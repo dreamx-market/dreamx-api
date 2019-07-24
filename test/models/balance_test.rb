@@ -119,6 +119,7 @@ class BalanceTest < ActiveSupport::TestCase
   test "total_traded is calculated correctly for buy orders with multiple trades" do
     maker = @taker
     taker = @maker
+    maker_receiving_balance = Balance.find_by({ :account_address => maker.account_address, :token_address => taker.token_address })
     deposits = batch_deposit([
       { :account_address => maker.account_address, :token_address => maker.token_address, :amount => "1".to_wei },
       { :account_address => taker.account_address, :token_address => taker.token_address, :amount => "1".to_wei }
@@ -128,6 +129,6 @@ class BalanceTest < ActiveSupport::TestCase
       { :account_address => taker.account_address, :order_hash => order.order_hash, :amount => "19043091019761810" },
       { :account_address => taker.account_address, :order_hash => order.order_hash, :amount => "32709951555155500" }
     ])
-    assert_equal maker.reload.balance.to_i, maker.total_deposited.to_i + maker.total_traded.to_i
+    assert_equal maker_receiving_balance.reload.balance.to_i, maker_receiving_balance.total_traded.to_i
   end
 end
