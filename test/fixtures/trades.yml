@@ -12,3 +12,4 @@ one:
   fee: "200000000000000000"
   maker_fee: "500000000000000"
   created_at: <%= 1.week.ago %>
+  

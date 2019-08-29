@@ -13,7 +13,7 @@ class TradesController < ApplicationController
     else
       @trades = Trade.joins(:order).where({ :trades => extract_filters_from_query_params([ :account_address ]) }).or(Trade.joins(:order).where({ :orders => extract_filters_from_query_params([ :account_address ]) })).where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
     end
-    @trades.order("created_at DESC")
+    @trades = @trades.order("created_at DESC")
     if (params[:market_symbol])
       @trades = @trades.select { |trade| trade.market_symbol == params[:market_symbol] }
     end
