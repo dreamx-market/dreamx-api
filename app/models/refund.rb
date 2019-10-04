@@ -4,6 +4,7 @@ class Refund < ApplicationRecord
   validate :amount_cannot_be_zero
 
   before_create :credit_balance
+  before_destroy :reverse_balance
 
   private
 
@@ -15,5 +16,9 @@ class Refund < ApplicationRecord
 
     def credit_balance
       self.balance.credit(self.amount)
+    end
+
+    def reverse_balance
+      self.balance.debit(self.amount)
     end
 end
