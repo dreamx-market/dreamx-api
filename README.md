@@ -1,3 +1,7 @@
+# Before going live
+
+* fix the lines marked with the 'debugging only' comments
+
 # Dependencies:
 
 * ruby 2.5.1p57

@@ -28,34 +28,56 @@ class Transaction < ApplicationRecord
         # transaction_receipt hasn't been available, skip
         next
       end
-      block_number = transaction_receipt['blockNumber'].hex
-      block_hash = transaction_receipt['blockHash']
-      gas = transaction_receipt['gasUsed'].hex
-      status = transaction_receipt['status'] == '0x1' ? 'confirmed' : 'failed'
+      transaction.block_number = transaction_receipt['blockNumber'].hex
+      transaction.block_hash = transaction_receipt['blockHash']
+      transaction.gas = transaction_receipt['gasUsed'].hex
+      transaction.status = transaction_receipt['status'] == '0x1' ? 'confirmed' : 'failed'
       confirmations_required = ENV['TRANSACTION_CONFIRMATIONS'].to_i
-      if last_block_number - block_number < confirmations_required
+      if last_block_number - transaction.block_number.to_i < confirmations_required
         next
       end
-      if status == 'failed'
-        transaction.transactable.refund
+      if transaction.status == 'failed'
+        transaction.mark_failed
 
         if transaction.raw.gas_limit == transaction_receipt['gasUsed'].hex
-          status = "out_of_gas"
+          transaction.mark_out_of_gas
         end
       end
-      transaction.update!({ :status => status, :block_number => block_number, :block_hash => block_hash, :gas => gas })
+      transaction.save!
     end
   end
 
   def mark_replaced(last_onchain_nonce)
     ActiveRecord::Base.transaction do
-      log_message = "marked as replaced, last onchain once: #{last_onchain_nonce}, transaction nonce: #{self.nonce}"
+      log_message = "replaced, last_onchain_nonce: #{last_onchain_nonce}, nonce: #{self.nonce}"
       if self.transaction_hash
-        log_message = log_message + ", transaction hash: #{self.transaction_hash}"
+        log_message = log_message + ", transaction_hash: #{self.transaction_hash}"
       end
       self.transaction_logs.create({ message: log_message })
       self.update!({ :status => 'replaced' })
       Config.set('read_only', 'true')
+    end
+  end
+
+  def mark_failed
+    ActiveRecord::Base.transaction do
+      self.transaction_logs.create({ message: "failed" })
+      self.update!({ :status => 'failed' })
+
+      # debugging only, remove this before going live
+      if ENV['RAILS_ENV'] == 'production'
+        Config.set('read_only', 'true')
+        return
+      end
+
+      self.transactable.refund
+    end
+  end
+
+  def mark_out_of_gas
+    ActiveRecord::Base.transaction do
+      self.transaction_logs.create({ message: "out_of_gas" })
+      self.update!({ :status => 'out_of_gas' })
     end
   end
 
