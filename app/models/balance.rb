@@ -53,6 +53,9 @@ class Balance < ApplicationRecord
     total_deposited.to_i + total_traded.to_i + total_refunded.to_i - hold_balance.to_i - total_withdrawn.to_i
   end
 
+  def total_balance
+    self.balance.to_i + self.hold_balance.to_i
+  end
 
   def hold_balance_authentic?
     return total_volume_held_in_open_orders.to_i == hold_balance.to_i
