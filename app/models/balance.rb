@@ -45,8 +45,11 @@ class Balance < ApplicationRecord
   end
 
   def balance_authentic?
-    calculated_balance = total_deposited.to_i + total_traded.to_i - hold_balance.to_i - total_withdrawn.to_i
-    return calculated_balance.to_i == balance.to_i
+    return self.real_balance.to_i == self.balance.to_i
+  end
+
+  def real_balance
+    total_deposited.to_i + total_traded.to_i - hold_balance.to_i - total_withdrawn.to_i
   end
 
   def hold_balance_authentic?
