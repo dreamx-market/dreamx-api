@@ -34,11 +34,13 @@ class Trade < ApplicationRecord
     maker_onchain_balance = exchange.call.balances(self.order.give_token_address, self.order.account_address)
     maker_give_amount = self.order.give_amount.to_i
     maker_difference = maker_give_amount - maker_onchain_balance
+    # if maker is giving more than he has, refund only what he has
     maker_refund_amount = maker_difference > 0 ? maker_give_amount - maker_difference : maker_give_amount
     taker_balance = self.account.balance(self.order.take_token_address)
     taker_onchain_balance = exchange.call.balances(self.order.take_token_address, self.account_address)
     taker_give_amount = self.amount.to_i
     taker_difference = taker_give_amount - taker_onchain_balance
+    # if taker is giving more than he has, refund only what he has
     taker_refund_amount =  taker_difference > 0 ? taker_give_amount - taker_difference : taker_give_amount
     ActiveRecord::Base.transaction do
       maker_balance.credit(maker_refund_amount)
