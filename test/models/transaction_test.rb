@@ -36,16 +36,18 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "should mark transaction as 'replaced' if transaction hash is nil nonce has been taken" do
+  test "should mark transaction as 'replaced' if transaction hash is nil or nonce has been taken" do
     withdraw = batch_withdraw([
       { :account_address => addresses[0], :token_address => '0x0000000000000000000000000000000000000000', :amount => 20000000000000000 }
     ]).first
     withdraw.tx.update({ :nonce => 0 })
 
-    Transaction.confirm_mined_transactions
-    withdraw.tx.reload
-    assert_equal(withdraw.tx.status, 'replaced')
-    assert_equal(Config.get('read_only'), 'true')
+    assert_difference("TransactionLog.count") do
+      Transaction.confirm_mined_transactions
+      withdraw.tx.reload
+      assert_equal(withdraw.tx.status, 'replaced')
+      assert_equal(Config.get('read_only'), 'true')
+    end
   end
 
   test "should mark transaction as 'replaced' if transaction hash can't be found and nonce has been taken" do

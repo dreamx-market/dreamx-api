@@ -1,5 +1,6 @@
 class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
+  has_many :transaction_logs
 
   before_create :assign_next_nonce
   after_create_commit :broadcast
@@ -19,8 +20,7 @@ class Transaction < ApplicationRecord
       end
       if !onchain_transaction
         # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
-        transaction.update!({ :status => 'replaced' })
-        Config.set('read_only', 'true')
+        transaction.mark_replaced(last_onchain_nonce)
         next
       end
       transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
@@ -44,6 +44,18 @@ class Transaction < ApplicationRecord
         end
       end
       transaction.update!({ :status => status, :block_number => block_number, :block_hash => block_hash, :gas => gas })
+    end
+  end
+
+  def mark_replaced(last_onchain_nonce)
+    ActiveRecord::Base.transaction do
+      log_message = "marked as replaced, last onchain once: #{last_onchain_nonce}, transaction nonce: #{self.nonce}"
+      if self.transaction_hash
+        log_message = log_message + ", transaction hash: #{self.transaction_hash}"
+      end
+      self.transaction_logs.create({ message: log_message })
+      self.update!({ :status => 'replaced' })
+      Config.set('read_only', 'true')
     end
   end
 
