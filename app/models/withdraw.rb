@@ -1,4 +1,6 @@
 class Withdraw < ApplicationRecord
+  attr_accessor :mock_balance_onchain_balance
+
   include FraudProtectable
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
@@ -25,12 +27,15 @@ class Withdraw < ApplicationRecord
   end
 
   def refund
-    exchange = Contract::Exchange.singleton.instance
-    onchain_balance = exchange.call.balances(self.token_address, self.account_address)
+    if self.mock_balance_onchain_balance
+      onchain_balance = self.mock_balance_onchain_balance.to_i
+    else
+      onchain_balance = self.balance.onchain_balance.to_i
+    end
     withdraw_amount = self.amount.to_i
     difference = withdraw_amount - onchain_balance
     # fake coins removal: if user is withdrawing more than he has, refund only what he has
-    refund_amount = withdraw_amount - difference
+    refund_amount = difference > 0 ? withdraw_amount - difference : withdraw_amount
     self.account.balance(self.token_address).refund(refund_amount)
   end
 
