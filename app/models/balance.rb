@@ -1,6 +1,7 @@
 class Balance < ApplicationRecord
-	validates_uniqueness_of :account_address, scope: [:token_address]
+  has_many :refunds, dependent: :destroy
 
+	validates_uniqueness_of :account_address, scope: [:token_address]
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
 
   before_create :remove_checksum
@@ -49,8 +50,9 @@ class Balance < ApplicationRecord
   end
 
   def real_balance
-    total_deposited.to_i + total_traded.to_i - hold_balance.to_i - total_withdrawn.to_i
+    total_deposited.to_i + total_traded.to_i + total_refunded.to_i - hold_balance.to_i - total_withdrawn.to_i
   end
+
 
   def hold_balance_authentic?
     return total_volume_held_in_open_orders.to_i == hold_balance.to_i
@@ -103,6 +105,14 @@ class Balance < ApplicationRecord
     return total
   end
 
+  def total_refunded
+    total = 0
+    self.refunds.each do |refund|
+      total += refund.amount.to_i
+    end
+    return total
+  end
+
   def total_deposited
     total = 0
     deposits.each do |deposit|
@@ -125,6 +135,10 @@ class Balance < ApplicationRecord
       total += (order.give_amount.to_i - order.filled.to_i)
     end
     return total
+  end
+
+  def refund(amount)
+    self.refunds.create({ amount: amount })
   end
 
   def credit(amount)

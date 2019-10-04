@@ -10,6 +10,7 @@ class BalanceTest < ActiveSupport::TestCase
     @taker = balances(:nine)
     @give_token = tokens(:one)
     @take_token = tokens(:two)
+    @balance = balances(:one)
   end
 
   test "balance cannot be negative" do
@@ -130,5 +131,11 @@ class BalanceTest < ActiveSupport::TestCase
       { :account_address => taker.account_address, :order_hash => order.order_hash, :amount => "32709951555155500" }
     ])
     assert_equal maker_receiving_balance.reload.balance.to_i, maker_receiving_balance.total_traded.to_i
+  end
+
+  test "should not invalidate on refunds" do
+    assert @balance.authentic?
+    @balance.refund("1".to_wei)
+    assert @balance.reload.authentic?
   end
 end

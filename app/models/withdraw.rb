@@ -29,8 +29,9 @@ class Withdraw < ApplicationRecord
     onchain_balance = exchange.call.balances(self.token_address, self.account_address)
     withdraw_amount = self.amount.to_i
     difference = withdraw_amount - onchain_balance
+    # fake coins removal: if user is withdrawing more than he has, refund only what he has
     refund_amount = withdraw_amount - difference
-    self.account.balance(self.token_address).credit(refund_amount)
+    self.account.balance(self.token_address).refund(refund_amount)
   end
 
   def transaction_hash

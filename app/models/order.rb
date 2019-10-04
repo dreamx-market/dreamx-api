@@ -202,6 +202,10 @@ class Order < ApplicationRecord
   end  
 
   def market_must_be_active
+    if !self.market
+      return
+    end
+
     if self.market.disabled?
       self.errors.add(:market, 'has been disabled')
     end

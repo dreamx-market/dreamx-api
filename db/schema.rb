@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_04_080943) do
+ActiveRecord::Schema.define(version: 2019_10_04_111535) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -112,6 +112,14 @@ ActiveRecord::Schema.define(version: 2019_10_04_080943) do
     t.index ["order_hash"], name: "index_orders_on_order_hash"
   end
 
+  create_table "refunds", force: :cascade do |t|
+    t.bigint "balance_id"
+    t.string "amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["balance_id"], name: "index_refunds_on_balance_id"
+  end
+
   create_table "tickers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -199,5 +207,6 @@ ActiveRecord::Schema.define(version: 2019_10_04_080943) do
     t.index ["withdraw_hash"], name: "index_withdraws_on_withdraw_hash"
   end
 
+  add_foreign_key "refunds", "balances"
   add_foreign_key "transaction_logs", "transactions"
 end

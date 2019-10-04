@@ -28,23 +28,24 @@ class Trade < ApplicationRecord
     self.account.balance(self.order.take_token_address)
   end
 
+  # used only when a failed transaction is detected
   def refund
     exchange = Contract::Exchange.singleton.instance
     maker_balance = self.order.account.balance(self.order.give_token_address)
     maker_onchain_balance = exchange.call.balances(self.order.give_token_address, self.order.account_address)
     maker_give_amount = self.order.give_amount.to_i
     maker_difference = maker_give_amount - maker_onchain_balance
-    # if maker is giving more than he has, refund only what he has
+    # fake coins removal: if maker is giving more than he has, refund only what he has
     maker_refund_amount = maker_difference > 0 ? maker_give_amount - maker_difference : maker_give_amount
     taker_balance = self.account.balance(self.order.take_token_address)
     taker_onchain_balance = exchange.call.balances(self.order.take_token_address, self.account_address)
     taker_give_amount = self.amount.to_i
     taker_difference = taker_give_amount - taker_onchain_balance
-    # if taker is giving more than he has, refund only what he has
+    # fake coins removal: if taker is giving more than he has, refund only what he has
     taker_refund_amount =  taker_difference > 0 ? taker_give_amount - taker_difference : taker_give_amount
     ActiveRecord::Base.transaction do
-      maker_balance.credit(maker_refund_amount)
-      taker_balance.credit(taker_refund_amount)
+      maker_balance.refund(maker_refund_amount)
+      taker_balance.refund(taker_refund_amount)
     end
   end
 
