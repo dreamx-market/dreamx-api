@@ -81,3 +81,22 @@ require "whenever/capistrano"
 ## Deposits of non-listed tokens:
 
 * validate its authenticity, list the tokens as non-tradable and manually create the deposits to match with their on-chain balances for them to withdraw, if happens too frequently, figure out a more effective solution
+
+# User flow
+1) The maker and taker deposit their tokens into the DreamX contract.
+2) The DreamX database is updated to include the customer addresses and token balances.
+3) Maker creates and submits a signed order that includes the relevant trade data.
+4) DreamX confirms that the maker’s account has sufficient funds and that the signed transaction matches
+what was submitted to DreamX.
+5) If all checks in part 4 pass, the order is added to the orderbook.
+6) The taker submits a matching order, signing a transaction with the same price as the target order and
+an amount less than or equal to it.
+7) DreamX confirms that the maker’s account has sufficient funds and that the signed transaction matches
+what was submitted to DreamX.
+8) If all checks in part 7 pass, the trade is marked as matched and the orderbook is updated.
+9) The DreamX database is updated to reflect the new balances, and both traders can continue to make new
+trades based these updates. Simultaneously, the signed order is added to the queue to be broadcast to
+the Ethereum network for processing.
+10) After all dependent trades have mined, the transaction is dispatched to the blockchain.
+11) The transaction is mined and the contract balances update to reflect the trade.
+12) Once the transaction has mined, the maker and taker are able to withdraw their funds.
