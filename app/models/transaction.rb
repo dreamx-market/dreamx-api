@@ -70,8 +70,7 @@ class Transaction < ApplicationRecord
         return
       end
 
-      # debugging only, uncomment this before going live
-      # self.transactable.refund
+      self.transactable.refund
     end
   end
 
