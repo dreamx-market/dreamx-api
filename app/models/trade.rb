@@ -196,34 +196,42 @@ class Trade < ApplicationRecord
     maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
     trade_amount_equivalence_in_take_tokens = order.calculate_take_amount(amount)
+    # makerFee = (fillAmount * takeAmount / giveAmount) * makerFee / 1 ether
     maker_fee_amount = (trade_amount_equivalence_in_take_tokens * maker_fee.to_i) / one_ether.to_i
+    # takerFee = fillAmount * takerFee / 1 ether
     taker_fee_amount = (amount.to_i * taker_fee.to_i) / one_ether.to_i
 
     maker_give_balance = Balance.find_by({ :account_address => maker_address, :token_address => order.give_token_address })
+    # makerGive = makerGive - fillAmount
     maker_give_balance.spend(amount)
 
     Account.initialize_if_not_exist(taker_address, order.give_token_address)
     taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.give_token_address })
     taker_receiving_amount_minus_fee = amount.to_i - taker_fee_amount.to_i
+    # takerGive = takerGive + fillAmount - takerFee
     taker_give_balance.credit(taker_receiving_amount_minus_fee)
     self.fee = taker_fee_amount
     self.maker_fee = maker_fee_amount
 
     Account.initialize_if_not_exist(fee_address, order.give_token_address)
     fee_give_balance = Balance.find_by({ :account_address => fee_address, :token_address => order.give_token_address })
+    # feeGive = feeGive + takerFee
     fee_give_balance.credit(taker_fee_amount)
 
     Account.initialize_if_not_exist(maker_address, order.take_token_address)
     maker_take_balance = Balance.find_by({ :account_address => maker_address, :token_address => order.take_token_address })
     maker_receiveing_amount_minus_fee = trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
+    # makerTake = makerTake + (fillAmount * takeAmount / giveAmount) - makerFee
     maker_take_balance.credit(maker_receiveing_amount_minus_fee)
     order.fill(amount, maker_fee_amount)
 
     taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.take_token_address })
+    # takerTake = takerTake - (fillAmount * takeAmount / giveAmount)
     taker_take_balance.debit(trade_amount_equivalence_in_take_tokens)
 
     Account.initialize_if_not_exist(fee_address, order.take_token_address)
     fee_take_balance = Balance.find_by({ :account_address => fee_address, :token_address => order.take_token_address })
+    # feeTake = feeTaker + makerFee
     fee_take_balance.credit(maker_fee_amount)
 
     self.total = self.is_sell ? self.amount : trade_amount_equivalence_in_take_tokens
