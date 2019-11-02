@@ -19,7 +19,6 @@ class Trade < ApplicationRecord
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
-  before_create { self.write_log('creating') }
   after_commit { self.write_log('created') }
   after_rollback { self.write_log('rollbacked') }
   def write_log(action)
