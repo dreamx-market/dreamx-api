@@ -1,4 +1,5 @@
 class Transaction < ApplicationRecord
+  include Loggable
   belongs_to :transactable, :polymorphic => true
   has_many :transaction_logs
 
@@ -20,8 +21,16 @@ class Transaction < ApplicationRecord
       end
       if !onchain_transaction
         # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
-        transaction.mark_replaced(last_onchain_nonce)
+
+        # debugging only, remove this in production
+        self.log("onchain transaction for #{transaction.transaction_hash} not found, response from eth_get_transaction_by_hash:")
+        self.log(client.eth_get_transaction_by_hash(transaction.transaction_hash))
+        self.log("-----------------")
         next
+
+        # debugging only, uncomment this in production
+        # transaction.mark_replaced(last_onchain_nonce)
+        # next
       end
       transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
       if !transaction_receipt
@@ -67,6 +76,7 @@ class Transaction < ApplicationRecord
       # debugging only, remove this before going live
       if ENV['RAILS_ENV'] == 'production'
         Config.set('read_only', 'true')
+        self.log("transaction #{self.id} failed, toggling read_only")
         return
       end
 

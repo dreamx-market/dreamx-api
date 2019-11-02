@@ -26,7 +26,9 @@ class Withdraw < ApplicationRecord
     self.account.balance(self.token_address)
   end
 
+  # used when there are failing transactions
   def refund
+    # mock_balance_onchain_balance is used for testing only
     if self.mock_balance_onchain_balance
       onchain_balance = self.mock_balance_onchain_balance.to_i
     else
