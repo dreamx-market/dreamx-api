@@ -26,7 +26,7 @@ class Trade < ApplicationRecord
     if ENV['RAILS_ENV'] == 'test'
       return
     end
-    self.log("#{action} #{self.type} trade ##{self.id} for order ##{self.order.id}")
+    self.log("#{action} #{self.type} trade #{self.id} for order #{self.order.id}")
     self.log("maker_balance: #{self.maker_balance.balance.to_s.to_ether}, maker_real_balance: #{self.maker_balance.real_balance.to_s.to_ether}")
     self.log("maker_hold_balance: #{self.maker_balance.hold_balance.to_s.to_ether}, maker_real_hold_balance: #{self.maker_balance.real_hold_balance.to_s.to_ether}")
     self.log("taker_balance: #{self.taker_balance.balance.to_s.to_ether}, taker_real_balance: #{self.taker_balance.real_balance.to_s.to_ether}")
