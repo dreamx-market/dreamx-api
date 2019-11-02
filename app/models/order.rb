@@ -1,4 +1,5 @@
 class Order < ApplicationRecord
+  include Loggable
   include FraudProtectable
 
   has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
@@ -20,6 +21,32 @@ class Order < ApplicationRecord
     AccountOrdersRelayJob.perform_later(self)
   }
   after_rollback :mark_balance_as_fraud_if_inauthentic
+
+  # debugging only, remove logging before going live
+  before_create { self.write_log('creating') }
+  after_commit { self.write_log('created') }
+  after_rollback { self.write_log('rollbacked') }
+  def write_log(action)
+    if ENV['RAILS_ENV'] == 'test'
+      return
+    end
+    self.log("#{action} order ##{self.id}")
+    self.log("balance: #{self.balance.balance.to_s.to_ether}, real_balance: #{self.balance.real_balance.to_s.to_ether}")
+    self.log("hold_balance: #{self.balance.hold_balance.to_s.to_ether}, real_hold_balance: #{self.balance.real_hold_balance.to_s.to_ether}")
+    self.log("-----------------")
+  end
+
+  def type
+    return self.is_sell ? 'sell' : 'buy'
+  end
+
+  def give_token
+    Token.find_by({ address: self.give_token_address })
+  end
+
+  def take_token
+    Token.find_by({ address: self.take_token_address })
+  end
 
   def mark_balance_as_fraud_if_inauthentic
     if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
@@ -164,10 +191,7 @@ class Order < ApplicationRecord
 	end
 
 	def hold_balance
-		balance = self.account.balances.find_by(:token_address => give_token_address)
-		balance.balance = balance.balance.to_i - give_amount.to_i
-		balance.hold_balance = balance.hold_balance.to_i + give_amount.to_i
-		balance.save
+    self.balance.hold(give_amount)
 	end
 
   def volume_must_be_greater_than_minimum

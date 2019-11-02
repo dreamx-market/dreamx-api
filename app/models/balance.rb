@@ -1,5 +1,8 @@
 class Balance < ApplicationRecord
+  include Loggable
+
   has_many :refunds, dependent: :destroy
+  belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
 
 	validates_uniqueness_of :account_address, scope: [:token_address]
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
@@ -23,6 +26,12 @@ class Balance < ApplicationRecord
       Account.initialize_if_not_exist(fee_address, token_address)
       self.find_by({ :account_address => fee_address, :token_address => token_address })
     end
+
+    def bot(token_symbol)
+      account_address = '0x53888c09d2E2a071D8EE6b4b1cA400C9201eE9E7'.without_checksum
+      token_address = Token.find_by({ token_symbol: token_symbol }).address
+      return Balance.find_by({ account_address: account_address, token_address: token_address })
+    end
   end
 
   def offchain_onchain_difference
@@ -38,6 +47,9 @@ class Balance < ApplicationRecord
   def mark_fraud!
     self.fraud = true
     self.save!
+    # debugging only, remove logging before going live
+    self.log("marked balance ##{self.id} as fraud")
+    self.log("-----------------")
   end
 
   def authentic?
@@ -55,6 +67,10 @@ class Balance < ApplicationRecord
 
   def real_balance
     total_deposited.to_i + total_traded.to_i + total_refunded.to_i - hold_balance.to_i - total_withdrawn.to_i
+  end
+
+  def real_hold_balance
+    self.total_volume_held_in_open_orders
   end
 
   def total_balance
@@ -162,6 +178,10 @@ class Balance < ApplicationRecord
     self.balance = balance.to_i - amount.to_i
     self.hold_balance = hold_balance.to_i + amount.to_i
     save!
+  end
+
+  def token_symbol
+    self.token.symbol
   end
 
   def release(amount)

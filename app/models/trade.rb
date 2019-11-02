@@ -1,5 +1,6 @@
 class Trade < ApplicationRecord
   include FraudProtectable
+  include Loggable
 
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
@@ -17,6 +18,22 @@ class Trade < ApplicationRecord
   after_create :update_ticker
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
+  # debugging only, remove logging before going live
+  before_create { self.write_log('creating') }
+  after_commit { self.write_log('created') }
+  after_rollback { self.write_log('rollbacked') }
+  def write_log(action)
+    if ENV['RAILS_ENV'] == 'test'
+      return
+    end
+    self.log("#{action} #{self.type} trade ##{self.id} for order ##{self.order.id}")
+    self.log("maker_balance: #{self.maker_balance.balance.to_s.to_ether}, maker_real_balance: #{self.maker_balance.real_balance.to_s.to_ether}")
+    self.log("maker_hold_balance: #{self.maker_balance.hold_balance.to_s.to_ether}, maker_real_hold_balance: #{self.maker_balance.real_hold_balance.to_s.to_ether}")
+    self.log("taker_balance: #{self.taker_balance.balance.to_s.to_ether}, taker_real_balance: #{self.taker_balance.real_balance.to_s.to_ether}")
+    self.log("taker_hold_balance: #{self.taker_balance.hold_balance.to_s.to_ether}, taker_real_hold_balance: #{self.taker_balance.real_hold_balance.to_s.to_ether}")
+    self.log("-----------------")
+  end
+
   def mark_balance_as_fraud_if_inauthentic
     if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
       self.balance.mark_fraud!
@@ -26,6 +43,14 @@ class Trade < ApplicationRecord
 
   def balance
     self.account.balance(self.order.take_token_address)
+  end
+
+  def maker_balance
+    self.order.balance
+  end
+
+  def taker_balance
+    self.balance
   end
 
   # used only when a failed transaction is detected
@@ -129,6 +154,10 @@ class Trade < ApplicationRecord
 
   def market_symbol
     return self.market.symbol
+  end
+
+  def type
+    return self.is_sell ? 'sell' : 'buy'
   end
 
   def is_sell
