@@ -52,10 +52,10 @@ class Transaction < ApplicationRecord
           transaction.mark_out_of_gas
         end
       end
-      transaction.save!
       # debugging only, remove this in production
       self.log("confirmed #{transaction.transaction_hash}")
       self.log("-----------------")
+      transaction.save!
     end
   end
 
