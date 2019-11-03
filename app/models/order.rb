@@ -23,7 +23,7 @@ class Order < ApplicationRecord
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
-  after_commit { self.write_log('created') }
+  after_commit { self.write_log('commited') }
   after_rollback { self.write_log('rollbacked') }
   def write_log(action)
     if ENV['RAILS_ENV'] == 'test'
