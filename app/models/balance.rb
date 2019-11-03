@@ -29,7 +29,7 @@ class Balance < ApplicationRecord
 
     def bot(token_symbol)
       account_address = '0x53888c09d2E2a071D8EE6b4b1cA400C9201eE9E7'.without_checksum
-      token_address = Token.find_by({ symbol: token_symbol }).address
+      token_address = Token.find_by({ symbol: token_symbol.upcase }).address
       return Balance.find_by({ account_address: account_address, token_address: token_address })
     end
   end
