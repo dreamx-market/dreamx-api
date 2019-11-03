@@ -54,7 +54,7 @@ class Transaction < ApplicationRecord
       end
       # debugging only, remove this in production
       if transaction.status == 'confirmed'
-        transaction.log("confirmed #{transaction.transaction_hash}")
+        transaction.log("#{transaction.transaction_hash} is #{transaction.status}")
         transaction.log("-----------------")
       end
       transaction.save!
