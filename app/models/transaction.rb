@@ -53,6 +53,9 @@ class Transaction < ApplicationRecord
         end
       end
       transaction.save!
+      # debugging only, remove this in production
+      self.log("confirmed #{transaction.transaction_hash}")
+      self.log("-----------------")
     end
   end
 
