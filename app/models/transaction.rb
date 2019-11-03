@@ -23,9 +23,9 @@ class Transaction < ApplicationRecord
         # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
 
         # debugging only, remove this in production
-        self.log("onchain transaction for #{transaction.transaction_hash} not found, response from eth_get_transaction_by_hash:")
-        self.log(client.eth_get_transaction_by_hash(transaction.transaction_hash))
-        self.log("-----------------")
+        transaction.log("onchain transaction for #{transaction.transaction_hash} not found, response from eth_get_transaction_by_hash:")
+        transaction.log(client.eth_get_transaction_by_hash(transaction.transaction_hash))
+        transaction.log("-----------------")
         next
 
         # debugging only, uncomment this in production
@@ -54,8 +54,8 @@ class Transaction < ApplicationRecord
       end
       # debugging only, remove this in production
       if transaction.status == 'confirmed'
-        self.log("confirmed #{transaction.transaction_hash}")
-        self.log("-----------------")
+        transaction.log("confirmed #{transaction.transaction_hash}")
+        transaction.log("-----------------")
       end
       transaction.save!
     end
