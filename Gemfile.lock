@@ -6,17 +6,6 @@ GIT
       activesupport (>= 4.0)
       digest-sha3 (~> 1.1)
 
-GIT
-  remote: https://github.com/hieudoan2609/ruby-eth.git
-  revision: aac5d904c87836a060074a4483a3f8f0c8e85d79
-  specs:
-    eth (0.4.10)
-      digest-sha3 (~> 1.1)
-      ffi (~> 1.0)
-      money-tree (~> 0.10.0)
-      rlp (~> 0.7.3)
-      scrypt (~> 3.0.6)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -90,6 +79,12 @@ GEM
     crass (1.0.4)
     digest-sha3 (1.1.0)
     erubi (1.8.0)
+    eth (0.4.10)
+      digest-sha3 (~> 1.1)
+      ffi (~> 1.0)
+      money-tree (~> 0.10.0)
+      rlp (~> 0.7.3)
+      scrypt (~> 3.0.6)
     ffi (1.10.0)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
@@ -207,7 +202,7 @@ DEPENDENCIES
   capistrano-passenger (~> 0.2.0)
   capistrano-rails (~> 1.4)
   capistrano-rbenv (~> 2.1, >= 2.1.4)
-  eth!
+  eth
   ethereum.rb!
   figaro
   jbuilder (~> 2.5)

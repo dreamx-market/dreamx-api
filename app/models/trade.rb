@@ -19,19 +19,19 @@ class Trade < ApplicationRecord
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
-  after_commit { self.write_log('commited') }
-  after_rollback { self.write_log('rollbacked') }
-  def write_log(action)
-    if ENV['RAILS_ENV'] == 'test'
-      return
-    end
-    self.log("#{action} #{self.type} trade #{self.id} for order #{self.order.id}")
-    self.log("maker_balance: #{self.maker_balance.balance.to_s.to_ether}, maker_real_balance: #{self.maker_balance.real_balance.to_s.to_ether}")
-    self.log("maker_hold_balance: #{self.maker_balance.hold_balance.to_s.to_ether}, maker_real_hold_balance: #{self.maker_balance.real_hold_balance.to_s.to_ether}")
-    self.log("taker_balance: #{self.taker_balance.balance.to_s.to_ether}, taker_real_balance: #{self.taker_balance.real_balance.to_s.to_ether}")
-    self.log("taker_hold_balance: #{self.taker_balance.hold_balance.to_s.to_ether}, taker_real_hold_balance: #{self.taker_balance.real_hold_balance.to_s.to_ether}")
-    self.log("-----------------")
-  end
+  # after_commit { self.write_log('commited') }
+  # after_rollback { self.write_log('rollbacked') }
+  # def write_log(action)
+  #   if ENV['RAILS_ENV'] == 'test'
+  #     return
+  #   end
+  #   self.log("#{action} #{self.type} trade #{self.id} for order #{self.order.id}")
+  #   self.log("maker_balance: #{self.maker_balance.balance.to_s.to_ether}, maker_real_balance: #{self.maker_balance.real_balance.to_s.to_ether}")
+  #   self.log("maker_hold_balance: #{self.maker_balance.hold_balance.to_s.to_ether}, maker_real_hold_balance: #{self.maker_balance.real_hold_balance.to_s.to_ether}")
+  #   self.log("taker_balance: #{self.taker_balance.balance.to_s.to_ether}, taker_real_balance: #{self.taker_balance.real_balance.to_s.to_ether}")
+  #   self.log("taker_hold_balance: #{self.taker_balance.hold_balance.to_s.to_ether}, taker_real_hold_balance: #{self.taker_balance.real_hold_balance.to_s.to_ether}")
+  #   self.log("-----------------")
+  # end
 
   def mark_balance_as_fraud_if_inauthentic
     if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?

@@ -3,7 +3,7 @@ class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
   has_many :transaction_logs
 
-  before_create :assign_next_nonce
+  before_create :assign_nonce, :sign
   after_create_commit :broadcast
   after_commit :relay_account_transactable, on: [:create, :update]
   after_commit :relay_market_transactable, on: :create
@@ -23,14 +23,15 @@ class Transaction < ApplicationRecord
         # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
 
         # debugging only, remove this in production
-        transaction.log("onchain transaction for #{transaction.transaction_hash} not found, response from eth_get_transaction_by_hash:")
-        transaction.log(client.eth_get_transaction_by_hash(transaction.transaction_hash))
-        transaction.log("-----------------")
-        next
+        if ENV['RAILS_ENV'] == 'production'
+          Config.set('read_only', 'true')
+          transaction.log("#{transaction.transaction_hash} has been replaced")
+          transaction.log("-----------------")
+          next
+        end
 
-        # debugging only, uncomment this in production
-        # transaction.mark_replaced(last_onchain_nonce)
-        # next
+        transaction.mark_replaced(last_onchain_nonce)
+        next
       end
       transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
       if !transaction_receipt
@@ -54,7 +55,7 @@ class Transaction < ApplicationRecord
       end
       # debugging only, remove this in production
       if transaction.status == 'confirmed'
-        transaction.log("#{transaction.transaction_hash} is #{transaction.status}")
+        transaction.log("#{transaction.transaction_hash} has been confirmed")
         transaction.log("-----------------")
       end
       transaction.save!
@@ -81,7 +82,7 @@ class Transaction < ApplicationRecord
       # debugging only, remove this before going live
       if ENV['RAILS_ENV'] == 'production'
         Config.set('read_only', 'true')
-        self.log("transaction #{self.id} failed, toggling read_only")
+        self.log("#{self.id} has failed")
         return
       end
 
@@ -151,7 +152,8 @@ class Transaction < ApplicationRecord
     replaced_transactions = self.replaced.sort_by { |transaction| transaction.nonce.to_i }
     replaced_transactions.each do |transaction|
       next_nonce = Redis.current.incr('nonce') - 1
-      transaction.update!({ :nonce => next_nonce, :status => "pending", :transaction_hash => nil })
+      transaction.assign_attributes({ :nonce => next_nonce, :status => "pending", :transaction_hash => nil, :hex => nil })
+      transaction.sign_and_save!
     end
     Config.set('read_only', 'false')
   end
@@ -211,9 +213,22 @@ class Transaction < ApplicationRecord
     return self.nonce.to_i > last_confirmed_nonce && self.broadcasted_at <= 5.minutes.ago
   end
 
+  def sign
+    raw = self.raw
+    self.hex = raw.hex
+    self.transaction_hash = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.keccak256(Eth::Utils.hex_to_bin(raw.hex)))
+    self.gas_limit = raw.gas_limit
+    self.gas_price = raw.gas_price
+  end
+
+  def sign_and_save!
+    self.sign
+    self.save!
+  end
+
   private
 
-  def assign_next_nonce
+  def assign_nonce
     self.nonce = Redis.current.incr('nonce') - 1
   end
 

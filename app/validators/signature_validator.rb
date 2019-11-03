@@ -1,7 +1,8 @@
 class SignatureValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     begin
-      recovered_public_key = Eth::Key.personal_recover_hex(value, record.signature)
+      bin_signature = Eth::Utils.hex_to_bin(record.signature).bytes.rotate(-1).pack('c*')
+      recovered_public_key = Eth::OpenSsl.recover_compact(Eth::Utils.keccak256(Eth::Utils.prefix_message(Eth::Utils.hex_to_bin(value))), bin_signature)
       recovered_address = Eth::Utils.public_key_to_address recovered_public_key
     rescue
     end

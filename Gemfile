@@ -47,7 +47,7 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
 gem 'figaro'
-gem 'eth', :git => 'https://github.com/hieudoan2609/ruby-eth.git'
+gem 'eth'
 gem 'ethereum.rb', :git => 'https://github.com/hieudoan2609/ethereum.rb.git'
 gem 'whenever', require: false
 gem 'redis', '~> 4.1'

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_04_111535) do
+ActiveRecord::Schema.define(version: 2019_11_03_144058) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -184,6 +184,7 @@ ActiveRecord::Schema.define(version: 2019_10_04_111535) do
     t.string "gas"
     t.integer "nonce"
     t.datetime "broadcasted_at"
+    t.text "hex"
     t.index ["transactable_id"], name: "index_transactions_on_transactable_id"
     t.index ["transactable_type"], name: "index_transactions_on_transactable_type"
     t.index ["transaction_hash"], name: "index_transactions_on_transaction_hash"
