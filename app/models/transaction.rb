@@ -75,22 +75,30 @@ class Transaction < ApplicationRecord
   end
 
   def mark_failed
+    # debugging only, remove this before going live
+    if ENV['RAILS_ENV'] == 'production'
+      Config.set('read_only', 'true')
+      self.log("#{self.id} failed")
+      self.log("-----------------")
+      return
+    end
+
     ActiveRecord::Base.transaction do
       self.transaction_logs.create({ message: "failed" })
       self.update!({ :status => 'failed' })
-
-      # debugging only, remove this before going live
-      if ENV['RAILS_ENV'] == 'production'
-        Config.set('read_only', 'true')
-        self.log("#{self.id} has failed")
-        return
-      end
-
       self.transactable.refund
     end
   end
 
   def mark_out_of_gas
+    # debugging only, remove this before going live
+    if ENV['RAILS_ENV'] == 'production'
+      Config.set('read_only', 'true')
+      self.log("#{self.id} ran out of gas")
+      self.log("-----------------")
+      return
+    end
+
     ActiveRecord::Base.transaction do
       self.transaction_logs.create({ message: "out_of_gas" })
       self.update!({ :status => 'out_of_gas' })
