@@ -4,7 +4,7 @@ class MarketsController < ApplicationController
   # GET /markets
   # GET /markets.json
   def index
-    @markets = Market.paginate({ :page => params[:page], :per_page => params[:per_page] })
+    @markets = Market.paginate({ :page => params[:page], :per_page => params[:per_page] }).includes([:base_token, :quote_token])
   end
 
   # # GET /markets/1
