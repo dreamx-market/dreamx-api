@@ -138,4 +138,65 @@ class BalanceTest < ActiveSupport::TestCase
     @balance.refund("1".to_wei)
     assert @balance.reload.authentic?
   end
+
+  test "balance.authentic? should not trigger n+1" do
+    # balance should have at least to trigger n+1
+    # 1 deposit
+    # 1 refund
+    # 1 open sell order
+    # 1 closed sell order
+    # 1 closed buy order
+    # 1 sell trade
+    # 1 buy trade
+
+    a_token_balance = balances(:one)
+    a_eth_balance = balances(:two)
+    b_token_balance = balances(:three)
+    b_eth_balance = balances(:four)
+    eth_address = a_eth_balance.token_address
+    token_address = a_token_balance.token_address
+    a_address = a_token_balance.account_address
+    b_address = b_token_balance.account_address
+
+    a_token_deposit = { account_address: a_address, token_address: token_address, amount: '10'.to_wei }
+    a_eth_deposit = { account_address: a_address, token_address: eth_address, amount: '10'.to_wei }
+    a_sell_order = { account_address: a_address, give_token_address: token_address, give_amount: '0.3'.to_wei, take_token_address: eth_address, take_amount: '1'.to_wei }
+    a_buy_order = { account_address: a_address, give_token_address: eth_address, give_amount: '1'.to_wei, take_token_address: token_address, take_amount: '0.3'.to_wei }
+
+    b_sell_order = { account_address: b_address, give_token_address: token_address, give_amount: '0.3'.to_wei, take_token_address: eth_address, take_amount: '1'.to_wei }
+    b_buy_order = { account_address: b_address, give_token_address: eth_address, give_amount: '0.3'.to_wei, take_token_address: token_address, take_amount: '1'.to_wei }
+
+    created_deposits = []
+    created_orders = []
+    assert_difference("Deposit.count", 4) do
+    assert_difference("Order.count", 5) do
+    assert_changes("a_token_balance.balance") do
+    assert_changes("a_eth_balance.balance") do
+      created_deposits = batch_deposit([a_token_deposit, a_token_deposit, a_token_deposit, a_eth_deposit])
+      created_orders = batch_order([a_sell_order, a_sell_order, a_buy_order, b_sell_order, b_buy_order])
+      a_token_balance.reload
+      a_eth_balance.reload
+    end
+    end
+    end
+    end
+
+    assert_difference("Refund.count", 1) do
+      a_token_balance.refund("1".to_wei)
+    end
+
+    a_buy_trade = { account_address: a_address, order_hash: created_orders[3].order_hash, amount: created_orders[3].give_amount }
+    a_sell_trade = { account_address: a_address, order_hash: created_orders[4].order_hash, amount: created_orders[4].give_amount }
+    b_buy_trade = { account_address: b_address, order_hash: created_orders[1].order_hash, amount: created_orders[1].give_amount }
+    b_sell_trade = { account_address: b_address, order_hash: created_orders[2].order_hash, amount: created_orders[2].give_amount }
+
+    assert_difference("Trade.count", 4) do
+      batch_trade([a_buy_trade, a_sell_trade, b_buy_trade, b_sell_trade])
+    end
+
+    assert a_token_balance.reload.authentic?
+    assert b_eth_balance.reload.authentic?
+    assert a_token_balance.reload.authentic?
+    assert b_eth_balance.reload.authentic?
+  end
 end
