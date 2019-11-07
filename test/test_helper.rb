@@ -5,6 +5,10 @@ require 'rails/test_help'
 class ActiveSupport::TestCase
   setup do
     @snapshot_id = snapshot_blockchain
+
+    if Bullet.enable?
+      Bullet.start_request
+    end
   end
 
   teardown do
@@ -12,6 +16,10 @@ class ActiveSupport::TestCase
     revert_environment_variables
     Redis.current.flushdb
     Rails.application.load_redis_config_variables
+
+    if Bullet.enable?
+      Bullet.end_request
+    end
   end
 
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.

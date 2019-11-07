@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_03_144058) do
+ActiveRecord::Schema.define(version: 2019_11_07_075932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -172,7 +172,7 @@ ActiveRecord::Schema.define(version: 2019_11_03_144058) do
 
   create_table "transactions", force: :cascade do |t|
     t.string "transactable_type"
-    t.string "transactable_id"
+    t.integer "transactable_id"
     t.string "gas_limit"
     t.string "gas_price"
     t.string "transaction_hash"
