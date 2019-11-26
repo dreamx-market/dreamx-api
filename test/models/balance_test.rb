@@ -139,8 +139,8 @@ class BalanceTest < ActiveSupport::TestCase
     assert @balance.reload.authentic?
   end
 
-  test "balance.authentic? should not trigger n+1" do
-    # balance should have at least to trigger n+1
+  test ".closed_and_partially_filled_buy_orders and .sell_trades preloads trades and orders" do
+    # a_token_balance has at least:
     # 1 deposit
     # 1 refund
     # 1 open sell order
@@ -168,16 +168,12 @@ class BalanceTest < ActiveSupport::TestCase
 
     created_deposits = []
     created_orders = []
-    assert_difference("Deposit.count", 4) do
-    assert_difference("Order.count", 5) do
     assert_changes("a_token_balance.balance") do
     assert_changes("a_eth_balance.balance") do
       created_deposits = batch_deposit([a_token_deposit, a_token_deposit, a_token_deposit, a_eth_deposit])
       created_orders = batch_order([a_sell_order, a_sell_order, a_buy_order, b_sell_order, b_buy_order])
       a_token_balance.reload
       a_eth_balance.reload
-    end
-    end
     end
     end
 
@@ -194,9 +190,7 @@ class BalanceTest < ActiveSupport::TestCase
       batch_trade([a_buy_trade, a_sell_trade, b_buy_trade, b_sell_trade])
     end
 
-    assert a_token_balance.reload.authentic?
-    assert b_eth_balance.reload.authentic?
-    assert a_token_balance.reload.authentic?
-    assert b_eth_balance.reload.authentic?
+    assert_equal a_token_balance.closed_and_partially_filled_buy_orders[0].association(:trades).loaded?, true
+    assert_equal a_token_balance.sell_trades[0].association(:order).loaded?, true
   end
 end

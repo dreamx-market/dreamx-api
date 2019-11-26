@@ -98,11 +98,11 @@ class Balance < ApplicationRecord
   end
 
   def closed_and_partially_filled_buy_orders
-    Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' })
+    Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' }).includes(:trades)
   end
 
   def sell_trades
-    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } )
+    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } ).includes(:order)
   end
 
   def buy_trades
@@ -111,19 +111,43 @@ class Balance < ApplicationRecord
 
   def total_traded
     total = 0
-    closed_and_partially_filled_sell_orders.each do |order|
+    total += self.total_trade_from_closed_and_partially_filled_sell_orders
+    total += self.total_traded_from_closed_and_partially_filled_buy_orders
+    total -= self.total_traded_from_sell_trades
+    total += self.total_traded_from_buy_trades
+    return total
+  end
+
+  def total_traded_from_buy_trades
+    total = 0
+    self.buy_trades.each do |trade|
+      total += (trade.amount.to_i - trade.fee.to_i)
+    end
+    return total
+  end
+
+  def total_traded_from_sell_trades
+    total = 0
+    self.sell_trades.each do |trade|
+      total -= trade.order.calculate_take_amount(trade.amount)
+    end
+    return total
+  end
+
+  def total_trade_from_closed_and_partially_filled_sell_orders
+    total = 0
+    self.closed_and_partially_filled_sell_orders.each do |order|
       total -= order.filled.to_i
     end
-    closed_and_partially_filled_buy_orders.each do |order|
+    return total
+  end
+
+  def total_traded_from_closed_and_partially_filled_buy_orders
+    total = 0
+    self.closed_and_partially_filled_buy_orders.each do |order|
       order.trades.each do |trade|
         total += (order.calculate_take_amount(trade.amount).to_i - trade.maker_fee.to_i)
       end
-    end
-    sell_trades.each do |trade|
-      total -= trade.order.calculate_take_amount(trade.amount)
-    end
-    buy_trades.each do |trade|
-      total += (trade.amount.to_i - trade.fee.to_i)
     end
     return total
   end
