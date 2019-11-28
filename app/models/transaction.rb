@@ -1,5 +1,4 @@
 class Transaction < ApplicationRecord
-  include Loggable
   belongs_to :transactable, :polymorphic => true
   has_many :transaction_logs
 
@@ -25,8 +24,7 @@ class Transaction < ApplicationRecord
         # debugging only, remove this in production
         if ENV['RAILS_ENV'] == 'production'
           Config.set('read_only', 'true')
-          transaction.log("#{transaction.transaction_hash} has been replaced")
-          transaction.log("-----------------")
+          AppLogger.log("#{transaction.transaction_hash} has been replaced")
           next
         end
 
@@ -55,8 +53,7 @@ class Transaction < ApplicationRecord
       end
       # debugging only, remove this in production
       if transaction.status == 'confirmed'
-        transaction.log("#{transaction.transaction_hash} has been confirmed")
-        transaction.log("-----------------")
+        AppLogger.log("#{transaction.transaction_hash} has been confirmed")
       end
       transaction.save!
     end
@@ -78,8 +75,7 @@ class Transaction < ApplicationRecord
     # debugging only, remove this before going live
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
-      self.log("#{self.id} failed")
-      self.log("-----------------")
+      AppLogger.log("#{self.id} failed")
       return
     end
 
@@ -94,8 +90,7 @@ class Transaction < ApplicationRecord
     # debugging only, remove this before going live
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
-      self.log("#{self.id} ran out of gas")
-      self.log("-----------------")
+      AppLogger.log("#{self.id} ran out of gas")
       return
     end
 
@@ -159,8 +154,8 @@ class Transaction < ApplicationRecord
     self.sync_nonce
     replaced_transactions = self.replaced.sort_by { |transaction| transaction.nonce.to_i }
     replaced_transactions.each do |transaction|
-      next_nonce = Redis.current.incr('nonce') - 1
-      transaction.assign_attributes({ :nonce => next_nonce, :status => "pending", :transaction_hash => nil, :hex => nil })
+      transaction.assign_nonce
+      transaction.assign_attributes({ :status => "pending", :transaction_hash => nil, :hex => nil })
       transaction.sign_and_save!
     end
     Config.set('read_only', 'false')
@@ -234,11 +229,11 @@ class Transaction < ApplicationRecord
     self.save!
   end
 
-  private
-
   def assign_nonce
     self.nonce = Redis.current.incr('nonce') - 1
   end
+
+  private
 
   def self.sync_nonce
     client = Ethereum::Singleton.instance

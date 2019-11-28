@@ -1,6 +1,4 @@
 class Balance < ApplicationRecord
-  include Loggable
-
   has_many :refunds, dependent: :destroy
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
 
@@ -48,8 +46,7 @@ class Balance < ApplicationRecord
     self.fraud = true
     self.save!
     # debugging only, remove logging before going live
-    self.log("marked balance ##{self.id} as fraud")
-    self.log("-----------------")
+    AppLogger.log("marked balance ##{self.id} as fraud")
   end
 
   def authentic?

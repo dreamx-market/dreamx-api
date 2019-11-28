@@ -44,6 +44,7 @@ module DreamxApi
         :SECRET_KEY_BASE => 'bff123f6ea48261cf749ba0a27d2cd5e50ffea689aecac9d696d0c47a1d94614e134c427f7fcb9ef2fa6fee05a5b41cfa4f92b21bcf54b4d41a37af7e614b4e6',
         :SERVER_PRIVATE_KEY => '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2',
         :FEE_COLLECTOR_ADDRESS => '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a',
+        :LOG_PATH => "#{Rails.root}/log/app.log",
       }
     end
 

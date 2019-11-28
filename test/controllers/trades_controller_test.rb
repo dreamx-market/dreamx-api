@@ -262,10 +262,10 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
 
     # syncing maker's give balance
     maker_give_balance = balances(:four)
-    batch_withdraw([
+    withdraws = batch_withdraw([
       { :account_address => maker_give_balance.account_address, :token_address => maker_give_balance.token_address, :amount => maker_give_balance.balance }
     ])
-    batch_deposit([
+    deposits = batch_deposit([
       { :account_address => maker_give_balance.account_address, :token_address => maker_give_balance.token_address, :amount => maker_give_balance.onchain_balance }
     ])
 
@@ -309,7 +309,11 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     sync_nonce
     order = Order.create(generate_order({ :account_address => maker_give_balance.account_address, :give_token_address => maker_give_balance.token_address, :give_amount => give_amount, :take_token_address => taker_take_balance.token_address, :take_amount => take_amount }))
     trade = Trade.create(generate_trade({ :account_address => taker_take_balance.account_address, :order_hash => order.order_hash, :amount => fill_amount }))
-    BroadcastTransactionJob.perform_now(trade.tx)
+    begin
+      BroadcastTransactionJob.perform_now(trade.tx)
+    rescue
+      byebug
+    end
 
     # after trade assertions
     assert_equal maker_give_balance.reload.balance, maker_give_balance.onchain_balance

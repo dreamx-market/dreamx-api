@@ -1,5 +1,4 @@
 class Order < ApplicationRecord
-  include Loggable
   include FraudProtectable
 
   has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
@@ -29,10 +28,9 @@ class Order < ApplicationRecord
   #   if ENV['RAILS_ENV'] == 'test'
   #     return
   #   end
-  #   self.log("#{action} order #{self.id}")
-  #   self.log("balance: #{self.balance.balance.to_s.to_ether}, real_balance: #{self.balance.real_balance.to_s.to_ether}")
-  #   self.log("hold_balance: #{self.balance.hold_balance.to_s.to_ether}, real_hold_balance: #{self.balance.real_hold_balance.to_s.to_ether}")
-  #   self.log("-----------------")
+  #   AppLogger.log("#{action} order #{self.id}")
+  #   AppLogger.log("balance: #{self.balance.balance.to_s.to_ether}, real_balance: #{self.balance.real_balance.to_s.to_ether}")
+  #   AppLogger.log("hold_balance: #{self.balance.hold_balance.to_s.to_ether}, real_hold_balance: #{self.balance.real_hold_balance.to_s.to_ether}")
   # end
 
   def type

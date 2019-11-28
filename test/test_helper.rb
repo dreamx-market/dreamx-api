@@ -5,7 +5,6 @@ require 'rails/test_help'
 class ActiveSupport::TestCase
   setup do
     @snapshot_id = snapshot_blockchain
-
     if Bullet.enable?
       Bullet.start_request
     end
