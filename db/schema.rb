@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_07_075932) do
+ActiveRecord::Schema.define(version: 2019_11_29_112624) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 2019_11_07_075932) do
 
   create_table "accounts", force: :cascade do |t|
     t.string "address"
+    t.boolean "ejected"
     t.index ["address"], name: "index_accounts_on_address"
   end
 

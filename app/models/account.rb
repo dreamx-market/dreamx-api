@@ -17,6 +17,10 @@ class Account < ApplicationRecord
     Balance.find_by({ :account_address => self.address, :token_address => token_address })
   end
 
+  # def eject
+    
+  # end
+
   private
 
   def remove_checksum
