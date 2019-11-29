@@ -1,5 +1,6 @@
 class Trade < ApplicationRecord
   include FraudProtectable
+  include AccountNonEjectable
 
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
@@ -11,7 +12,7 @@ class Trade < ApplicationRecord
 	validates :nonce, nonce: true, on: :create
   validates :trade_hash, signature: true, uniqueness: true
   validate :market_must_be_active, :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
-  validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum
+  validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum, :account_must_not_be_ejected
 
   before_create :remove_checksum, :trade_balances, :generate_transaction
   after_create :update_ticker

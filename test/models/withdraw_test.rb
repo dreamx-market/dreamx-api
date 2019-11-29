@@ -95,4 +95,11 @@ class WithdrawTest < ActiveSupport::TestCase
     withdraw.refund
     assert_equal withdraw.balance.reload.balance, "0.5".to_wei    
   end
+
+  test "account must not be ejected" do
+    assert @withdraw.valid?
+    @withdraw.account.eject
+    assert_not @withdraw.valid?
+    assert_equal @withdraw.errors.messages[:account_address], ["has been ejected"]
+  end
 end

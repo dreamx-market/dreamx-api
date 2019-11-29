@@ -2,6 +2,7 @@ class Withdraw < ApplicationRecord
   attr_accessor :mock_balance_onchain_balance
 
   include FraudProtectable
+  include AccountNonEjectable
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
@@ -9,7 +10,7 @@ class Withdraw < ApplicationRecord
 
   validates :nonce, nonce: true, on: :create
   validates :withdraw_hash, signature: true, uniqueness: true
-  validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum
+  validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :remove_checksum, :collect_fee_and_debit_balance, :generate_transaction

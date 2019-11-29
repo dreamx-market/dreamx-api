@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 2019_11_29_155925) do
 
   create_table "accounts", force: :cascade do |t|
     t.string "address"
-    t.boolean "ejected"
+    t.boolean "ejected", default: false
     t.index ["address"], name: "index_accounts_on_address"
   end
 

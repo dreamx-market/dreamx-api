@@ -2,27 +2,36 @@
 
 fee:
   address: "0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a"
+  ejected: false
 
 one:
   address: "0xe37a4faa73fced0a177da51d8b62d02764f2fc45"
+  ejected: false
 
 two:
   address: "0x4e30dba9762aba125f5ab81647edebff9f9df7a7"
+  ejected: false
 
 three:
   address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
+  ejected: false
 
 four:
   address: "0xfa46ed8f8d3f15e7d820e7246233bbd9450903e3"
+  ejected: false
 
 five:
   address: "0xbfd525710ecb49a266337683971bac0d72d746a6"
+  ejected: false
 
 six:
   address: "0x266a483b876c85fb10c1bd0933e3e64e7ce4ecbb"
+  ejected: false
 
 seven:
   address: "0x76446f63c6b7756257b9c7d56ce7dde29836c203"
+  ejected: false
 
 eight:
   address: "0x16e86d3935e8922a9b14c722a97552a202575256"
+  ejected: false
