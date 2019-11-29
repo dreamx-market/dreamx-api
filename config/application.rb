@@ -45,6 +45,8 @@ module DreamxApi
         :SERVER_PRIVATE_KEY => '0xf1caff04b5ff349674820a4eb6ee11c459ad3698ca581c8a8e82ee09591b7aa2',
         :FEE_COLLECTOR_ADDRESS => '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a',
         :LOG_PATH => "#{Rails.root}/log/app.log",
+        :RATE_LIMIT => '120',
+        :RATE_LIMIT_DURATION => 1.minute.to_s,
       }
     end
 
