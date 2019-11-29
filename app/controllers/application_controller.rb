@@ -2,8 +2,8 @@ class ApplicationController < ActionController::API
   before_action :authorize_request
 
   def authorize_request
-    @limit = 4
-    duration = 10
+    @limit = ENV['RATE_LIMIT'].to_i
+    duration = ENV['RATE_LIMIT_DURATION'].to_i
     @ip = request.remote_ip
     @current_requests = Redis.current.get(@ip)
 
@@ -21,7 +21,7 @@ class ApplicationController < ActionController::API
       set_response_headers
     else
       set_response_headers
-      render status: :too_many_requests
+      render json: "too many requests", status: :too_many_requests
       return
     end
   end
