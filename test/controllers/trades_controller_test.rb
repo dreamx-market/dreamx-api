@@ -262,6 +262,8 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
 
     # syncing maker's give balance
     maker_give_balance = balances(:four)
+    # for debugging
+    maker_give_balance_original = maker_give_balance.onchain_balance
     withdraws = batch_withdraw([
       { :account_address => maker_give_balance.account_address, :token_address => maker_give_balance.token_address, :amount => maker_give_balance.balance }
     ])
