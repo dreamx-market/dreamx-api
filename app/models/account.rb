@@ -2,6 +2,7 @@ class Account < ApplicationRecord
 	has_many :balances, foreign_key: 'account_address', primary_key: 'address'
   has_many :deposits, foreign_key: 'account_address', primary_key: 'address'
   has_many :withdraws, foreign_key: 'account_address', primary_key: 'address'
+  has_one :ejection, foreign_key: 'account_address', primary_key: 'address'
 	validates :address, uniqueness: true
 
   before_create :remove_checksum
@@ -17,9 +18,22 @@ class Account < ApplicationRecord
     Balance.find_by({ :account_address => self.address, :token_address => token_address })
   end
 
-  # def eject
-    
-  # end
+  def eject
+    ActiveRecord::Base.transaction do
+      self.close_all_open_orders
+      self.ejection = Ejection.new
+      self.ejected = true
+      self.save!
+    end
+  end
+
+  def close_all_open_orders
+    self.balances.each do |balance|
+      balance.open_orders.each do |order|
+        order.cancel
+      end
+    end
+  end
 
   private
 

@@ -1,6 +1,7 @@
 class Balance < ApplicationRecord
   has_many :refunds, dependent: :destroy
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
+  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
 
 	validates_uniqueness_of :account_address, scope: [:token_address]
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
@@ -80,6 +81,10 @@ class Balance < ApplicationRecord
 
   def open_orders
     Order.where({ :account_address => account_address, :give_token_address => token_address }).where.not({ status: 'closed' })
+  end
+
+  def closed_orders
+    Order.where({ :account_address => account_address, :give_token_address => token_address }).where({ status: 'closed' })
   end
 
   def deposits
