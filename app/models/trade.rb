@@ -15,7 +15,7 @@ class Trade < ApplicationRecord
   validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum, :account_must_not_be_ejected
 
   before_create :remove_checksum, :trade_balances, :generate_transaction
-  after_create :update_ticker
+  after_create :enqueue_update_ticker
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
@@ -305,8 +305,8 @@ class Trade < ApplicationRecord
     self.account_address = self.account_address.without_checksum
   end
 
-  def update_ticker
-    self.market.ticker.update_data
+  def enqueue_update_ticker
+    UpdateMarketTickerJob.perform_later(self)
   end
 
   def market_must_be_active

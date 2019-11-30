@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class TickerTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+  
   setup do
     @ticker = tickers(:one)
     @token_one = tokens(:one)
@@ -21,7 +23,10 @@ class TickerTest < ActiveSupport::TestCase
 
   test "should update on new trades" do
     order = Order.create(generate_order(@order))
-    trade = Trade.create(generate_trade({ :account_address => @trade.account_address, :order_hash => order.order_hash, :amount => @trade.amount }))
+
+    perform_enqueued_jobs do
+      trade = Trade.create(generate_trade({ :account_address => @trade.account_address, :order_hash => order.order_hash, :amount => @trade.amount }))
+    end
 
     assert_changes "@ticker.last" do
       @ticker.reload

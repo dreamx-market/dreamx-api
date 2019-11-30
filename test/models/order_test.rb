@@ -96,7 +96,11 @@ class OrderTest < ActiveSupport::TestCase
 
     new_order = Order.create(generate_order(@order))
     before_cancel_balance = @order.account.balance(@order.give_token_address).balance
-    assert_not_equal original_balance, before_cancel_balance
+    begin
+      assert_not_equal original_balance, before_cancel_balance
+    rescue
+      byebug
+    end
 
     new_order.market.disable
     new_order.reload
