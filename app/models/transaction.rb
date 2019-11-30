@@ -268,7 +268,7 @@ class Transaction < ApplicationRecord
     AppLogger.log("synce nonce, next_nonce: #{self.next_nonce}, next_onchain_nonce: #{self.next_onchain_nonce}")
     client = Ethereum::Singleton.instance
     key = Eth::Key.new priv: ENV['SERVER_PRIVATE_KEY'].hex
-    Redis.current.set("nonce", client.get_nonce(key.address) - 1)
+    Redis.current.set("nonce", client.get_nonce(key.address))
   end
 
   def relay_account_transactable

@@ -204,11 +204,6 @@ class TransactionTest < ActiveSupport::TestCase
     assert_no_changes 'withdraw1.tx.nonce' do
     assert_changes 'trade.tx.nonce' do
     assert_no_changes 'withdraw2.tx.nonce' do
-      # manually expire txs so they can be broadcasted, in production, they will likely be expired
-      # already by the time they are re-generated
-      Transaction.replaced.each do |transaction|
-      end
-
       perform_enqueued_jobs do
         Transaction.broadcast_expired_transactions
       end
