@@ -173,6 +173,18 @@ class Transaction < ApplicationRecord
     Config.set('read_only', 'false')
   end
 
+  def self.regenerate_unconfirmed_transactions
+    Config.set('read_only', 'true')
+    self.sync_nonce
+    unconfirmed_transactions = self.unconfirmed.sort_by { |transaction| transaction.nonce.to_i }
+    unconfirmed_transactions.each do |transaction|
+      transaction.assign_nonce
+      transaction.assign_attributes({ :status => "pending", :transaction_hash => nil, :hex => nil })
+      transaction.sign_and_save!
+    end
+    Config.set('read_only', 'false')
+  end
+
   def self.has_unconfirmed_and_pending_transactions?
     self.unconfirmed_and_pending.first ? true : false
   end
@@ -206,6 +218,10 @@ class Transaction < ApplicationRecord
 
   def self.unconfirmed_and_pending
     self.where({ :status => ["unconfirmed", "pending"] })
+  end
+
+  def self.unconfirmed
+    self.where({ :status => "unconfirmed" })
   end
 
   def self.replaced
