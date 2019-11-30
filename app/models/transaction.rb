@@ -248,9 +248,11 @@ class Transaction < ApplicationRecord
   private
 
   def self.sync_nonce
+    # debugging only, remove logging before going live
+    AppLogger.log("synce nonce, next_nonce: #{self.next_nonce}, next_onchain_nonce: #{self.next_onchain_nonce}")
     client = Ethereum::Singleton.instance
     key = Eth::Key.new priv: ENV['SERVER_PRIVATE_KEY'].hex
-    Redis.current.set("nonce", client.get_nonce(key.address))
+    Redis.current.set("nonce", client.get_nonce(key.address) - 1)
   end
 
   def relay_account_transactable
