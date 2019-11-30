@@ -19,20 +19,20 @@ class Trade < ApplicationRecord
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
-  after_commit { self.write_log('commited') }
-  after_rollback { self.write_log('rollbacked') }
-  def write_log(action)
-    if ENV['RAILS_ENV'] == 'test'
-      return
-    end
-    self.maker_balance.reload
-    self.taker_balance.reload
-    AppLogger.log("#{action} #{self.type} trade #{self.id} for order #{self.order.id}")
-    AppLogger.log("maker_balance: #{self.maker_balance.balance.to_s.to_ether}, maker_real_balance: #{self.maker_balance.real_balance.to_s.to_ether}")
-    AppLogger.log("maker_hold_balance: #{self.maker_balance.hold_balance.to_s.to_ether}, maker_real_hold_balance: #{self.maker_balance.real_hold_balance.to_s.to_ether}")
-    AppLogger.log("taker_balance: #{self.taker_balance.balance.to_s.to_ether}, taker_real_balance: #{self.taker_balance.real_balance.to_s.to_ether}")
-    AppLogger.log("taker_hold_balance: #{self.taker_balance.hold_balance.to_s.to_ether}, taker_real_hold_balance: #{self.taker_balance.real_hold_balance.to_s.to_ether}")
-  end
+  # after_commit { self.write_log('commited') }
+  # after_rollback { self.write_log('rollbacked') }
+  # def write_log(action)
+  #   if ENV['RAILS_ENV'] == 'test'
+  #     return
+  #   end
+  #   self.maker_balance.reload
+  #   self.taker_balance.reload
+  #   AppLogger.log("#{action} #{self.type} trade #{self.id} for order #{self.order.id}")
+  #   AppLogger.log("maker_balance: #{self.maker_balance.balance.to_s.to_ether}, maker_real_balance: #{self.maker_balance.real_balance.to_s.to_ether}")
+  #   AppLogger.log("maker_hold_balance: #{self.maker_balance.hold_balance.to_s.to_ether}, maker_real_hold_balance: #{self.maker_balance.real_hold_balance.to_s.to_ether}")
+  #   AppLogger.log("taker_balance: #{self.taker_balance.balance.to_s.to_ether}, taker_real_balance: #{self.taker_balance.real_balance.to_s.to_ether}")
+  #   AppLogger.log("taker_hold_balance: #{self.taker_balance.hold_balance.to_s.to_ether}, taker_real_hold_balance: #{self.taker_balance.real_hold_balance.to_s.to_ether}")
+  # end
 
   def mark_balance_as_fraud_if_inauthentic
     if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
@@ -264,6 +264,20 @@ class Trade < ApplicationRecord
     fee_take_balance.credit(maker_fee_amount)
 
     self.total = self.is_sell ? self.amount : trade_amount_equivalence_in_take_tokens
+
+    maker_give_balance.reload
+    maker_take_balance.reload
+    taker_give_balance.reload
+    taker_take_balance.reload
+    AppLogger.log("NEW TRADE")
+    AppLogger.log("maker_give_balance: #{maker_give_balance.balance.to_s.to_ether}, maker_give_real_balance: #{maker_give_balance.real_balance.to_s.to_ether}")
+    AppLogger.log("maker_give_hold_balance: #{maker_give_balance.hold_balance.to_s.to_ether}, maker_give_real_hold_balance: #{maker_give_balance.real_hold_balance.to_s.to_ether}")
+    AppLogger.log("maker_take_balance: #{maker_take_balance.balance.to_s.to_ether}, maker_take_real_balance: #{maker_take_balance.real_balance.to_s.to_ether}")
+    AppLogger.log("maker_take_hold_balance: #{maker_take_balance.hold_balance.to_s.to_ether}, maker_take_real_hold_balance: #{maker_take_balance.real_hold_balance.to_s.to_ether}")
+    AppLogger.log("taker_give_balance: #{taker_give_balance.balance.to_s.to_ether}, taker_give_real_balance: #{taker_give_balance.real_balance.to_s.to_ether}")
+    AppLogger.log("taker_give_hold_balance: #{taker_give_balance.hold_balance.to_s.to_ether}, taker_give_real_hold_balance: #{taker_give_balance.real_hold_balance.to_s.to_ether}")
+    AppLogger.log("taker_take_balance: #{taker_take_balance.balance.to_s.to_ether}, taker_take_real_balance: #{taker_take_balance.real_balance.to_s.to_ether}")
+    AppLogger.log("taker_take_hold_balance: #{taker_take_balance.hold_balance.to_s.to_ether}, taker_take_real_hold_balance: #{taker_take_balance.real_hold_balance.to_s.to_ether}")
   end
 
   def balances_must_be_authentic

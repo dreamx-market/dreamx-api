@@ -23,17 +23,17 @@ class Order < ApplicationRecord
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
-  after_commit { self.write_log('commited') }
-  after_rollback { self.write_log('rollbacked') }
-  def write_log(action)
-    if ENV['RAILS_ENV'] == 'test'
-      return
-    end
-    self.balance.reload
-    AppLogger.log("#{action} order #{self.id}")
-    AppLogger.log("balance: #{self.balance.balance.to_s.to_ether}, real_balance: #{self.balance.real_balance.to_s.to_ether}")
-    AppLogger.log("hold_balance: #{self.balance.hold_balance.to_s.to_ether}, real_hold_balance: #{self.balance.real_hold_balance.to_s.to_ether}")
-  end
+  # after_commit { self.write_log('commited') }
+  # after_rollback { self.write_log('rollbacked') }
+  # def write_log(action)
+  #   if ENV['RAILS_ENV'] == 'test'
+  #     return
+  #   end
+  #   self.balance.reload
+  #   AppLogger.log("#{action} order #{self.id}")
+  #   AppLogger.log("balance: #{self.balance.balance.to_s.to_ether}, real_balance: #{self.balance.real_balance.to_s.to_ether}")
+  #   AppLogger.log("hold_balance: #{self.balance.hold_balance.to_s.to_ether}, real_hold_balance: #{self.balance.real_hold_balance.to_s.to_ether}")
+  # end
 
   def type
     return self.is_sell ? 'sell' : 'buy'
