@@ -13,6 +13,9 @@ class Deposit < ApplicationRecord
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   def mark_balance_as_fraud_if_inauthentic
+    # debugging only, remove logging before going live
+    AppLogger.log("ROLLED BACK DEPOSIT")
+
     if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
       self.balance.mark_fraud!
       Config.set('read_only', 'true')

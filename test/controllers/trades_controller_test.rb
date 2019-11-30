@@ -118,7 +118,7 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     assert_response 201
   end
 
-  test "should batch trade" do
+  test "should batch trades" do
     trades = []
     3.times do
       trades << generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount.to_i / 3 })
