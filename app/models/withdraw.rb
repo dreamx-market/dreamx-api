@@ -125,11 +125,11 @@ class Withdraw < ApplicationRecord
   def collect_fee_and_debit_balance
     fee_collector_balance = Balance.fee_collector(self.token_address)
     self.fee = (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
-    self.account.balance(self.token_address).debit(self.amount)
     # DEBUGGING ONLY
     AppLogger.log('withdraw debits')
-    fee_collector_balance.credit(self.fee)
+    self.account.balance(self.token_address).debit(self.amount)
     AppLogger.log('withdraw debited')
+    fee_collector_balance.credit(self.fee)
   end
 
   def balances_must_be_authentic
