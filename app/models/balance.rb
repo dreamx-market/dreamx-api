@@ -177,32 +177,45 @@ class Balance < ApplicationRecord
   # balance altering operations
 
   def credit(amount)
-    self.balance = balance.to_i + amount.to_i
-    save!
+    ActiveRecord::Base.transaction do
+      self.lock!
+      self.balance = self.reload.balance.to_i + amount.to_i
+      self.save!
+    end
   end
 
   def debit(amount)
-    starting_balance = self.reload.balance.to_i
-    AppLogger.log("starting balance: #{starting_balance}")
-    self.balance = starting_balance - amount.to_i
-    save!
+    ActiveRecord::Base.transaction do
+      self.lock!
+      self.balance = self.reload.balance.to_i - amount.to_i
+      self.save!
+    end
   end
 
   def hold(amount)
-    self.balance = balance.to_i - amount.to_i
-    self.hold_balance = hold_balance.to_i + amount.to_i
-    save!
+    ActiveRecord::Base.transaction do
+      self.lock!
+      self.balance = balance.to_i - amount.to_i
+      self.hold_balance = hold_balance.to_i + amount.to_i
+      self.save!
+    end
   end
 
   def release(amount)
-    self.balance = balance.to_i + amount.to_i
-    self.hold_balance = hold_balance.to_i - amount.to_i
-    save!
+    ActiveRecord::Base.transaction do
+      self.lock!
+      self.balance = balance.to_i + amount.to_i
+      self.hold_balance = hold_balance.to_i - amount.to_i
+      self.save!
+    end
   end
 
   def spend(amount)
-    self.hold_balance = hold_balance.to_i - amount.to_i
-    save!
+    ActiveRecord::Base.transaction do
+      self.lock!
+      self.hold_balance = hold_balance.to_i - amount.to_i
+      self.save!
+    end
   end
 
   private

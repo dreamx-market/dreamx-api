@@ -43,6 +43,7 @@ three:
   hold_balance: "0"
 
 four:
+  id: 4
   account_address: "0xa77344043e0b0bada9318f41803e07e9dfc57b0b"
   token_address: "0x0000000000000000000000000000000000000000"
   balance: "99500000000000000000"

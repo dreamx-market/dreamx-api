@@ -193,4 +193,62 @@ class BalanceTest < ActiveSupport::TestCase
     assert_equal a_token_balance.closed_and_partially_filled_buy_orders[0].association(:trades).loaded?, true
     assert_equal a_token_balance.sell_trades[0].association(:order).loaded?, true
   end
+
+  test "balance altering operations should be thread-safe" do
+    assert_equal ActiveRecord::Base.connection.pool.size, 5
+
+    threads = []
+    3.times do
+      thread = Thread.new do
+        @balance.credit(1)
+      end
+      threads.push(thread)
+    end
+    threads.each(&:join)
+    assert_equal @balance.reload.balance.to_i, 3
+
+    threads = []
+    3.times do
+      thread = Thread.new do
+        @balance.debit(1)
+      end
+      threads.push(thread)
+    end
+    threads.each(&:join)
+    assert_equal @balance.reload.balance.to_i, 0
+
+    threads = []
+    3.times do
+      thread = Thread.new do
+        @balance.credit(1)
+        @balance.hold(1)
+      end
+      threads.push(thread)
+    end
+    threads.each(&:join)
+    assert_equal @balance.reload.hold_balance.to_i, 3
+
+    threads = []
+    3.times do
+      thread = Thread.new do
+        @balance.spend(1)
+      end
+      threads.push(thread)
+    end
+    threads.each(&:join)
+    assert_equal @balance.reload.hold_balance.to_i, 0
+
+    threads = []
+    3.times do
+      thread = Thread.new do
+        @balance.credit(1)
+        @balance.hold(1)
+        @balance.release(1)
+      end
+      threads.push(thread)
+    end
+    threads.each(&:join)
+    assert_equal @balance.reload.balance.to_i, 3
+    assert_equal @balance.reload.hold_balance.to_i, 0
+  end
 end
