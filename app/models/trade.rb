@@ -20,7 +20,7 @@ class Trade < ApplicationRecord
 
   # debugging only, remove logging before going live
   after_create { self.write_log }
-  def write_log(action)
+  def write_log
     if ENV['RAILS_ENV'] == 'test'
       return
     end
