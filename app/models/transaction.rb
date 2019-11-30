@@ -7,6 +7,13 @@ class Transaction < ApplicationRecord
   after_commit :relay_account_transactable, on: [:create, :update]
   after_commit :relay_market_transactable, on: :create
 
+  class << self
+    def get_onchain_nonce
+      key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
+      last_onchain_nonce = client.get_nonce(key.address) - 1
+    end
+  end
+
   def self.confirm_mined_transactions
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
