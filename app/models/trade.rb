@@ -261,10 +261,7 @@ class Trade < ApplicationRecord
 
     taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.take_token_address })
     # takerTake = takerTake - (fillAmount * takeAmount / giveAmount)
-    # DEBUGGING ONLY
-    AppLogger.log('trade debits')
     taker_take_balance.debit(trade_amount_equivalence_in_take_tokens)
-    AppLogger.log('trade debited')
 
     Account.initialize_if_not_exist(fee_address, order.take_token_address)
     fee_take_balance = Balance.find_by({ :account_address => fee_address, :token_address => order.take_token_address })
