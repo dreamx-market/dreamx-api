@@ -187,7 +187,9 @@ class Balance < ApplicationRecord
   def debit(amount)
     ActiveRecord::Base.transaction do
       self.lock!
-      self.balance = self.reload.balance.to_i - amount.to_i
+      starting_balance = self.reload.balance.to_i
+      AppLogger.log("starting_balance: #{starting_balance}")
+      self.balance = starting_balance - amount.to_i
       self.save!
     end
   end
