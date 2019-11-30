@@ -8,7 +8,11 @@ class Transaction < ApplicationRecord
   after_commit :relay_market_transactable, on: :create
 
   class << self
-    def get_onchain_nonce
+    def next_nonce
+      Redis.current.get('nonce')
+    end
+
+    def next_onchain_nonce
       client = Ethereum::Singleton.instance
       key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
       last_onchain_nonce = client.get_nonce(key.address) - 1
