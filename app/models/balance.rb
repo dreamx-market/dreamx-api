@@ -170,13 +170,21 @@ class Balance < ApplicationRecord
     self.refunds.create({ amount: amount })
   end
 
+  def token_symbol
+    self.token.symbol
+  end
+
+  # balance altering operations
+
   def credit(amount)
     self.balance = balance.to_i + amount.to_i
     save!
   end
 
   def debit(amount)
-    self.balance = balance.to_i - amount.to_i
+    starting_balance = self.reload.balance.to_i
+    AppLogger.log("starting balance: #{starting_balance}")
+    self.balance = starting_balance - amount.to_i
     save!
   end
 
@@ -184,10 +192,6 @@ class Balance < ApplicationRecord
     self.balance = balance.to_i - amount.to_i
     self.hold_balance = hold_balance.to_i + amount.to_i
     save!
-  end
-
-  def token_symbol
-    self.token.symbol
   end
 
   def release(amount)
