@@ -19,8 +19,7 @@ class Trade < ApplicationRecord
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
-  after_commit { self.write_log('commited') }
-  after_rollback { self.write_log('rollbacked') }
+  after_create { self.write_log }
   def write_log(action)
     if ENV['RAILS_ENV'] == 'test'
       return
@@ -29,7 +28,7 @@ class Trade < ApplicationRecord
     maker_take_balance = Balance.find_by({ :account_address => maker_address, :token_address => order.take_token_address })
     taker_give_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.give_token_address })
     taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.take_token_address })
-    AppLogger.log("#{action} #{self.type} trade #{self.id} for order #{self.order.id}")
+    AppLogger.log("NEW TRADE")
     AppLogger.log("maker_give_balance: #{maker_give_balance.balance.to_s.to_ether}, maker_give_real_balance: #{maker_give_balance.real_balance.to_s.to_ether}")
     AppLogger.log("maker_give_hold_balance: #{maker_give_balance.hold_balance.to_s.to_ether}, maker_give_real_hold_balance: #{maker_give_balance.real_hold_balance.to_s.to_ether}")
     AppLogger.log("maker_take_balance: #{maker_take_balance.balance.to_s.to_ether}, maker_take_real_balance: #{maker_take_balance.real_balance.to_s.to_ether}")
