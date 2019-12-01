@@ -17,7 +17,7 @@ class Order < ApplicationRecord
 	before_create :remove_checksum, :hold_balance
   after_create :enqueue_update_ticker
   after_commit { 
-    MarketOrdersRelayJob.perform_later(self) 
+    MarketOrdersRelayJob.perform_later(self)
     AccountOrdersRelayJob.perform_later(self)
   }
   after_rollback :mark_balance_as_fraud_if_inauthentic

@@ -105,4 +105,8 @@ class MarketTest < ActiveSupport::TestCase
     total_count = @market.open_orders.length
     assert_equal total_count, sell_orders_count + buy_orders_count
   end
+
+  test ".trades should eager-load orders" do
+    assert_equal @market.trades.first.association(:order).loaded?, true
+  end
 end
