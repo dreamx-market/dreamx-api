@@ -32,14 +32,6 @@ class Transaction < ApplicationRecord
       end
       if !onchain_transaction
         # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
-
-        # debugging only, remove this in production
-        if ENV['RAILS_ENV'] == 'production'
-          Config.set('read_only', 'true')
-          AppLogger.log("#{transaction.transaction_hash} has been replaced")
-          next
-        end
-
         transaction.mark_replaced(last_onchain_nonce)
         next
       end
@@ -72,6 +64,13 @@ class Transaction < ApplicationRecord
   end
 
   def mark_replaced(last_onchain_nonce)
+    # debugging only, remove this in production
+    if ENV['RAILS_ENV'] == 'production'
+      Config.set('read_only', 'true')
+      AppLogger.log("#{transaction.transaction_hash} has been replaced")
+      return
+    end
+
     ActiveRecord::Base.transaction do
       log_message = "replaced, last_onchain_nonce: #{last_onchain_nonce}, nonce: #{self.nonce}"
       if self.transaction_hash
