@@ -71,12 +71,8 @@ class Market < ApplicationRecord
     return Trade.joins(:order).where(:orders => { :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).or(Trade.joins(:order).where(:orders => { :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address }))
   end
 
-  def all_trades
-    Trade.joins(:order).where(:orders => { :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).or(Trade.joins(:order).where(:orders => { :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address })) 
-  end
-
   def trades(period=nil)
-    # @memoized_current_time ||= Time.current
+    @memoized_current_time ||= Time.current
     trades = []
 
     if (!period)
@@ -84,7 +80,7 @@ class Market < ApplicationRecord
       trades = self.all_trades
     else
       # return trades within the period
-      trades = self.all_trades.where({ :created_at => (Time.current - period)..Time.current })
+      trades = self.all_trades.where({ :created_at => (@memoized_current_time - period)..@memoized_current_time })
     end
 
     trades.includes(:order)

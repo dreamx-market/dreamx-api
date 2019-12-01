@@ -1,5 +1,6 @@
 class Ticker < ApplicationRecord
   validates :market_symbol, uniqueness: true
+  # TODO: add belongs_to market
 
   after_commit { MarketTickersRelayJob.perform_later(self) }
 
