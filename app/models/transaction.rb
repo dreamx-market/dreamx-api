@@ -258,6 +258,11 @@ class Transaction < ApplicationRecord
   end
 
   def assign_nonce
+    # DEBUGGING ONLY, REMOVE THIS IN PRODUCTION
+    if (self.nonce)
+      AppLogger.log("overriding nonce ##{self.nonce}")
+    end
+
     self.nonce = Redis.current.incr('nonce') - 1
   end
 
