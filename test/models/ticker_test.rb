@@ -34,17 +34,19 @@ class TickerTest < ActiveSupport::TestCase
   end
 
   test "should update on new orders and order cancels" do
-    order = Order.create(generate_order(@order))
+    perform_enqueued_jobs do
+      order = Order.create(generate_order(@order))
 
-    assert_changes "@ticker.lowest_ask" do
-      @ticker.reload
-    end
+      assert_changes "@ticker.lowest_ask" do
+        @ticker.reload
+      end
 
-    @order_cancel.order_hash, @order_cancel.account_address = order.order_hash, order.account_address
-    order_cancel = OrderCancel.create(generate_order_cancel(@order_cancel))
+      @order_cancel.order_hash, @order_cancel.account_address = order.order_hash, order.account_address
+      order_cancel = OrderCancel.create(generate_order_cancel(@order_cancel))
 
-    assert_changes "@ticker.lowest_ask" do
-      @ticker.reload
+      assert_changes "@ticker.lowest_ask" do
+        @ticker.reload
+      end
     end
   end
 end

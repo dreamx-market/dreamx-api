@@ -306,7 +306,7 @@ class Trade < ApplicationRecord
   end
 
   def enqueue_update_ticker
-    UpdateMarketTickerJob.perform_later(self)
+    UpdateMarketTickerJob.perform_later(self.market)
   end
 
   def market_must_be_active

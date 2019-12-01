@@ -12,7 +12,7 @@ class OrderCancel < ApplicationRecord
   validate :balances_must_be_authentic, on: :create
 
   before_create :remove_checksum, :cancel_order
-  after_create :update_ticker
+  after_create :enqueue_update_ticker
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
   def mark_balance_as_fraud_if_inauthentic
@@ -86,8 +86,8 @@ class OrderCancel < ApplicationRecord
     self.account_address = self.account_address.without_checksum
   end
 
-  def update_ticker
-    self.market.ticker.update_data
+  def enqueue_update_ticker
+    UpdateMarketTickerJob.perform_later(self.market)
   end
 
   def order_must_be_valid

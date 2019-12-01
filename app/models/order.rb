@@ -15,7 +15,7 @@ class Order < ApplicationRecord
   validate :market_must_be_active, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, :volume_must_be_greater_than_minimum, on: :create
 
 	before_create :remove_checksum, :hold_balance
-  after_create :update_ticker
+  after_create :enqueue_update_ticker
   after_commit { 
     MarketOrdersRelayJob.perform_later(self) 
     AccountOrdersRelayJob.perform_later(self)
@@ -220,9 +220,9 @@ class Order < ApplicationRecord
     self.take_token_address = self.take_token_address.without_checksum
   end
 
-  def update_ticker
-    self.market.ticker.update_data
-  end  
+  def enqueue_update_ticker
+    UpdateMarketTickerJob.perform_later(self.market)
+  end
 
   def market_must_be_active
     if !self.market
