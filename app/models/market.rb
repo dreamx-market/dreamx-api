@@ -177,6 +177,6 @@ class Market < ApplicationRecord
   end
 
   def create_ticker
-    Ticker.create!({ :market_symbol => self.symbol })
+    self.ticker = Ticker.new
   end
 end
