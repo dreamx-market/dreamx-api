@@ -76,6 +76,7 @@ class Market < ApplicationRecord
   end
 
   def trades(period=nil)
+    @memoized_current_time ||= Time.current
     trades = []
 
     if (!period)
@@ -83,7 +84,7 @@ class Market < ApplicationRecord
       trades = self.all_trades
     else
       # return trades within the period
-      trades = self.all_trades.where({ :created_at => (Time.current - period)..Time.current }).includes(:order)
+      trades = self.all_trades.where({ :created_at => (@memoized_current_time - period)..@memoized_current_time }).includes(:order)
     end
 
     trades.includes(:order)
