@@ -40,15 +40,6 @@ class Trade < ApplicationRecord
       taker_take_hold_balance: #{taker_take_balance.hold_balance.to_s.to_ether}, taker_take_real_hold_balance: #{taker_take_balance.real_hold_balance.to_s.to_ether}, difference: #{taker_take_balance.hold_balance.to_i - taker_take_balance.real_hold_balance.to_i}
     }
     AppLogger.log(log_message)
-    # AppLogger.log("new trade, trade_hash: #{self.trade_hash}")
-    # AppLogger.log("maker_give_balance: #{maker_give_balance.balance.to_s.to_ether}, maker_give_real_balance: #{maker_give_balance.real_balance.to_s.to_ether}, difference: #{maker_give_balance.balance.to_i - maker_give_balance.real_balance.to_i}")
-    # AppLogger.log("maker_give_hold_balance: #{maker_give_balance.hold_balance.to_s.to_ether}, maker_give_real_hold_balance: #{maker_give_balance.real_hold_balance.to_s.to_ether}, difference: #{maker_give_balance.hold_balance.to_i - maker_give_balance.real_hold_balance.to_i}")
-    # AppLogger.log("maker_take_balance: #{maker_take_balance.balance.to_s.to_ether}, maker_take_real_balance: #{maker_take_balance.real_balance.to_s.to_ether}, difference: #{maker_take_balance.balance.to_i - maker_take_balance.real_balance.to_i}")
-    # AppLogger.log("maker_take_hold_balance: #{maker_take_balance.hold_balance.to_s.to_ether}, maker_take_real_hold_balance: #{maker_take_balance.real_hold_balance.to_s.to_ether}, difference: #{maker_take_balance.hold_balance.to_i - maker_take_balance.real_hold_balance.to_i}")
-    # AppLogger.log("taker_give_balance: #{taker_give_balance.balance.to_s.to_ether}, taker_give_real_balance: #{taker_give_balance.real_balance.to_s.to_ether}, difference: #{taker_give_balance.balance.to_i - taker_give_balance.real_balance.to_i}")
-    # AppLogger.log("taker_give_hold_balance: #{taker_give_balance.hold_balance.to_s.to_ether}, taker_give_real_hold_balance: #{taker_give_balance.real_hold_balance.to_s.to_ether}, difference: #{taker_give_balance.hold_balance.to_i - taker_give_balance.real_hold_balance.to_i}")
-    # AppLogger.log("taker_take_balance: #{taker_take_balance.balance.to_s.to_ether}, taker_take_real_balance: #{taker_take_balance.real_balance.to_s.to_ether}, difference: #{taker_take_balance.balance.to_i - taker_take_balance.real_balance.to_i}")
-    # AppLogger.log("taker_take_hold_balance: #{taker_take_balance.hold_balance.to_s.to_ether}, taker_take_real_hold_balance: #{taker_take_balance.real_hold_balance.to_s.to_ether}, difference: #{taker_take_balance.hold_balance.to_i - taker_take_balance.real_hold_balance.to_i}")
   end
 
   def mark_balance_as_fraud_if_inauthentic
