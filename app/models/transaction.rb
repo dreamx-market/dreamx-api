@@ -26,40 +26,43 @@ class Transaction < ApplicationRecord
     last_block_number = client.eth_get_block_by_number('latest', false)['result']['number'].hex
     mined_transactions = self.where({ :status => ["unconfirmed", "pending"] }).where({ :nonce => 0..last_onchain_nonce })
     mined_transactions.each do |transaction|
-      begin
-        onchain_transaction = client.eth_get_transaction_by_hash(transaction.transaction_hash)['result']
-      rescue
-      end
-      if !onchain_transaction
-        # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
-        transaction.mark_replaced(last_onchain_nonce)
-        next
-      end
-      transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
-      if !transaction_receipt
-        # transaction_receipt hasn't been available, skip
-        next
-      end
-      transaction.block_number = transaction_receipt['blockNumber'].hex
-      transaction.block_hash = transaction_receipt['blockHash']
-      transaction.gas = transaction_receipt['gasUsed'].hex
-      transaction.status = transaction_receipt['status'] == '0x1' ? 'confirmed' : 'failed'
-      confirmations_required = ENV['TRANSACTION_CONFIRMATIONS'].to_i
-      if last_block_number - transaction.block_number.to_i < confirmations_required
-        next
-      end
-      if transaction.status == 'failed'
-        transaction.mark_failed
-
-        if transaction.raw.gas_limit == transaction_receipt['gasUsed'].hex
-          transaction.mark_out_of_gas
+      transaction.with_lock do
+        begin
+          onchain_transaction = client.eth_get_transaction_by_hash(transaction.transaction_hash)['result']
+        rescue
         end
+        if !onchain_transaction
+          # transaction has a nonce equal to or lesser than last onchain nonce and it is cannot be found on-chain, mark as replaced
+          transaction.mark_replaced(last_onchain_nonce)
+          transaction.save!
+          next
+        end
+        transaction_receipt = client.eth_get_transaction_receipt(transaction.transaction_hash)['result']
+        if !transaction_receipt
+          # transaction_receipt hasn't been available, skip
+          next
+        end
+        transaction.block_number = transaction_receipt['blockNumber'].hex
+        transaction.block_hash = transaction_receipt['blockHash']
+        transaction.gas = transaction_receipt['gasUsed'].hex
+        transaction.status = transaction_receipt['status'] == '0x1' ? 'confirmed' : 'failed'
+        confirmations_required = ENV['TRANSACTION_CONFIRMATIONS'].to_i
+        if last_block_number - transaction.block_number.to_i < confirmations_required
+          next
+        end
+        if transaction.status == 'failed'
+          transaction.mark_failed
+
+          if transaction.raw.gas_limit == transaction_receipt['gasUsed'].hex
+            transaction.mark_out_of_gas
+          end
+        end
+        # debugging only, remove this in production
+        if transaction.status == 'confirmed'
+          AppLogger.log("#{transaction.transaction_hash} has been confirmed")
+        end
+        transaction.save!
       end
-      # debugging only, remove this in production
-      if transaction.status == 'confirmed'
-        AppLogger.log("#{transaction.transaction_hash} has been confirmed")
-      end
-      transaction.save!
     end
   end
 
@@ -71,15 +74,13 @@ class Transaction < ApplicationRecord
       return
     end
 
-    ActiveRecord::Base.transaction do
-      log_message = "replaced, last_onchain_nonce: #{last_onchain_nonce}, nonce: #{self.nonce}"
-      if self.transaction_hash
-        log_message = log_message + ", transaction_hash: #{self.transaction_hash}"
-      end
-      self.transaction_logs.create({ message: log_message })
-      self.update!({ :status => 'replaced' })
-      Config.set('read_only', 'true')
+    log_message = "replaced, last_onchain_nonce: #{last_onchain_nonce}, nonce: #{self.nonce}"
+    if self.transaction_hash
+      log_message = log_message + ", transaction_hash: #{self.transaction_hash}"
     end
+    self.transaction_logs.build({ message: log_message })
+    self.status = 'replaced'
+    Config.set('read_only', 'true')
   end
 
   def mark_failed
@@ -90,11 +91,9 @@ class Transaction < ApplicationRecord
       return
     end
 
-    ActiveRecord::Base.transaction do
-      self.transaction_logs.create({ message: "failed" })
-      self.update!({ :status => 'failed' })
-      self.transactable.refund
-    end
+    self.transaction_logs.build({ message: "failed" })
+    self.status = 'failed'
+    self.transactable.refund
   end
 
   def mark_out_of_gas
@@ -105,10 +104,8 @@ class Transaction < ApplicationRecord
       return
     end
 
-    ActiveRecord::Base.transaction do
-      self.transaction_logs.create({ message: "out_of_gas" })
-      self.update!({ :status => 'out_of_gas' })
-    end
+    self.transaction_logs.build({ message: "out_of_gas" })
+    self.status = 'out_of_gas'
   end
 
   def raw
@@ -165,9 +162,11 @@ class Transaction < ApplicationRecord
     self.sync_nonce
     replaced_transactions = self.replaced.sort_by { |transaction| transaction.nonce.to_i }
     replaced_transactions.each do |transaction|
-      transaction.assign_nonce
-      transaction.assign_attributes({ :status => "pending", :transaction_hash => nil, :hex => nil })
-      transaction.sign_and_save!
+      transaction.with_lock do
+        transaction.assign_nonce
+        transaction.assign_attributes({ :status => "pending", :transaction_hash => nil, :hex => nil })
+        transaction.sign_and_save!
+      end
     end
     Config.set('read_only', 'false')
   end
@@ -177,9 +176,11 @@ class Transaction < ApplicationRecord
     self.sync_nonce
     unconfirmed_transactions = self.unconfirmed.sort_by { |transaction| transaction.nonce.to_i }
     unconfirmed_transactions.each do |transaction|
-      transaction.assign_nonce
-      transaction.assign_attributes({ :status => "pending", :transaction_hash => nil, :hex => nil })
-      transaction.sign_and_save!
+      transaction.with_lock do
+        transaction.assign_nonce
+        transaction.assign_attributes({ :status => "pending", :transaction_hash => nil, :hex => nil })
+        transaction.sign_and_save!
+      end
     end
     Config.set('read_only', 'false')
   end
@@ -201,14 +202,16 @@ class Transaction < ApplicationRecord
         if ENV['RAILS_ENV'] == 'test'
           # ganache raises an error upon VM exceptions instead of returning the transaction hash
           # so we have to ignore the error and update transaction_hash manually
-          if e.to_s.include?('VM Exception while processing transaction: revert')
-            client = Ethereum::Singleton.instance
-            transaction_hash = client.eth_get_block_by_number('latest', false)['result']['transactions'].first
-            transaction.update!({ :transaction_hash => transaction_hash, :status => 'unconfirmed' })
-          elsif e.to_s.include?("the tx doesn't have the correct nonce")
-            transaction.update!({ :status => 'unconfirmed' })
-          else
-            transaction.update!({ :status => 'undefined' })
+          transaction.with_lock do
+            if e.to_s.include?('VM Exception while processing transaction: revert')
+              client = Ethereum::Singleton.instance
+              transaction_hash = client.eth_get_block_by_number('latest', false)['result']['transactions'].first
+              transaction.update!({ :transaction_hash => transaction_hash, :status => 'unconfirmed' })
+            elsif e.to_s.include?("the tx doesn't have the correct nonce")
+              transaction.update!({ :status => 'unconfirmed' })
+            else
+              transaction.update!({ :status => 'undefined' })
+            end
           end
         end
       end
@@ -257,7 +260,7 @@ class Transaction < ApplicationRecord
   end
 
   def assign_nonce
-    # DEBUGGING ONLY, REMOVE THIS IN PRODUCTION
+    # DEBUGGING ONLY
     if (self.nonce)
       AppLogger.log("overriding nonce ##{self.nonce}")
     end
@@ -268,7 +271,7 @@ class Transaction < ApplicationRecord
   private
 
   def self.sync_nonce
-    # debugging only, remove logging before going live
+    # DEBUGGING ONLY
     AppLogger.log("sync nonce, next_nonce: #{self.next_nonce}, next_onchain_nonce: #{self.next_onchain_nonce}")
 
     client = Ethereum::Singleton.instance

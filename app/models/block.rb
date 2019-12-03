@@ -4,27 +4,29 @@ class Block < ApplicationRecord
     current_block = client.eth_block_number["result"].hex
     saved_block = self.last
 
-    required_confirmations = ENV['TRANSACTION_CONFIRMATIONS'].to_i
-    last_confirmed_block_number = current_block - required_confirmations
-    last_processed_block_number = saved_block ? saved_block.block_number : last_confirmed_block_number
-    last_block_number = last_processed_block_number
+    saved_block.with_lock do
+      required_confirmations = ENV['TRANSACTION_CONFIRMATIONS'].to_i
+      last_confirmed_block_number = current_block - required_confirmations
+      last_processed_block_number = saved_block ? saved_block.block_number : last_confirmed_block_number
+      last_block_number = last_processed_block_number
 
-    if (current_block < required_confirmations or (saved_block and saved_block.block_number == last_confirmed_block_number))
-      return
+      if (current_block < required_confirmations or (saved_block and saved_block.block_number == last_confirmed_block_number))
+        return
+      end
+
+      (last_processed_block_number..last_confirmed_block_number).step(1) do |i|
+        self.process_block(i)
+        last_block_number = i
+      end
+
+      last_block = client.eth_get_block_by_number(last_block_number, false)
+
+      if (!saved_block)
+        saved_block = Block.create(:id => 1)
+      end
+
+      saved_block.update!(:block_number => last_block["result"]["number"].hex, :block_hash => last_block["result"]["hash"], :parent_hash => last_block["result"]["parentHash"])
     end
-
-    (last_processed_block_number..last_confirmed_block_number).step(1) do |i|
-      self.process_block(i)
-      last_block_number = i
-    end
-
-    last_block = client.eth_get_block_by_number(last_block_number, false)
-
-    if (!saved_block)
-      saved_block = Block.create(:id => 1)
-    end
-
-    saved_block.update!(:block_number => last_block["result"]["number"].hex, :block_hash => last_block["result"]["hash"], :parent_hash => last_block["result"]["parentHash"])
   end
 
   def self.process_block(block_number)
@@ -35,10 +37,14 @@ class Block < ApplicationRecord
   end
 
   def self.revert_to_block(block_number)
-    if !self.last
+    last_block = self.last
+
+    if !last_block
       return
     end
 
-    self.last.update!({ :block_number => block_number })
+    last_block.with_lock do
+      last_block.update!({ :block_number => block_number })
+    end
   end
 end

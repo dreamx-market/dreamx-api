@@ -22,19 +22,6 @@ class Order < ApplicationRecord
   }
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
-  # debugging only, remove logging before going live
-  # after_commit { self.write_log('commited') }
-  # after_rollback { self.write_log('rollbacked') }
-  # def write_log(action)
-  #   if ENV['RAILS_ENV'] == 'test'
-  #     return
-  #   end
-  #   self.balance.reload
-  #   AppLogger.log("#{action} order #{self.id}")
-  #   AppLogger.log("balance: #{self.balance.balance.to_s.to_ether}, real_balance: #{self.balance.real_balance.to_s.to_ether}")
-  #   AppLogger.log("hold_balance: #{self.balance.hold_balance.to_s.to_ether}, real_hold_balance: #{self.balance.real_hold_balance.to_s.to_ether}")
-  # end
-
   def type
     return self.is_sell ? 'sell' : 'buy'
   end
@@ -107,23 +94,32 @@ class Order < ApplicationRecord
     self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
   end
 
-  def fill(amount, fee)
-    self.filled = self.filled.to_i + amount.to_i
-    self.fee = self.fee.to_i + fee.to_i
+  # order altering operations
 
-    if self.filled.to_i == self.give_amount.to_i or !self.has_sufficient_remaining_volume? then
-      self.cancel
-    else
-      self.status = 'partially_filled'
-      self.save!
+  def fill(amount, fee)
+    self.with_lock do
+      self.filled = self.filled.to_i + amount.to_i
+      self.fee = self.fee.to_i + fee.to_i
+
+      if self.filled.to_i == self.give_amount.to_i or !self.has_sufficient_remaining_volume? then
+        remaining = self.give_amount.to_i - self.filled.to_i
+        self.account.balance(self.give_token_address).release(remaining)
+        self.status = 'closed'
+        self.save!
+      else
+        self.status = 'partially_filled'
+        self.save!
+      end
     end
   end
 
   def cancel
-    remaining = self.give_amount.to_i - self.filled.to_i
-    self.account.balance(self.give_token_address).release(remaining)
-    self.status = 'closed'
-    self.save!
+    self.with_lock do
+      remaining = self.give_amount.to_i - self.filled.to_i
+      self.account.balance(self.give_token_address).release(remaining)
+      self.status = 'closed'
+      self.save!
+    end
   end
 
 	private

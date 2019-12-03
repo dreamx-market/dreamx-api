@@ -8,10 +8,12 @@ class Ticker < ApplicationRecord
   end
 
   def update_data
-    ticker = self.build_ticker
-    self.assign_attributes(ticker)
-    if self.changed?
-      self.save
+    self.with_lock do
+      ticker = self.build_ticker
+      self.assign_attributes(ticker)
+      if self.changed?
+        self.save!
+      end
     end
   end
 

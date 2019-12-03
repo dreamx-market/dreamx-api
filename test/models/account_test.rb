@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class AccountTest < ActiveSupport::TestCase
+  setup do
+    @balance = balances(:one)
+    @account = @balance.account
+  end
+
   test "initialize_if_not_exist should not reset existing balances to 0" do
     existing_balance = Balance.find_by({ :account_address => "0xfa46ed8f8d3f15e7d820e7246233bbd9450903e3", :token_address => "0x21921361bab476be44c0655256a2f4281bfcf07d" })
     batch_deposit([

@@ -204,4 +204,20 @@ class ActiveSupport::TestCase
   def get_action_nonce
     Time.now.to_i * 1000 + Redis.current.incr('action_nonce')
   end
+
+  def concurrently(thread_count=4)
+    waiting = true
+
+    threads = []
+    thread_count.times do |i|
+      thread = Thread.new do
+        true while waiting
+        yield(i)
+      end
+      threads.push(thread)
+    end
+
+    waiting = false
+    threads.each(&:join)
+  end
 end

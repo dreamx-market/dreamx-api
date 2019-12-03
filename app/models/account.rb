@@ -19,7 +19,7 @@ class Account < ApplicationRecord
   end
 
   def eject
-    ActiveRecord::Base.transaction do
+    self.with_lock do
       self.close_all_open_orders
       self.ejection = Ejection.new
       self.ejected = true

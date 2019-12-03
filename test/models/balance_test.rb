@@ -251,4 +251,12 @@ class BalanceTest < ActiveSupport::TestCase
     assert_equal @balance.reload.balance.to_i, 3
     assert_equal @balance.reload.hold_balance.to_i, 0
   end
+
+  test "creating refunds should be thread-safe" do
+    concurrently do
+      @balance.refund(1)
+    end
+
+    assert_equal @balance.reload.balance.to_i, 4
+  end
 end

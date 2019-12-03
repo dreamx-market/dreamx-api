@@ -25,12 +25,6 @@ class Balance < ApplicationRecord
       Account.initialize_if_not_exist(fee_address, token_address)
       self.find_by({ :account_address => fee_address, :token_address => token_address })
     end
-
-    def bot(token_symbol)
-      account_address = '0x53888c09d2E2a071D8EE6b4b1cA400C9201eE9E7'.without_checksum
-      token_address = Token.find_by({ symbol: token_symbol.upcase }).address
-      return Balance.find_by({ account_address: account_address, token_address: token_address })
-    end
   end
 
   def offchain_onchain_difference
@@ -44,10 +38,12 @@ class Balance < ApplicationRecord
   end
 
   def mark_fraud!
-    self.fraud = true
-    self.save!
-    # debugging only, remove logging before going live
-    AppLogger.log("marked balance ##{self.id} as fraud")
+    self.with_lock do
+      self.fraud = true
+      self.save!
+      # debugging only, remove logging before going live
+      AppLogger.log("marked balance ##{self.id} as fraud")
+    end
   end
 
   def authentic?
@@ -177,24 +173,21 @@ class Balance < ApplicationRecord
   # balance altering operations
 
   def credit(amount)
-    ActiveRecord::Base.transaction do
-      self.lock!
+    self.with_lock do
       self.balance = self.reload.balance.to_i + amount.to_i
       self.save!
     end
   end
 
   def debit(amount)
-    ActiveRecord::Base.transaction do
-      self.lock!
+    self.with_lock do
       self.balance = self.reload.balance.to_i - amount.to_i
       self.save!
     end
   end
 
   def hold(amount)
-    ActiveRecord::Base.transaction do
-      self.lock!
+    self.with_lock do
       self.balance = balance.to_i - amount.to_i
       self.hold_balance = hold_balance.to_i + amount.to_i
       self.save!
@@ -202,8 +195,7 @@ class Balance < ApplicationRecord
   end
 
   def release(amount)
-    ActiveRecord::Base.transaction do
-      self.lock!
+    self.with_lock do
       self.balance = balance.to_i + amount.to_i
       self.hold_balance = hold_balance.to_i - amount.to_i
       self.save!
@@ -211,8 +203,7 @@ class Balance < ApplicationRecord
   end
 
   def spend(amount)
-    ActiveRecord::Base.transaction do
-      self.lock!
+    self.with_lock do
       self.hold_balance = hold_balance.to_i - amount.to_i
       self.save!
     end

@@ -26,11 +26,13 @@ class Deposit < ApplicationRecord
   private
 
   def credit_balance
-    if (!self.account)
+    account = self.account
+
+    if (!account)
       return
     end
 
-    self.account.balance(self.token_address).credit(self.amount)
+    account.balance(self.token_address).credit(self.amount)
   end
 
   def self.aggregate(block_number)
