@@ -60,6 +60,10 @@ class Balance < ApplicationRecord
     return onchain_balance.to_s
   end
 
+  def total_onchain_difference
+    return self.total_balance.to_i - self.onchain_balance.to_i
+  end
+
   def mark_fraud!
     self.with_lock do
       self.fraud = true
