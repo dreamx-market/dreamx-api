@@ -20,6 +20,18 @@ class Balance < ApplicationRecord
       return false
     end
 
+    def unauthentic_balances
+      result = []
+
+      self.all.each do |b|
+        if !b.authentic?
+          result << b
+        end
+      end
+
+      return result
+    end
+
     def fee_collector(token_address)
       fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
       Account.initialize_if_not_exist(fee_address, token_address)
