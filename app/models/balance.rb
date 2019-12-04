@@ -50,18 +50,14 @@ class Balance < ApplicationRecord
     end
   end
 
-  def offchain_onchain_difference
-    self.total_balance.to_i - self.onchain_balance.to_i
-  end
-
   def onchain_balance
     exchange = Contract::Exchange.singleton.instance
     onchain_balance = exchange.call.balances(self.token_address, self.account_address)
     return onchain_balance.to_s
   end
 
-  def total_onchain_difference
-    return self.total_balance.to_i - self.onchain_balance.to_i
+  def onchain_difference
+    self.total_balance.to_i - self.onchain_balance.to_i
   end
 
   def mark_fraud!
