@@ -20,10 +20,11 @@ class Balance < ApplicationRecord
       return false
     end
 
-    def fee_collector(token_address)
+    def fee_collector(token_symbol)
+      token = Token.find_by({ symbol: token_symbol })
       fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
-      Account.initialize_if_not_exist(fee_address, token_address)
-      self.find_by({ :account_address => fee_address, :token_address => token_address })
+      Account.initialize_if_not_exist(fee_address, token.address)
+      self.find_by({ :account_address => fee_address, :token_address => token.address })
     end
   end
 
