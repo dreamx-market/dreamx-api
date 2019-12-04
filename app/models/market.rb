@@ -125,7 +125,7 @@ class Market < ApplicationRecord
         result += trade.order.calculate_take_amount(trade.amount)
       end
     end
-    return result.to_s.to_ether
+    return result.to_s.from_wei
   end
 
   def quote_volume(period=1.day)
@@ -139,7 +139,7 @@ class Market < ApplicationRecord
         result += trade.amount.to_i
       end
     end
-    return result.to_s.to_ether
+    return result.to_s.from_wei
   end
 
   def percent_change_24h

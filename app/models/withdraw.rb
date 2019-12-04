@@ -105,7 +105,7 @@ class Withdraw < ApplicationRecord
     end
 
     if (self.amount.to_i < self.token.withdraw_minimum.to_i)
-      errors.add(:amount, "must be greater than #{self.token.withdraw_minimum.to_ether}")
+      errors.add(:amount, "must be greater than #{self.token.withdraw_minimum.from_wei}")
     end
   end
 

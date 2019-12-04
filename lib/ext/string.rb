@@ -7,7 +7,7 @@ class String
     Eth::Utils.prefix_hex(Eth::Utils.bin_to_hex(Eth::Utils.normalize_address(self)))
   end
 
-  def to_ether
+  def from_wei
     formatter = Ethereum::Formatter.new
     formatter.from_wei(self.to_f).to_s
   end

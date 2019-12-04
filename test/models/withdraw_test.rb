@@ -43,7 +43,7 @@ class WithdrawTest < ActiveSupport::TestCase
   test "amount must be greater than minimum volume" do
     @withdraw.amount = 0
     assert_not @withdraw.valid?
-    assert_equal @withdraw.errors.messages[:amount], ["must be greater than #{@withdraw.token.withdraw_minimum.to_ether}"]
+    assert_equal @withdraw.errors.messages[:amount], ["must be greater than #{@withdraw.token.withdraw_minimum.from_wei}"]
   end
 
   test "withdraw_hash must be valid" do
