@@ -168,8 +168,8 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     take_token_address = "0x0000000000000000000000000000000000000000"
     give_amount = "100000000000000000000"
     take_amount = "100000000000000000000"
-    Account.initialize_if_not_exist(maker_address, give_token_address)
-    Account.initialize_if_not_exist(taker_address, take_token_address)
+    Balance.find_or_create_by({ account_address: maker_address, token_address: give_token_address })
+    Balance.find_or_create_by({ account_address: taker_address, token_address: take_token_address })
     deposits = batch_deposit([
       { :account_address => maker_address, :token_address => give_token_address, :amount => give_amount },
       { :account_address => taker_address, :token_address => take_token_address, :amount => take_amount }
@@ -247,7 +247,11 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
 
     assert_no_difference('Trade.count') do
       post trades_url, params: [trade], as: :json
-      assert_equal balance.reload.fraud, true
+      begin
+        assert_equal balance.reload.fraud, true
+      rescue
+        byebug
+      end
     end
 
     ENV['FRAUD_PROTECTION'] = 'false'

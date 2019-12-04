@@ -1,11 +1,12 @@
 class Balance < ApplicationRecord
   has_many :refunds, dependent: :destroy
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
-  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
+  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
 
 	validates_uniqueness_of :account_address, scope: [:token_address]
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }
 
+  after_initialize :initialize_account_if_not_exist
   before_create :remove_checksum
   after_commit { AccountBalancesRelayJob.perform_later(self) }
 
@@ -32,10 +33,20 @@ class Balance < ApplicationRecord
       return result
     end
 
-    def fee_collector(token_address)
+    def fee_collector(token_address_or_symbol)
+      if (!token_address_or_symbol.is_a_valid_address?)
+        token = Token.find_by({ symbol: token_address_or_symbol.upcase })
+        token_address_or_symbol = token.address
+      end
+
       fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
-      Account.initialize_if_not_exist(fee_address, token_address)
-      self.find_by({ :account_address => fee_address, :token_address => token_address })
+      self.find_or_create_by({ :account_address => fee_address, :token_address => token_address_or_symbol })
+    end
+  end
+
+  def initialize_account_if_not_exist
+    if !self.account
+      self.account = Account.new({ address: self.account_address })
     end
   end
 

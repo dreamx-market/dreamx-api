@@ -39,8 +39,17 @@ class DepositTest < ActiveSupport::TestCase
   end
 
   test "should aggregate new deposits" do
+    # remove the existing account and balance so they can be re-initialize
+    balance = Balance.find_by({ account_address: '0xa77344043e0b0bada9318f41803e07e9dfc57b0b', token_address: '0x0000000000000000000000000000000000000000' })
+    account = balance.account
+    account.destroy
+
+    assert_difference('Account.count') do
+    assert_difference('Balance.count') do
     assert_difference('Deposit.count') do
       Deposit.aggregate(9)
+    end
+    end
     end
   end
 

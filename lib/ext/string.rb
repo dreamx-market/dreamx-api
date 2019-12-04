@@ -16,4 +16,9 @@ class String
     formatter = Ethereum::Formatter.new
     formatter.to_wei(self.to_f).to_s
   end
+
+  def is_a_valid_address?
+    address = Eth::Address.new(self)
+    address.valid?
+  end
 end

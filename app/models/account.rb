@@ -1,5 +1,5 @@
 class Account < ApplicationRecord
-	has_many :balances, foreign_key: 'account_address', primary_key: 'address'
+	has_many :balances, foreign_key: 'account_address', primary_key: 'address', dependent: :destroy
   has_many :deposits, foreign_key: 'account_address', primary_key: 'address'
   has_many :withdraws, foreign_key: 'account_address', primary_key: 'address'
   has_one :ejection, foreign_key: 'account_address', primary_key: 'address'
@@ -8,10 +8,6 @@ class Account < ApplicationRecord
   before_create :remove_checksum
 
   class << self
-    def initialize_if_not_exist(account_address, token_address)
-      self.create({ :address => account_address })
-      Balance.create({ :account_address => account_address, :token_address => token_address })
-    end
   end
 
   def balance(token_address)
