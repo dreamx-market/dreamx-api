@@ -256,11 +256,7 @@ class Trade < ApplicationRecord
     maker_take_balance = Balance.find_or_create_by({ :account_address => maker_address, :token_address => order.take_token_address })
     maker_receiveing_amount_minus_fee = trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
     # makerTake = makerTake + (fillAmount * takeAmount / giveAmount) - makerFee
-    # DEBUGGING
-    old_maker_take_balance = maker_take_balance.reload
-    AppLogger.log("crediting #{maker_receiveing_amount_minus_fee}, maker_take_balance: #{old_maker_take_balance}")
     maker_take_balance.credit(maker_receiveing_amount_minus_fee)
-    AppLogger.log("credited #{maker_receiveing_amount_minus_fee}, new maker_take_balance: #{maker_take_balance.reload.balance}, difference: #{maker_take_balance.reload.balance - old_maker_take_balance}")
     order.fill(amount, maker_fee_amount)
 
     taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.take_token_address })
