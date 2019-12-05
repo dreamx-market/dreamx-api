@@ -120,4 +120,12 @@ class OrderTest < ActiveSupport::TestCase
     assert_not new_buy_order.valid?
     assert_equal new_buy_order.errors.messages[:give_amount], ["must be greater than #{ENV['MAKER_MINIMUM_ETH_IN_WEI']}"]
   end
+
+  test "updating MAKER_MINIMUM does not invalidate existing orders" do
+    assert_equal @order.valid?, true
+    old_minimum_volume = ENV['MAKER_MINIMUM_ETH_IN_WEI']
+
+    ENV['MAKER_MINIMUM_ETH_IN_WEI'] = (@order.volume.to_i * 2).to_s
+    assert_equal @order.valid?, true
+  end
 end

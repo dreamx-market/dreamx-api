@@ -22,6 +22,9 @@ class Order < ApplicationRecord
   }
   after_rollback :mark_balance_as_fraud_if_inauthentic
 
+  class << self
+  end
+
   def type
     return self.is_sell ? 'sell' : 'buy'
   end
@@ -122,6 +125,14 @@ class Order < ApplicationRecord
     end
   end
 
+  def volume
+    if (self.is_sell)
+      return self.take_amount.to_i
+    else
+      return self.give_amount.to_i
+    end
+  end
+
 	private
 
   def status_must_be_open_closed_or_partially_filled
@@ -192,14 +203,12 @@ class Order < ApplicationRecord
   def volume_must_be_greater_than_minimum
     if (self.is_sell) then
       attribute = :take_amount
-      volume = self.take_amount.to_i
     else
       attribute = :give_amount
-      volume = self.give_amount.to_i
     end
 
     minimum_volume = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i
-    errors.add(attribute, "must be greater than #{minimum_volume}") unless volume >= minimum_volume
+    errors.add(attribute, "must be greater than #{minimum_volume}") unless self.volume >= minimum_volume
   end
 
   def balances_must_be_authentic
