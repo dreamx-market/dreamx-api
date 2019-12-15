@@ -79,7 +79,7 @@ class Balance < ApplicationRecord
   end
 
   def balance_authentic?
-    return self.real_balance.to_i == self.balance.to_i
+    return self.reload.real_balance.to_i == self.balance.to_i
   end
 
   def real_total_balance
@@ -99,7 +99,7 @@ class Balance < ApplicationRecord
   end
 
   def hold_balance_authentic?
-    return real_hold_balance.to_i == hold_balance.to_i
+    return self.reload.real_hold_balance.to_i == self.hold_balance.to_i
   end
 
   def open_orders

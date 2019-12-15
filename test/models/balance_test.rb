@@ -44,7 +44,6 @@ class BalanceTest < ActiveSupport::TestCase
       { :account_address => @maker.account_address, :token_address => @give_token.address, :amount => "0.5".to_wei },
     ])
 
-    @maker.reload
     assert @maker.authentic?
   end
 

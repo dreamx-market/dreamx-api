@@ -152,8 +152,7 @@ class Order < ApplicationRecord
 	end
 
 	def balance_must_exist_and_is_sufficient
-		balance = self.account.balances.find_by(token_address: give_token_address)
-		if !balance || balance.balance.to_i < give_amount.to_i then
+		if !self.balance || self.balance.reload.balance.to_i < give_amount.to_i then
 			errors.add(:account_address, 'insufficient balance')
 		end
 	end

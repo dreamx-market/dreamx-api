@@ -25,7 +25,7 @@ module DreamxApi
 
     def environment_variables
       return {
-        :FRAUD_PROTECTION => 'true',
+        :FRAUD_PROTECTION => 'false', # fraud protection isn't thread-safe and performant, disabled by default
         :GAS_LIMIT => '2000000',
         :REDIS_HOST => 'redis://127.0.0.1:6379',
         :ETHEREUM_HOST => 'https://ropsten.infura.io/v3/b41fd9db5b3442a5b3be799b1bc91bf0',
