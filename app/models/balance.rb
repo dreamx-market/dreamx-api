@@ -56,7 +56,7 @@ class Balance < ApplicationRecord
     return onchain_balance.to_s
   end
 
-  def onchain_difference
+  def onchain_delta
     self.total_balance.to_i - self.onchain_balance.to_i
   end
 
