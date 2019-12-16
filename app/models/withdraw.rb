@@ -114,10 +114,10 @@ class Withdraw < ApplicationRecord
   private
 
   def collect_fee_and_debit_balance
-    fee_collector_balance = Balance.fee_collector(self.token_address)
+    fee_balance = Balance.fee(self.token_address)
     self.fee = (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
     self.account.balance(self.token_address).debit(self.amount)
-    fee_collector_balance.credit(self.fee)
+    fee_balance.credit(self.fee)
   end
 
   def generate_transaction

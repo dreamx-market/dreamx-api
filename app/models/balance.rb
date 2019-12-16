@@ -197,14 +197,14 @@ class Balance < ApplicationRecord
 
   def credit(amount)
     self.with_lock do
-      self.balance = self.reload.balance.to_i + amount.to_i
+      self.balance = self.balance.to_i + amount.to_i
       self.save!
     end
   end
 
   def debit(amount)
     self.with_lock do
-      self.balance = self.reload.balance.to_i - amount.to_i
+      self.balance = self.balance.to_i - amount.to_i
       self.save!
     end
   end
