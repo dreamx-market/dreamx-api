@@ -1,5 +1,4 @@
 class OrderCancel < ApplicationRecord
-  include FraudProtectable
   include AccountNonEjectable
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
@@ -9,18 +8,9 @@ class OrderCancel < ApplicationRecord
   validates :cancel_hash, signature: true
 
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid, :order_must_be_valid, :account_must_not_be_ejected
-  validate :balances_must_be_authentic, on: :create
 
   before_create :remove_checksum, :cancel_order
   after_create :enqueue_update_ticker
-  after_rollback :mark_balance_as_fraud_if_inauthentic
-
-  def mark_balance_as_fraud_if_inauthentic
-    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
-      self.balance.mark_fraud!
-      Config.set('read_only', 'true')
-    end
-  end
 
   def balance
     self.account.balance(self.order.give_token_address)
@@ -72,14 +62,6 @@ class OrderCancel < ApplicationRecord
 
   def cancel_order
     self.order.cancel
-  end
-
-  def balances_must_be_authentic
-    if (!self.account or !self.order)
-      return
-    end
-
-    validate_balances_integrity(self.account.balance(self.order.give_token_address))
   end
 
   def remove_checksum

@@ -1,5 +1,4 @@
 class Trade < ApplicationRecord
-  include FraudProtectable
   include AccountNonEjectable
 
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
@@ -11,12 +10,11 @@ class Trade < ApplicationRecord
   validates_presence_of VALIDATABLE_ATTRS
 	validates :nonce, nonce: true, on: :create
   validates :trade_hash, signature: true, uniqueness: true
-  validate :market_must_be_active, :order_must_be_open, :order_must_have_sufficient_volume, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
+  validate :market_must_be_active, :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
   validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum, :account_must_not_be_ejected
 
   before_create :remove_checksum, :trade_balances, :generate_transaction
   after_create :enqueue_update_ticker
-  after_rollback :mark_balance_as_fraud_if_inauthentic
 
   # debugging only, remove logging before going live
   after_create { self.write_log }
@@ -40,13 +38,6 @@ class Trade < ApplicationRecord
       taker_take_hold_balance: #{taker_take_balance.hold_balance.to_s.from_wei}, taker_take_real_hold_balance: #{taker_take_balance.real_hold_balance.to_s.from_wei}, difference: #{taker_take_balance.hold_balance.to_i - taker_take_balance.real_hold_balance.to_i}
     }
     AppLogger.log(log_message)
-  end
-
-  def mark_balance_as_fraud_if_inauthentic
-    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
-      self.balance.mark_fraud!
-      Config.set('read_only', 'true')
-    end
   end
 
   def balance
@@ -268,14 +259,6 @@ class Trade < ApplicationRecord
     fee_take_balance.credit(maker_fee_amount)
 
     self.total = self.is_sell ? self.amount : trade_amount_equivalence_in_take_tokens
-  end
-
-  def balances_must_be_authentic
-    if (!self.account or !self.order)
-      return
-    end
-
-    validate_balances_integrity(account.balance(order.take_token_address))
   end
 
   def order_must_be_open

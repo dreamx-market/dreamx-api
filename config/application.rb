@@ -25,7 +25,6 @@ module DreamxApi
 
     def environment_variables
       return {
-        :FRAUD_PROTECTION => 'false', # fraud protection isn't thread-safe and performant, disabled by default
         :GAS_LIMIT => '2000000',
         :REDIS_HOST => 'redis://127.0.0.1:6379',
         :ETHEREUM_HOST => 'https://ropsten.infura.io/v3/b41fd9db5b3442a5b3be799b1bc91bf0',
@@ -46,7 +45,7 @@ module DreamxApi
         :FEE_COLLECTOR_ADDRESS => '0xcc6cfe1a7f27f84309697beeccbc8112a6b7240a',
         :LOG_PATH => "#{Rails.root}/log/app.log",
         :RATE_LIMIT => '120',
-        :RATE_LIMIT_DURATION => 1.minute.to_s,
+        :RATE_LIMIT_DURATION => 1.minute.to_s
       }
     end
 
@@ -61,8 +60,7 @@ module DreamxApi
         :CONTRACT_ADDRESS => '0xf675cf9c811022a8d934df1c96bb8af884dc92ee',
         :ETHEREUM_HOST => 'http://localhost:8545',
         :TRANSACTION_CONFIRMATIONS => '0',
-        :REDIS_HOST => 'redis://127.0.0.1:6379/2', # use database 2 for test environment
-        :FRAUD_PROTECTION => 'false'
+        :REDIS_HOST => 'redis://127.0.0.1:6379/2' # use database 2 for test environment
       }
     end
 

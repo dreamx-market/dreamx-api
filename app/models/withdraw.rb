@@ -1,7 +1,6 @@
 class Withdraw < ApplicationRecord
   attr_accessor :mock_balance_onchain_balance
 
-  include FraudProtectable
   include AccountNonEjectable
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
@@ -11,17 +10,9 @@ class Withdraw < ApplicationRecord
   validates :nonce, nonce: true, on: :create
   validates :withdraw_hash, signature: true, uniqueness: true
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
-  validate :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, on: :create
+  validate :balance_must_exist_and_is_sufficient, on: :create
 
   before_create :remove_checksum, :collect_fee_and_debit_balance, :generate_transaction
-  after_rollback :mark_balance_as_fraud_if_inauthentic
-
-  def mark_balance_as_fraud_if_inauthentic
-    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
-      self.balance.mark_fraud!
-      Config.set('read_only', 'true')
-    end
-  end
   
   def balance
     self.account.balance(self.token_address)
@@ -127,14 +118,6 @@ class Withdraw < ApplicationRecord
     self.fee = (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
     self.account.balance(self.token_address).debit(self.amount)
     fee_collector_balance.credit(self.fee)
-  end
-
-  def balances_must_be_authentic
-    if (!self.account)
-      return
-    end
-
-    validate_balances_integrity(self.account.balance(self.token_address))
   end
 
   def generate_transaction

@@ -237,26 +237,6 @@ class TradesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "should mark balance as fraudulent" do
-    ENV['FRAUD_PROTECTION'] = 'true'
-
-    trade = generate_trade({ :account_address => @trade.account_address, :order_hash => @orders[0].order_hash, :amount => @trade.amount })
-    balance = @trade.balance
-    balance.update({ :hold_balance => 1 })
-    assert_equal balance.reload.fraud, false
-
-    assert_no_difference('Trade.count') do
-      post trades_url, params: [trade], as: :json
-      begin
-        assert_equal balance.reload.fraud, true
-      rescue
-        byebug
-      end
-    end
-
-    ENV['FRAUD_PROTECTION'] = 'false'
-  end
-
   test "should be consistent with on-chain balances" do
     give_token = tokens(:one)
     take_token = tokens(:four)

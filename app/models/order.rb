@@ -1,5 +1,4 @@
 class Order < ApplicationRecord
-  include FraudProtectable
   include AccountNonEjectable
 
   has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
@@ -12,7 +11,7 @@ class Order < ApplicationRecord
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }, on: :update
 
 	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
-  validate :market_must_be_active, :balances_must_be_authentic, :balance_must_exist_and_is_sufficient, :volume_must_be_greater_than_minimum, on: :create
+  validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_be_greater_than_minimum, on: :create
 
 	before_create :remove_checksum, :hold_balance
   after_create :enqueue_update_ticker
@@ -20,7 +19,6 @@ class Order < ApplicationRecord
     MarketOrdersRelayJob.perform_later(self)
     AccountOrdersRelayJob.perform_later(self)
   }
-  after_rollback :mark_balance_as_fraud_if_inauthentic
 
   class << self
   end
@@ -35,13 +33,6 @@ class Order < ApplicationRecord
 
   def take_token
     Token.find_by({ address: self.take_token_address })
-  end
-
-  def mark_balance_as_fraud_if_inauthentic
-    if ENV['FRAUD_PROTECTION'] == 'true' and !balance.authentic?
-      self.balance.mark_fraud!
-      Config.set('read_only', 'true')
-    end
   end
 
   def balance
@@ -208,14 +199,6 @@ class Order < ApplicationRecord
 
     minimum_volume = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i
     errors.add(attribute, "must be greater than #{minimum_volume}") unless self.volume >= minimum_volume
-  end
-
-  def balances_must_be_authentic
-    if (!self.account)
-      return
-    end
-    
-    validate_balances_integrity(self.account.balance(self.give_token_address))
   end
 
   def remove_checksum

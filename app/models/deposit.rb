@@ -1,6 +1,4 @@
 class Deposit < ApplicationRecord
-  include FraudProtectable
-  
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
 
