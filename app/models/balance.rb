@@ -33,7 +33,7 @@ class Balance < ApplicationRecord
       return result
     end
 
-    def fee_collector(token_address_or_symbol)
+    def fee(token_address_or_symbol)
       if (!token_address_or_symbol.is_a_valid_address?)
         token = Token.find_by({ symbol: token_address_or_symbol.upcase })
         token_address_or_symbol = token.address
