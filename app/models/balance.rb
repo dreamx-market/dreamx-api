@@ -36,11 +36,13 @@ class Balance < ApplicationRecord
     def fee(token_address_or_symbol)
       if (!token_address_or_symbol.is_a_valid_address?)
         token = Token.find_by({ symbol: token_address_or_symbol.upcase })
-        token_address_or_symbol = token.address
+        token_address = token.address
+      else
+        token_address = token_address_or_symbol
       end
 
       fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
-      self.find_or_create_by({ :account_address => fee_address, :token_address => token_address_or_symbol })
+      self.find_or_create_by({ :account_address => fee_address, :token_address => token_address })
     end
   end
 

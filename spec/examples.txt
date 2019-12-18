@@ -1,3 +1,4 @@
-example_id                         | status | run_time        |
----------------------------------- | ------ | --------------- |
-./spec/models/account_spec.rb[1:1] | passed | 0.18405 seconds |
+example_id                                            | status | run_time        |
+----------------------------------------------------- | ------ | --------------- |
+./spec/channels/account_balances_channel_spec.rb[1:1] | passed | 0.30576 seconds |
+./spec/models/account_spec.rb[1:1]                    | passed | 0.3333 seconds  |

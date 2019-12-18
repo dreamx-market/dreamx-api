@@ -10,8 +10,15 @@ class Account < ApplicationRecord
   class << self
   end
 
-  def balance(token_address)
-    Balance.find_by({ :account_address => self.address, :token_address => token_address })
+  def balance(token_address_or_symbol)
+    if (!token_address_or_symbol.is_a_valid_address?)
+      token = Token.find_by({ symbol: token_address_or_symbol.upcase })
+      token_address = token.address
+    else
+      token_address = token_address_or_symbol
+    end
+
+    Balance.find_or_create_by({ :account_address => self.address, :token_address => token_address })
   end
 
   def eject

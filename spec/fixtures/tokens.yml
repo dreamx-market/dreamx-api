@@ -1,0 +1,14 @@
+ETH:
+  id: 1
+  symbol: 'ETH'
+  address: "<%= TestHelpers::token_addresses['ETH'] %>"
+
+ONE:
+  id: 2
+  symbol: 'ONE'
+  address: "<%= TestHelpers::token_addresses['ONE'] %>"
+  
+TWO:
+  id: 3
+  symbol: 'TWO'
+  address: "<%= TestHelpers::token_addresses['TWO'] %>"
