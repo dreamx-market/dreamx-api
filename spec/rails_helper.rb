@@ -68,21 +68,28 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
 
-  config.global_fixtures = :tokens
+  # config.global_fixtures = []
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
 
   config.around(:each) do |example|
-    if Bullet.enable?
-      Bullet.start_request
-    end
+    DatabaseCleaner.cleaning do
+      if Bullet.enable?
+        Bullet.start_request
+      end
 
-    example.run
+      example.run
 
-    TestHelpers::revert_environment_variables
-    Redis.current.flushdb
-    Rails.application.load_redis_config_variables
+      TestHelpers::revert_environment_variables
+      Redis.current.flushdb
+      Rails.application.load_redis_config_variables
 
-    if Bullet.enable?
-      Bullet.end_request
+      if Bullet.enable?
+        Bullet.end_request
+      end
     end
   end
 
@@ -104,5 +111,23 @@ RSpec.configure do |config|
     example.run
 
     ActiveJob::Base.queue_adapter = old_queue_adapter
+  end
+
+  config.around(:each, :with_funded_accounts) do |example|
+    token_address_one = TestHelpers::token_addresses['ETH']
+    token_address_two = TestHelpers::token_addresses['ONE']
+    token_one = create(:token, address: token_address_one, name: 'Ethereum', symbol: 'ETH')
+    token_two = create(:token, address: token_address_two, name: 'One', symbol: 'ONE')
+
+    address_one = TestHelpers::addresses[0]
+    address_two = TestHelpers::addresses[1]
+    account_one = create(:account, address: address_one)
+    account_two = create(:account, address: address_two)
+    balance_one = create(:balance, account: account_one, token: token_one, balance: '1000'.to_wei)
+    balance_two = create(:balance, account: account_one, token: token_two, balance: '1000'.to_wei)
+    balance_three = create(:balance, account: account_two, token: token_one, balance: '1000'.to_wei)
+    balance_four = create(:balance, account: account_two, token: token_two, balance: '1000'.to_wei)
+
+    example.run
   end
 end

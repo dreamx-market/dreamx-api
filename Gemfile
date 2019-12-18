@@ -44,6 +44,7 @@ group :test do
   gem 'action-cable-testing'
   gem 'rspec-rails', '~> 3.9.0'
   gem "factory_bot_rails"
+  gem 'database_cleaner'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

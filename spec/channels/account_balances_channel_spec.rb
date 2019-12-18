@@ -8,4 +8,12 @@ RSpec.describe AccountBalancesChannel, type: :channel do
       deposit.save
     }.to have_broadcasted_to("account_balances:#{deposit.account_address}")
   end
+
+  it "broadcasts a message when a new withdrawal is created", :perform_enqueued, :with_funded_accounts do
+    withdraw = build(:withdraw)
+
+    expect {
+      withdraw.save
+    }.to have_broadcasted_to("account_balances:#{withdraw.account_address}")
+  end
 end
