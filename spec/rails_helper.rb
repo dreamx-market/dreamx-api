@@ -26,9 +26,6 @@ require "action_cable/testing/rspec"
 #
 Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
 
-# modules included by default for all specs
-include TestHelpers
-
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
 begin
@@ -40,11 +37,12 @@ end
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.global_fixtures = :all
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
 
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
@@ -67,67 +65,4 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.include FactoryBot::Syntax::Methods
-
-  # config.global_fixtures = []
-
-  config.before(:suite) do
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with(:truncation)
-  end
-
-  config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
-      if Bullet.enable?
-        Bullet.start_request
-      end
-
-      example.run
-
-      TestHelpers::revert_environment_variables
-      Redis.current.flushdb
-      Rails.application.load_redis_config_variables
-
-      if Bullet.enable?
-        Bullet.end_request
-      end
-    end
-  end
-
-  config.around(:each, :onchain) do |example|
-    TestHelpers::sync_nonce
-    snapshot_id = TestHelpers::snapshot_blockchain
-
-    example.run
-
-    TestHelpers::revert_blockchain(snapshot_id)
-  end
-
-  config.around(:each, :perform_enqueued) do |example|
-    old_queue_adapter = ActiveJob::Base.queue_adapter
-    ActiveJob::Base.queue_adapter = :test
-    ActiveJob::Base.queue_adapter.perform_enqueued_jobs = true
-    ActiveJob::Base.queue_adapter.perform_enqueued_at_jobs = true
-
-    example.run
-
-    ActiveJob::Base.queue_adapter = old_queue_adapter
-  end
-
-  config.around(:each, :with_funded_accounts) do |example|
-    token_address_one = TestHelpers::token_addresses['ETH']
-    token_address_two = TestHelpers::token_addresses['ONE']
-    token_one = create(:token, address: token_address_one, name: 'Ethereum', symbol: 'ETH')
-    token_two = create(:token, address: token_address_two, name: 'One', symbol: 'ONE')
-
-    address_one = TestHelpers::addresses[0]
-    address_two = TestHelpers::addresses[1]
-    account_one = create(:account, address: address_one)
-    account_two = create(:account, address: address_two)
-    balance_one = create(:balance, account: account_one, token: token_one, balance: '1000'.to_wei)
-    balance_two = create(:balance, account: account_one, token: token_two, balance: '1000'.to_wei)
-    balance_three = create(:balance, account: account_two, token: token_one, balance: '1000'.to_wei)
-    balance_four = create(:balance, account: account_two, token: token_two, balance: '1000'.to_wei)
-
-    example.run
-  end
 end

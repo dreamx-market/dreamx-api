@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Account, type: :model do
   it "successfully ejects", :onchain do
-    account = create(:account)
+    account = accounts(:one)
     allow(account).to receive(:close_all_open_orders)
 
     account.eject

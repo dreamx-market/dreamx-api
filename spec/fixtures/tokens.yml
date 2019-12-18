@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+eth:
+  name: Ethereum
+  address: "<%= token_addresses['ETH'] %>"
+  symbol: ETH
+  decimals: 18
+  withdraw_minimum: <%= "0.02".to_wei %>
+  withdraw_fee: <%= "0.01".to_wei %>
+
+one:
+  name: One
+  address: "<%= token_addresses['ONE'] %>"
+  symbol: ONE
+  decimals: 18
+  withdraw_minimum: <%= "0.02".to_wei %>
+  withdraw_fee: <%= "0.01".to_wei %>
+
+two:
+  name: Two
+  address: "<%= token_addresses['TWO'] %>"
+  symbol: TWO
+  decimals: 18
+  withdraw_minimum: <%= "0.02".to_wei %>
+  withdraw_fee: <%= "0.01".to_wei %>

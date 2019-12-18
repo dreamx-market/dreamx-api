@@ -5,13 +5,19 @@ class Market < ApplicationRecord
   validate :immutable_attributes_cannot_be_updated, on: :update
 
   has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol'
-  has_one :ticker, class_name: 'Ticker', foreign_key: 'market_symbol', primary_key: 'symbol'
 	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
 	validates_uniqueness_of :base_token_address, scope: [:quote_token_address]
 	validate :status_must_be_active_or_disabled, :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
 
   before_create :remove_checksum, :assign_symbol, :create_ticker
+
+  class << self
+  end
+
+  def ticker
+    Ticker.find_or_create_by({ market_symbol: self.symbol })
+  end
 
   def disabled?
     return self.status == 'disabled' ? true : false

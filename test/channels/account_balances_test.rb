@@ -23,26 +23,6 @@ class AccountBalancesTest < ActionCable::TestCase
     ]
     @orders = batch_order(order_data)
   end
-  
-  test "broadcast a message when a new deposit is created" do
-    new_deposit = Deposit.new({ :account_address => @deposit.account_address, :token_address => @deposit.token_address, :amount => @deposit.amount })
-
-    assert_broadcasts("account_balances:#{new_deposit.account_address}", 1) do
-      perform_enqueued_jobs do
-        new_deposit.save
-      end
-    end
-  end
-
-  test "broadcast a message when a new withdrawal is created" do
-    new_withdraw = Withdraw.new(generate_withdraw(@withdraw))
-
-    assert_broadcasts("account_balances:#{new_withdraw.account_address}", 1) do
-      perform_enqueued_jobs do
-        new_withdraw.save
-      end
-    end
-  end
 
   test "broadcast a message when a new order is created" do
     new_order = Order.new(generate_order(@order))

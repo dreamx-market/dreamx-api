@@ -1,0 +1,11 @@
+fee:
+  address: "<%= addresses[9] %>"
+  ejected: false
+
+one:
+  address: "<%= addresses[0] %>"
+  ejected: false
+
+two:
+  address: "<%= addresses[1] %>"
+  ejected: false

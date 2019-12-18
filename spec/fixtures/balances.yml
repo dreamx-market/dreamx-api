@@ -1,0 +1,23 @@
+one_eth:
+  account_address: "<%= addresses[0] %>"
+  token_address: "<%= token_addresses['ETH'] %>"
+  balance: <%= "1000".to_wei %>
+  hold_balance: "0"
+
+one_one:
+  account_address: "<%= addresses[0] %>"
+  token_address: "<%= token_addresses['ONE'] %>"
+  balance: <%= "1000".to_wei %>
+  hold_balance: "0"
+
+one_two:
+  account_address: "<%= addresses[0] %>"
+  token_address: "<%= token_addresses['TWO'] %>"
+  balance: <%= "1000".to_wei %>
+  hold_balance: "0"
+
+two_eth:
+  account_address: "<%= addresses[0] %>"
+  token_address: "<%= token_addresses['ONE'] %>"
+  balance: <%= "1000".to_wei %>
+  hold_balance: "0"

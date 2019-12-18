@@ -131,5 +131,9 @@ module DreamxApi
     config.action_cable.disable_request_forgery_protection = true
 
     config.active_job.queue_adapter = :sucker_punch
+
+    config.generators do |g|
+      g.test_framework :rspec
+    end
   end
 end
