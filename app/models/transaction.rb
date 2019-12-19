@@ -111,7 +111,7 @@ class Transaction < ApplicationRecord
   def raw
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
-    gas_price = client.eth_gas_price['result'].hex.to_i
+    gas_price = ENV['RAILS_ENV'] != 'test' ? client.eth_gas_price['result'].hex.to_i : 0
     gas_limit = ENV['GAS_LIMIT'].to_i
     contract_address = ENV['CONTRACT_ADDRESS'].without_checksum
     payload = self.transactable.payload

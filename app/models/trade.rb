@@ -52,6 +52,30 @@ class Trade < ApplicationRecord
     self.balance
   end
 
+  def maker_give_balance
+    self.order.account.balance(self.order.give_token_address)
+  end
+
+  def maker_take_balance
+    self.order.account.balance(self.order.take_token_address)
+  end
+
+  def taker_give_balance
+    self.account.balance(self.order.give_token_address)
+  end
+
+  def taker_take_balance
+    self.account.balance(self.order.take_token_address)
+  end
+
+  def fee_give_balance
+    Balance.fee(self.order.give_token_address)
+  end
+
+  def fee_take_balance
+    Balance.fee(self.order.take_token_address)
+  end
+
   # used only when a failed transaction is detected
   def refund
     exchange = Contract::Exchange.singleton.instance
@@ -275,6 +299,38 @@ class Trade < ApplicationRecord
         self.errors.add(:order, 'must have sufficient volume')
       end
     end
+  end
+
+  def calculate_maker_fee
+    formatter = Ethereum::Formatter.new
+    one_ether = formatter.to_wei(1)
+    maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
+    trade_amount_equivalence_in_take_tokens = self.order.calculate_take_amount(self.amount)
+    return (trade_amount_equivalence_in_take_tokens * maker_fee.to_i) / one_ether.to_i
+  end
+
+  def calculate_taker_fee
+    formatter = Ethereum::Formatter.new
+    one_ether = formatter.to_wei(1)
+    taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
+    return (self.amount.to_i * taker_fee.to_i) / one_ether.to_i
+  end
+
+  def maker_receiving_amount_after_fee
+    trade_amount_equivalence_in_take_tokens = self.order.calculate_take_amount(self.amount)
+    return trade_amount_equivalence_in_take_tokens.to_i - self.maker_fee.to_i
+  end
+
+  def taker_receiving_amount_after_fee
+    return self.amount.to_i - self.taker_fee.to_i
+  end
+
+  def give_amount
+    self.amount
+  end
+
+  def take_amount
+    return self.order.calculate_take_amount(self.amount)
   end
 
   private

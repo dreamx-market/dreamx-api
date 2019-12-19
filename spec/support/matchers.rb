@@ -15,7 +15,7 @@ RSpec.configure do |config|
     end
 
     failure_message do
-      "value hasn't been decreased by #{@amount}, before: #{@first}, after: #{@second}, delta: #{@delta}"
+      "value hasn't been decreased by #{@amount}, before: #{@first}, after: #{@second}, delta: #{@first - @second}"
     end
   end
 
@@ -35,7 +35,7 @@ RSpec.configure do |config|
     end
 
     failure_message do |actual|
-      "value hasn't been increased by #{@amount}, before: #{@first}, after: #{@second}, delta: #{@delta}"
+      "value hasn't been increased by #{@amount}, before: #{@first}, after: #{@second}, delta: #{@first - @second}"
     end
   end
 end
