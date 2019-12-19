@@ -4,4 +4,4 @@ one:
   base_token_address: "<%= token_addresses['ETH'] %>"
   quote_token_address: "<%= token_addresses['ONE'] %>"
   status: "active"
-  symbol: "ETH_ONE"
+  symbol: "ONE_ETH"

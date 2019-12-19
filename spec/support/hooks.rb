@@ -1,24 +1,17 @@
 RSpec.configure do |config|
-  config.before(:suite) do
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with(:truncation)
-  end
-
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
-      if Bullet.enable?
-        Bullet.start_request
-      end
+    if Bullet.enable?
+      Bullet.start_request
+    end
 
-      example.run
+    example.run
 
-      revert_environment_variables
-      Redis.current.flushdb
-      Rails.application.load_redis_config_variables
+    revert_environment_variables
+    Redis.current.flushdb
+    Rails.application.load_redis_config_variables
 
-      if Bullet.enable?
-        Bullet.end_request
-      end
+    if Bullet.enable?
+      Bullet.end_request
     end
   end
 

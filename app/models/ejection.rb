@@ -2,7 +2,7 @@ class Ejection < ApplicationRecord
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   has_one :tx, class_name: 'Transaction', as: :transactable
 
-  before_create :generate_transaction
+  before_create :build_transaction
 
   def payload
     exchange = Contract::Exchange.singleton
@@ -13,7 +13,7 @@ class Ejection < ApplicationRecord
 
   private
 
-  def generate_transaction
+  def build_transaction
     self.tx = Transaction.new({ status: 'pending' })
   end
 end

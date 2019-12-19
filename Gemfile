@@ -43,7 +43,6 @@ end
 group :test do
   gem 'action-cable-testing'
   gem 'rspec-rails', '~> 3.9.0'
-  gem 'database_cleaner'
   gem 'factory_bot_rails'
 end
 

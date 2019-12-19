@@ -13,7 +13,7 @@ class Trade < ApplicationRecord
   validate :market_must_be_active, :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
   validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum, :account_must_not_be_ejected
 
-  before_create :remove_checksum, :trade_balances, :generate_transaction
+  before_create :remove_checksum, :trade_balances, :build_transaction
   after_create :enqueue_update_ticker
 
   # debugging only, remove logging before going live
@@ -279,7 +279,7 @@ class Trade < ApplicationRecord
 
   private
 
-  def generate_transaction
+  def build_transaction
     self.tx = Transaction.new({ status: 'pending' })
   end  
 

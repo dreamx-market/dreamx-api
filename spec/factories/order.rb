@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :buy_order, class: 'Order' do
+  factory :order, class: 'Order' do
     account_address { addresses[0] }
     give_token_address { token_addresses['ETH'] }
     give_amount { '1'.to_wei }
@@ -11,6 +11,16 @@ FactoryBot.define do
     after(:build) do |order|
       order.order_hash = Order.calculate_hash(order)
       order.signature = sign_message(order.account_address, order.order_hash)
+    end
+
+    trait :buy do
+      give_token_address { token_addresses['ETH'] }
+      take_token_address { token_addresses['ONE'] }
+    end
+
+    trait :sell do
+      give_token_address { token_addresses['ONE'] }
+      take_token_address { token_addresses['ETH'] }
     end
   end
 end
