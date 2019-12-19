@@ -7,6 +7,8 @@ FactoryBot.define do
     take_amount { '0.4'.to_wei }
     nonce { get_action_nonce }
     expiry_timestamp_in_milliseconds { 1.week.from_now.to_i * 1000 }
+    filled { '0' }
+    status { 'open' }
 
     after(:build) do |order|
       order.order_hash = Order.calculate_hash(order)
@@ -21,6 +23,11 @@ FactoryBot.define do
     trait :sell do
       give_token_address { token_addresses['ONE'] }
       take_token_address { token_addresses['ETH'] }
+    end
+
+    trait :partially_filled do
+      filled { give_amount.to_i / 2 }
+      status { "partially_filled" }
     end
   end
 end
