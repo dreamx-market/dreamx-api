@@ -28,4 +28,4 @@ config/application.yml
 
 .chaindata
 
-/spec/examples.txt
+examples.txt
