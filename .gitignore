@@ -27,3 +27,5 @@ config/application.yml
 .DS_Store
 
 .chaindata
+
+spec/examples.txt
