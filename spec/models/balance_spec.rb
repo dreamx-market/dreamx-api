@@ -84,36 +84,16 @@ RSpec.describe Balance, type: :model do
     }.to have_increased {balance_with_sell_trade.total_traded}.by(trade.taker_receiving_amount_after_fee)
   end
 
-  # it "balance altering operations should be threaded", :bypass_cleaner, :focus do
-  #   balance = create(:balance)
+  it "balance altering operations should be wrapped in .with_lock" do
+    balance = create(:balance)
 
-  #   concurrently(4) do
-  #     balance.credit(1)
-  #   end
-  #   expect(balance.reload.balance.to_i).to eq(4)
-
-  #   concurrently(4) do
-  #     balance.debit(1)
-  #   end
-  #   expect(balance.reload.balance.to_i).to eq(0)
-
-  #   concurrently(4) do
-  #     balance.credit(1)
-  #     balance.hold(1)
-  #   end
-  #   expect(balance.reload.hold_balance.to_i).to eq(4)
-
-  #   concurrently(4) do
-  #     balance.spend(1)
-  #   end
-  #   expect(balance.reload.hold_balance.to_i).to eq(0)
-
-  #   concurrently(4) do
-  #     balance.credit(1)
-  #     balance.hold(1)
-  #     balance.release(1)
-  #   end
-  #   expect(balance.reload.balance.to_i).to eq(4)
-  #   expect(balance.reload.hold_balance.to_i).to eq(0)
-  # end
+    expect(balance).to receive(:with_lock).exactly(5).times do |*args, &block|
+      block.call
+    end
+    balance.credit(3)
+    balance.debit(1)
+    balance.hold(2)
+    balance.spend(1)
+    balance.release(1)
+  end
 end
