@@ -128,6 +128,11 @@ class Balance < ApplicationRecord
     Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' }).includes(:trades)
   end
 
+  def trades
+    # orders included for both sell and buy trades
+    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } ).includes(:order).or(Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :give_token_address => token_address } ).includes(:order))
+  end
+
   def sell_trades
     Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } ).includes(:order)
   end

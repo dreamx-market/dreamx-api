@@ -93,3 +93,11 @@ end
 def get_action_nonce
   Time.now.to_i * 1000 + Redis.current.incr('action_nonce')
 end
+
+def new_key
+  Eth::Key.new
+end
+
+def generate_random_transaction_hash
+  "0x#{SecureRandom.hex(32)}"
+end
