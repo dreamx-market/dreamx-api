@@ -4,7 +4,7 @@ RSpec.describe "Tickers", type: :request do
   it "GET /tickers" do
     get tickers_url, as: :json
     expect(response).to be_successful
-    expect(json['total']).to eq(1)
+    expect(json[:total]).to eq(1)
   end
 
   it "GET /tickers/:market_symbol" do

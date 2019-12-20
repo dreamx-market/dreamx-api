@@ -15,9 +15,5 @@ RSpec.describe AccountTransfersChannel, type: :channel, perform_enqueued: true d
     expect {
       withdraw.save
     }.to have_broadcasted_to("account_transfers:#{withdraw.account_address}")
-
-    expect {
-      BroadcastTransactionJob.perform_now(withdraw.tx)
-    }.to have_broadcasted_to("account_transfers:#{withdraw.account_address}")
   end
 end

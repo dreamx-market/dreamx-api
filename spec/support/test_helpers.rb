@@ -54,7 +54,7 @@ def revert_environment_variables
 end
 
 def json
-  JSON.parse(response.body)
+  JSON.parse(response.body).deep_symbolize_keys!
 end
 
 def concurrently(thread_count=4)

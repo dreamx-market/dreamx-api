@@ -40,6 +40,11 @@ class Order < ApplicationRecord
   end
 
   def has_sufficient_remaining_volume?
+    minimum_volume = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i
+    return self.remaining_volume >= minimum_volume
+  end
+
+  def remaining_volume
     if (self.is_sell) then
       attribute = :take_amount
       remaining_volume = self.take_amount.to_i - self.calculate_take_amount(self.filled.to_i)
@@ -47,8 +52,6 @@ class Order < ApplicationRecord
       attribute = :give_amount
       remaining_volume = self.give_amount.to_i - self.filled.to_i
     end
-    minimum_volume = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i
-    return remaining_volume >= minimum_volume
   end
 
   def remaining_give_amount

@@ -6,7 +6,7 @@ RSpec.describe "Orders", type: :request do
       create(:order)
       get orders_url, as: :json
       expect(response).to be_successful
-      expect(json['total']).to eq(1)
+      expect(json[:total]).to eq(1)
     end
   end
 

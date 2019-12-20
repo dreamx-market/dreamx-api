@@ -14,13 +14,13 @@ RSpec.describe AccountTradesChannel, type: :channel, perform_enqueued: true do
   end
 
   it "broadcast a message for both maker and taker when a trade's transaction is updated", :onchain do
-    trade = create(:trade)
+    trade = build(:trade)
     maker = trade.order.account_address
     taker = trade.account_address
 
     expect {
     expect {
-      BroadcastTransactionJob.perform_now(trade.tx)
+      trade.save
     }.to have_broadcasted_to("account_trades:#{taker}")
     }.to have_broadcasted_to("account_trades:#{maker}")
   end
