@@ -131,6 +131,10 @@ class Order < ApplicationRecord
     end
   end
 
+  def filled_take_minus_fee
+    self.calculate_take_amount(self.filled).to_i - self.fee.to_i
+  end
+
 	private
 
   def status_must_be_open_closed_or_partially_filled
