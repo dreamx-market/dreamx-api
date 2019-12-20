@@ -1,5 +1,9 @@
 FactoryBot.define do
   factory :balance do
+    transient do
+      funded { false }
+    end
+
     account_address { addresses[3] }
     token_address { token_addresses['ETH'] }
 
@@ -8,8 +12,10 @@ FactoryBot.define do
       balance.account = Account.new({ address: balance.account_address })
     end
 
-    after (:create) do |balance|
-      create :deposit, account: balance.account
+    after (:create) do |balance, evaluator|
+      if evaluator.funded
+        create :deposit, account: balance.account
+      end
     end
   end
 end

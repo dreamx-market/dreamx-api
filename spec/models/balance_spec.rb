@@ -25,7 +25,7 @@ RSpec.describe Balance, type: :model do
   end
 
   it "becomes unauthentic because of invalid withdrawals" do
-    balance = create(:balance)
+    balance = create(:balance, funded: true)
     withdraw = create(:withdraw, account: balance.account)
     expect(balance.reload.authentic?).to be(true)
     withdraw.amount = withdraw.amount.to_i / 2
@@ -34,7 +34,7 @@ RSpec.describe Balance, type: :model do
   end
 
   it "becomes unauthentic because of invalid trades" do
-    balance = create(:balance)
+    balance = create(:balance, funded: true)
     trade = create(:trade, account: balance.account)
     expect(balance.reload.authentic?).to be(true)
     trade.amount = trade.amount.to_i / 2
@@ -49,7 +49,7 @@ RSpec.describe Balance, type: :model do
   end
 
   it "becomes unauthentic because of invalid open orders" do
-    balance = create(:balance)
+    balance = create(:balance, funded: true)
     order = create(:order, :buy, account: balance.account)
     expect(balance.reload.authentic?).to be(true)
     order.give_amount = order.give_amount.to_i / 2
@@ -87,9 +87,15 @@ RSpec.describe Balance, type: :model do
   # it "balance altering operations should be threaded", :bypass_cleaner, :focus do
   #   balance = create(:balance)
 
+  #   pp balance.reload
+
   #   # Thread.new do
   #   #   balance.credit(1)
   #   # end
+
+  #   # sleep(5)
+
+  #   # pp balance.reload.balance
 
   #   # threads = []
   #   # 3.times do
@@ -103,10 +109,10 @@ RSpec.describe Balance, type: :model do
 
   #   # pp balance.reload.balance
 
-  #   concurrently(4) do
-  #     balance.credit(1)
-  #   end
-  #   pp balance.reload.balance
+  #   # concurrently(4) do
+  #   #   balance.credit(1)
+  #   # end
+  #   # pp balance.reload.balance
   #   # expect(balance.reload.balance).to eq(4)
   # end
 end
