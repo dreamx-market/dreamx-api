@@ -58,19 +58,22 @@ def json
 end
 
 def concurrently(thread_count=4)
-  waiting = true
-
-  threads = []
-  thread_count.times do |i|
-    thread = Thread.new do
-      true while waiting
-      yield(i)
+  expect(ActiveRecord::Base.connection.pool.size).to be >= thread_count+1
+  begin
+    waiting = true
+    threads = []
+    thread_count.times do |i|
+      thread = Thread.new do
+        true while waiting
+        yield(i)
+      end
+      threads.push(thread)
     end
-    threads.push(thread)
+    waiting = false
+    threads.each(&:join)
+  ensure
+    ActiveRecord::Base.connection_pool.disconnect!
   end
-
-  waiting = false
-  threads.each(&:join)
 end
 
 def assert_record_exists(model, records)

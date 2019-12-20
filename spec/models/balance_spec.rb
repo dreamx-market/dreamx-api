@@ -87,32 +87,33 @@ RSpec.describe Balance, type: :model do
   # it "balance altering operations should be threaded", :bypass_cleaner, :focus do
   #   balance = create(:balance)
 
-  #   pp balance.reload
+  #   concurrently(4) do
+  #     balance.credit(1)
+  #   end
+  #   expect(balance.reload.balance.to_i).to eq(4)
 
-  #   # Thread.new do
-  #   #   balance.credit(1)
-  #   # end
+  #   concurrently(4) do
+  #     balance.debit(1)
+  #   end
+  #   expect(balance.reload.balance.to_i).to eq(0)
 
-  #   # sleep(5)
+  #   concurrently(4) do
+  #     balance.credit(1)
+  #     balance.hold(1)
+  #   end
+  #   expect(balance.reload.hold_balance.to_i).to eq(4)
 
-  #   # pp balance.reload.balance
+  #   concurrently(4) do
+  #     balance.spend(1)
+  #   end
+  #   expect(balance.reload.hold_balance.to_i).to eq(0)
 
-  #   # threads = []
-  #   # 3.times do
-  #   #   thread = Thread.new do
-  #   #     balance.credit(1)
-  #   #     pp balance.balance
-  #   #   end
-  #   #   threads.push(thread)
-  #   # end
-  #   # threads.each(&:join)
-
-  #   # pp balance.reload.balance
-
-  #   # concurrently(4) do
-  #   #   balance.credit(1)
-  #   # end
-  #   # pp balance.reload.balance
-  #   # expect(balance.reload.balance).to eq(4)
+  #   concurrently(4) do
+  #     balance.credit(1)
+  #     balance.hold(1)
+  #     balance.release(1)
+  #   end
+  #   expect(balance.reload.balance.to_i).to eq(4)
+  #   expect(balance.reload.hold_balance.to_i).to eq(0)
   # end
 end
