@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :market do
     transient do
-      with_trades { false }
+      orders { 0 }
+      trades { 0 }
     end
 
     base_token_address { token_addresses['ETH'] }
@@ -13,10 +14,23 @@ FactoryBot.define do
     end
 
     after(:create) do |market, evaluator|
-      if evaluator.with_trades
-        market.enable
+      if evaluator.trades > 0
+        if (market.status != 'active')
+          market.enable
+        end
+
+        count = evaluator.trades
         order = create(:order, give_token_address: market.quote_token_address, take_token_address: market.base_token_address)
-        create(:trade, order: order)
+        create_list(:trade, count, order: order, amount: order.give_amount.to_i / count)
+      end
+
+      if evaluator.orders > 0
+        if (market.status != 'active')
+          market.enable
+        end
+
+        count = evaluator.orders
+        create_list(:order, count, give_token_address: market.quote_token_address, take_token_address: market.base_token_address)
       end
     end
   end

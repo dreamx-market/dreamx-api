@@ -6,9 +6,9 @@ class Order < ApplicationRecord
   
 	validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
-	validates :nonce, nonce: true, on: :create
+	validates :nonce, uniqueness: true
   validates :order_hash, signature: true, uniqueness: true
-  validates :filled, numericality: { :greater_than_or_equal_to => 0 }, on: :update
+  validates :filled, numericality: { :greater_than_or_equal_to => 0 }
 
 	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
   validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_be_greater_than_minimum, on: :create
@@ -41,6 +41,7 @@ class Order < ApplicationRecord
 
   def has_sufficient_remaining_volume?
     minimum_volume = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i
+    pp self.remaining_volume.to_s.from_wei, minimum_volume.to_s.from_wei
     return self.remaining_volume >= minimum_volume
   end
 
@@ -155,7 +156,7 @@ class Order < ApplicationRecord
 
 	def balance_must_exist_and_is_sufficient
 		if !self.balance || self.balance.reload.balance.to_i < give_amount.to_i then
-			errors.add(:account_address, 'insufficient balance')
+			errors.add(:account, 'insufficient balance')
 		end
 	end
 
