@@ -35,7 +35,7 @@ class Deposit < ApplicationRecord
   end
 
   def self.aggregate(block_number)
-    exchange = Contract::Exchange.new
+    exchange = Contract::Exchange.singleton
     deposits = exchange.deposits(block_number)
     deposits.each do |deposit|
       deposit['account'], deposit['token'] = deposit['account'].without_checksum, deposit['token'].without_checksum

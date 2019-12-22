@@ -52,9 +52,9 @@ class Withdraw < ApplicationRecord
 
   def payload
     exchange = Contract::Exchange.singleton
-    fun = exchange.instance.parent.functions.select { |fun| fun.name == 'withdraw'}.first
+    fun = exchange.functions('withdraw')
     args = [token_address, amount.to_i, account_address, self.token.withdraw_fee.to_i]
-    exchange.instance.parent.call_payload(fun, args)
+    exchange.call_payload(fun, args)
   end
 
   def v

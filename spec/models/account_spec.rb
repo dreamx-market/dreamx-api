@@ -12,8 +12,8 @@ RSpec.describe Account, type: :model do
     expect(Transaction.count).to eq(1)
 
     ejection = Ejection.last
-    exchange = Contract::Exchange.singleton.instance
+    exchange = Contract::Exchange.singleton
     BroadcastTransactionJob.perform_now(ejection.tx)
-    expect(exchange.call.account_manual_withdraws(account.address)).to eq(true)
+    expect(exchange.account_manual_withdraws(account.address)).to eq(true)
   end
 end

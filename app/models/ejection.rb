@@ -6,9 +6,9 @@ class Ejection < ApplicationRecord
 
   def payload
     exchange = Contract::Exchange.singleton
-    fun = exchange.instance.parent.functions.select { |fun| fun.name == 'setAccountManualWithdraws'}.first
+    fun = exchange.functions('setAccountManualWithdraws')
     args = [self.account.address, true]
-    exchange.instance.parent.call_payload(fun, args)
+    exchange.call_payload(fun, args)
   end
 
   private

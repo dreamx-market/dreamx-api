@@ -53,8 +53,8 @@ class Balance < ApplicationRecord
   end
 
   def onchain_balance
-    exchange = Contract::Exchange.singleton.instance
-    onchain_balance = exchange.call.balances(self.token_address, self.account_address)
+    exchange = Contract::Exchange.singleton
+    onchain_balance = exchange.balances(self.token_address, self.account_address)
     return onchain_balance.to_s
   end
 

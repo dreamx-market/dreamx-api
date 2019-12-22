@@ -78,15 +78,15 @@ class Trade < ApplicationRecord
 
   # used only when a failed transaction is detected
   def refund
-    exchange = Contract::Exchange.singleton.instance
+    exchange = Contract::Exchange.singleton
     maker_balance = self.order.account.balance(self.order.give_token_address)
-    maker_onchain_balance = exchange.call.balances(self.order.give_token_address, self.order.account_address)
+    maker_onchain_balance = exchange.balances(self.order.give_token_address, self.order.account_address)
     maker_give_amount = self.order.give_amount.to_i
     maker_difference = maker_give_amount - maker_onchain_balance
     # fake coins removal: if maker is giving more than he has, refund only what he has
     maker_refund_amount = maker_difference > 0 ? maker_give_amount - maker_difference : maker_give_amount
     taker_balance = self.account.balance(self.order.take_token_address)
-    taker_onchain_balance = exchange.call.balances(self.order.take_token_address, self.account_address)
+    taker_onchain_balance = exchange.balances(self.order.take_token_address, self.account_address)
     taker_give_amount = self.amount.to_i
     taker_difference = taker_give_amount - taker_onchain_balance
     # fake coins removal: if taker is giving more than he has, refund only what he has
@@ -122,13 +122,13 @@ class Trade < ApplicationRecord
     taker_s = s
 
     exchange = Contract::Exchange.singleton
-    fun = exchange.instance.parent.functions.select { |fun| fun.name == 'trade'}.first
+    fun = exchange.functions('trade')
     addresses = [maker_address, taker_address, give_token, take_token]
     uints = [give_amount, take_amount, fill_amount, maker_nonce, taker_nonce, maker_fee, taker_fee, expiry]
     v = [maker_v, taker_v]
     rs = [maker_r, maker_s, taker_r, taker_s]
     args = [addresses, uints, v, rs]
-    exchange.instance.parent.call_payload(fun, args)
+    exchange.call_payload(fun, args)
   end
 
   def v
