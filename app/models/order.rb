@@ -41,7 +41,6 @@ class Order < ApplicationRecord
 
   def has_sufficient_remaining_volume?
     minimum_volume = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i
-    pp self.remaining_volume.to_s.from_wei, minimum_volume.to_s.from_wei
     return self.remaining_volume >= minimum_volume
   end
 

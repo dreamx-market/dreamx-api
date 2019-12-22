@@ -9,11 +9,11 @@ RSpec.describe Order, type: :model do
     expect(order.has_sufficient_remaining_volume?).to be(false)
   end
 
-  it "is a sell order with insufficient volume", :focus do
+  it "is a sell order with insufficient volume" do
+    order = build(:order, :sell)
     expect(order.has_sufficient_remaining_volume?).to be(true)
     order.filled = '0.88'.to_wei
-    pp order.has_sufficient_remaining_volume?
-    # expect(order.has_sufficient_remaining_volume?).to be(false)
+    expect(order.has_sufficient_remaining_volume?).to be(false)
   end
 
   it 'must have non-zero amounts' do
