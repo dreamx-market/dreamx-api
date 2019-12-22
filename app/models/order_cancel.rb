@@ -4,9 +4,8 @@ class OrderCancel < ApplicationRecord
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
   belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
 
-  validates :nonce, nonce: true, on: :create
+  validates :nonce, uniqueness: true
   validates :cancel_hash, signature: true
-
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid, :order_must_be_valid, :account_must_not_be_ejected
 
   before_create :remove_checksum, :cancel_order
@@ -20,14 +19,14 @@ class OrderCancel < ApplicationRecord
     if (!self.order)
       return
     end
-    errors.add(:order_hash, "must be open") unless self.order.status != 'closed'
+    errors.add(:order, "must be open") unless self.order.status != 'closed'
   end
 
   def account_address_must_be_owner
     if (!self.order)
       return
     end
-    errors.add(:account_address, "must be owner") unless self.order.account_address == self.account_address
+    errors.add(:account, "must be owner") unless self.order.account_address == self.account_address
   end
 
   def cancel_hash_must_be_valid

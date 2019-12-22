@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Deposit, type: :model do
-  let (:deposit) {build(:deposit)}
+  let (:deposit) { build(:deposit) }
 
   it "must have a unique transaction_hash" do
     deposit = create(:deposit)

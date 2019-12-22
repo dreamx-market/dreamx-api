@@ -10,7 +10,7 @@ class Market < ApplicationRecord
 	validates_uniqueness_of :base_token_address, scope: [:quote_token_address]
 	validate :status_must_be_active_or_disabled, :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
 
-  before_create :remove_checksum, :assign_symbol, :create_ticker
+  before_create :remove_checksum, :assign_symbol
 
   class << self
   end
@@ -180,9 +180,5 @@ class Market < ApplicationRecord
 
   def assign_symbol
     self.symbol = "#{self.base_token.symbol}_#{self.quote_token.symbol}"
-  end
-
-  def create_ticker
-    self.ticker = Ticker.new
   end
 end
