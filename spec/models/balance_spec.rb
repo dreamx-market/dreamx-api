@@ -83,17 +83,4 @@ RSpec.describe Balance, type: :model do
     }.to have_decreased {balance_with_buy_trade.total_traded}.by(trade.take_amount)
     }.to have_increased {balance_with_sell_trade.total_traded}.by(trade.taker_receiving_amount_after_fee)
   end
-
-  it "balance altering operations should be wrapped in .with_lock" do
-    balance = create(:balance)
-
-    expect(balance).to receive(:with_lock).exactly(5).times do |*args, &block|
-      block.call
-    end
-    balance.credit(3)
-    balance.debit(1)
-    balance.hold(2)
-    balance.spend(1)
-    balance.release(1)
-  end
 end

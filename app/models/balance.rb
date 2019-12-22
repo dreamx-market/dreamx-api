@@ -201,40 +201,30 @@ class Balance < ApplicationRecord
   # balance altering operations
 
   def credit(amount)
-    self.with_lock do
-      self.balance = self.balance.to_i + amount.to_i
-      self.save!
-    end
+    self.balance = self.balance.to_i + amount.to_i
+    self.save!
   end
 
   def debit(amount)
-    self.with_lock do
-      self.balance = self.balance.to_i - amount.to_i
-      self.save!
-    end
+    self.balance = self.balance.to_i - amount.to_i
+    self.save!
   end
 
   def hold(amount)
-    self.with_lock do
-      self.balance = balance.to_i - amount.to_i
-      self.hold_balance = hold_balance.to_i + amount.to_i
-      self.save!
-    end
+    self.balance = balance.to_i - amount.to_i
+    self.hold_balance = hold_balance.to_i + amount.to_i
+    self.save!
   end
 
   def release(amount)
-    self.with_lock do
-      self.balance = balance.to_i + amount.to_i
-      self.hold_balance = hold_balance.to_i - amount.to_i
-      self.save!
-    end
+    self.balance = balance.to_i + amount.to_i
+    self.hold_balance = hold_balance.to_i - amount.to_i
+    self.save!
   end
 
   def spend(amount)
-    self.with_lock do
-      self.hold_balance = hold_balance.to_i - amount.to_i
-      self.save!
-    end
+    self.hold_balance = hold_balance.to_i - amount.to_i
+    self.save!
   end
 
   private

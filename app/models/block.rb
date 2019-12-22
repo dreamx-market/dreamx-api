@@ -35,16 +35,4 @@ class Block < ApplicationRecord
     # to an earlier block number
     Deposit.aggregate(block_number)
   end
-
-  def self.revert_to_block(block_number)
-    last_block = self.last
-
-    if !last_block
-      return
-    end
-
-    last_block.with_lock do
-      last_block.update!({ :block_number => block_number })
-    end
-  end
 end
