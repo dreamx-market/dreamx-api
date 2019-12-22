@@ -104,3 +104,31 @@ end
 def generate_random_transaction_hash
   "0x#{SecureRandom.hex(32)}"
 end
+
+def create_onchain_deposit(token_address, amount, account_address)
+  client = Ethereum::Singleton.instance
+  exchange = Contract::Exchange.singleton
+  key = Eth::Key.new(priv: private_keys[account_address])
+  contract_address = ENV['CONTRACT_ADDRESS'].without_checksum
+  # generate raw transaction
+  fun = exchange.functions('deposit')
+  args = [token_address, amount.to_i]
+  payload = exchange.call_payload(fun, args)
+  nonce = client.get_nonce(key.address)
+  args = {
+    from: key.address,
+    to: contract_address,
+    value: amount.to_i,
+    data: payload,
+    nonce: nonce.to_i,
+    gas_limit: 2000000,
+    gas_price: 0
+  }
+  tx = Eth::Tx.new(args)
+  # sign
+  tx.sign key
+  # broadcast
+  tx_hash = client.eth_send_raw_transaction(tx.hex)["result"]
+  tx = client.eth_get_transaction_by_hash(tx_hash)["result"].convert_keys_to_underscore_symbols!
+  return tx
+end

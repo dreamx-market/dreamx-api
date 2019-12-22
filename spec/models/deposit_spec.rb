@@ -15,4 +15,16 @@ RSpec.describe Deposit, type: :model do
     expect(built_deposit).to_not be_valid
     expect(built_deposit.errors.messages[:transaction_hash]).to include("can't be blank")
   end
+
+  it 'aggregates new deposits', :onchain do
+    token_address = token_addresses['ETH']
+    amount = '1'.to_wei
+    account_address = addresses[0]
+    tx = create_onchain_deposit(token_address, amount, account_address)
+    block_number = tx[:block_number].hex
+
+    expect {
+      Deposit.aggregate(block_number)
+    }.to have_increased { Deposit.count }.by(1)
+  end
 end

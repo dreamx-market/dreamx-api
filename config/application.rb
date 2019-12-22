@@ -21,6 +21,7 @@ module DreamxApi
   class Application < Rails::Application
     require 'ext/string'
     require 'ext/integer'
+    require 'ext/hash'
     require 'config'
 
     def environment_variables
