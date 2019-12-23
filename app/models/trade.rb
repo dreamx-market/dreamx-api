@@ -8,10 +8,10 @@ class Trade < ApplicationRecord
 	NON_VALIDATABLE_ATTRS = ["id", "created_at", "updated_at", "gas_fee", "transaction_hash"]
   VALIDATABLE_ATTRS = attribute_names.reject{|attr| NON_VALIDATABLE_ATTRS.include?(attr)}
   validates_presence_of VALIDATABLE_ATTRS
-	validates :nonce, nonce: true, on: :create
+	validates :nonce, uniqueness: true
   validates :trade_hash, signature: true, uniqueness: true
-  validate :market_must_be_active, :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
-  validate :trade_hash_must_be_valid, :volume_must_be_greater_than_minimum, :account_must_not_be_ejected
+  validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
+  validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum, :account_must_not_be_ejected
 
   before_create :remove_checksum, :trade_balances, :build_transaction
   after_create :enqueue_update_ticker
@@ -199,14 +199,14 @@ class Trade < ApplicationRecord
 		balance = account.balances.find_by(token_address: order.take_token_address)
 		required_balance = order.calculate_take_amount(amount)
 		if !balance || balance.balance.to_i < required_balance.to_i then
-			errors.add(:account_address, 'insufficient balance')
+			errors.add(:balance, 'is insufficient')
 		end
 	end
 
 	def trade_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
 		if (!calculated_hash or calculated_hash != self.trade_hash) then
-			errors.add(:trade_hash, "invalid")
+			errors.add(:trade_hash, "is invalid")
 		end
 	end
 
@@ -224,19 +224,23 @@ class Trade < ApplicationRecord
     return result
   end
 
-  def volume_must_be_greater_than_minimum
+  def volume
+    if (order.is_sell) then
+      return order.take_amount.to_i * amount.to_i / order.give_amount.to_i
+    else
+      return amount.to_i
+    end
+  end
+
+  def volume_must_meet_taker_minimum
     if (!order) then
       return
     end
 
-    if (order.is_sell) then
-      volume = order.take_amount.to_i * amount.to_i / order.give_amount.to_i
-    else
-      volume = amount.to_i
-    end
-
     minimum_volume = ENV['TAKER_MINIMUM_ETH_IN_WEI'].to_i
-    errors.add(:amount, "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}") unless volume >= minimum_volume
+    if self.volume < minimum_volume
+      errors.add(:amount, "must be greater than #{ENV['TAKER_MINIMUM_ETH_IN_WEI']}")
+    end
   end
 
   def trade_balances
@@ -337,13 +341,5 @@ class Trade < ApplicationRecord
 
   def enqueue_update_ticker
     UpdateMarketTickerJob.perform_later(self.market)
-  end
-
-  def market_must_be_active
-    if self.order
-      if self.market.disabled?
-        self.errors.add(:market, 'has been disabled')
-      end
-    end
   end
 end

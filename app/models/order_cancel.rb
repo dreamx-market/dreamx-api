@@ -32,7 +32,7 @@ class OrderCancel < ApplicationRecord
   def cancel_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
     if (!calculated_hash or calculated_hash != cancel_hash) then
-      errors.add(:cancel_hash, "invalid")
+      errors.add(:cancel_hash, 'is invalid')
     end
   end
 
@@ -74,7 +74,7 @@ class OrderCancel < ApplicationRecord
   def order_must_be_valid
     if self.order && !self.order.valid?
       self.order.errors.full_messages.each do |msg|
-        errors.add(:order, msg)
+        errors.add(:order, msg.downcase)
       end
     end
   end

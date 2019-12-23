@@ -89,7 +89,7 @@ RSpec.describe "Trades", type: :request do
       expected_response = {
         "code": 100,
         'reason': 'Validation failed',
-        'validation_errors': [[], [], [{'field': 'signature', 'reason': ['invalid']}]]
+        'validation_errors': [[], [], [{'field': 'signature', 'reason': ['is invalid']}]]
       }
 
       expect {

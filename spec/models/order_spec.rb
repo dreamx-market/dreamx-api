@@ -74,13 +74,13 @@ RSpec.describe Order, type: :model do
   it 'must have a valid order_hash' do
     order.order_hash = 'INVALID'
     expect(order.valid?).to eq(false)
-    expect(order.errors.messages[:order_hash]).to include('invalid')
+    expect(order.errors.messages[:order_hash]).to include('is invalid')
   end
 
   it 'must have a valid signature' do
     order.signature = 'INVALID'
     expect(order.valid?).to eq(false)
-    expect(order.errors.messages[:signature]).to include('invalid')
+    expect(order.errors.messages[:signature]).to include('is invalid')
   end
 
   it 'must be created with a sufficient balance' do

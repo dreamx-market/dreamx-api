@@ -11,7 +11,7 @@ class SignatureValidator < ActiveModel::EachValidator
       !Eth::Utils.valid_address?(record.account_address) or
       recovered_address != Eth::Utils.format_address(record.account_address)
     ) then
-      record.errors[:signature] << (options[:message] || "invalid")
+      record.errors[:signature] << (options[:message] || 'is invalid')
     end
   end
 end

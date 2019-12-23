@@ -12,7 +12,7 @@ class Order < ApplicationRecord
   validates :filled, numericality: { :equal_to => 0 }, on: :create
   validate :status_must_be_open_on_create, on: :create
 	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
-  validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_be_above_maker_minimum, on: :create
+  validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_meet_maker_minimum, on: :create
 
 	before_create :remove_checksum, :hold_balance
   after_create :enqueue_update_ticker
@@ -123,7 +123,7 @@ class Order < ApplicationRecord
     end
   end
 
-  def volume_must_be_above_maker_minimum
+  def volume_must_meet_maker_minimum
     if (self.is_sell) then
       attribute = :take_amount
     else
@@ -179,7 +179,7 @@ class Order < ApplicationRecord
 	def order_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
 		if (!calculated_hash or calculated_hash != order_hash) then
-			errors.add(:order_hash, "invalid")
+			errors.add(:order_hash, 'is invalid')
 		end
 	end
 
@@ -202,7 +202,7 @@ class Order < ApplicationRecord
 	def addresses_must_be_valid
 		[:account_address, :give_token_address, :take_token_address].each do |key|
 			if !Eth::Address.new(eval(key.to_s)).valid? then
-				errors.add(key, "invalid #{key.to_s}")
+				errors.add(key, 'is invalid')
 			end
 		end
 	end

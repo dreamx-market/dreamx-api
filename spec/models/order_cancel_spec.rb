@@ -32,18 +32,18 @@ RSpec.describe OrderCancel, type: :model do
   it 'has a valid cancel_hash' do
     order_cancel.cancel_hash = 'INVALID'
     expect(order_cancel.valid?).to eq(false)
-    expect(order_cancel.errors.messages[:cancel_hash]).to include('invalid')
+    expect(order_cancel.errors.messages[:cancel_hash]).to include('is invalid')
   end
 
   it 'has a valid signature' do
     order_cancel.signature = 'INVALID'
     expect(order_cancel.valid?).to eq(false)
-    expect(order_cancel.errors.messages[:signature]).to include('invalid')
+    expect(order_cancel.errors.messages[:signature]).to include('is invalid')
   end
 
   it 'displays validation errors for the associated order' do
     order_cancel.order.signature = 'INVALID'
     expect(order_cancel.valid?).to eq(false)
-    expect(order_cancel.errors.messages[:order]).to include('Signature invalid')
+    expect(order_cancel.errors.messages[:order]).to include('signature is invalid')
   end
 end
