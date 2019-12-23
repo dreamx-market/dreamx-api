@@ -156,7 +156,6 @@ ActiveRecord::Schema.define(version: 2019_12_19_125712) do
     t.string "nonce"
     t.string "trade_hash"
     t.string "signature"
-    t.uuid "uuid", default: -> { "gen_random_uuid()" }
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "fee", default: "0"

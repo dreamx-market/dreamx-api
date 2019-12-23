@@ -105,6 +105,10 @@ def generate_random_transaction_hash
   "0x#{SecureRandom.hex(32)}"
 end
 
+def generate_random_address
+  "0x#{SecureRandom.hex(20)}"
+end
+
 def create_onchain_deposit(token_address, amount, account_address)
   client = Ethereum::Singleton.instance
   exchange = Contract::Exchange.singleton

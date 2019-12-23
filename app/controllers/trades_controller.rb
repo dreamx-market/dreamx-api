@@ -77,7 +77,7 @@ class TradesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def trades_params
       params.require('_json').map do |p|
-        p.permit(:account_address, :order_hash, :amount, :nonce, :trade_hash, :signature, :uuid)
+        p.permit(:account_address, :order_hash, :amount, :nonce, :trade_hash, :signature)
       end
     end
 end
