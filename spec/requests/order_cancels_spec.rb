@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "OrderCancels", type: :request do
   describe "POST /order_cancels" do
     it "cancels an order" do
-      order = build(:order, :partially_filled)
+      order = build(:order)
       order_cancel = build(:order_cancel, order: order)
 
       expect {

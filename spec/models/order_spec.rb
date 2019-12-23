@@ -2,18 +2,45 @@ require 'rails_helper'
 
 RSpec.describe Order, type: :model do
   let (:order) { build(:order) }
+  let (:maker_minimum) { ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i }
 
-  it "is a buy order with insufficient volume" do
-    expect(order.has_sufficient_remaining_volume?).to be(true)
+  it "is a buy order with volume below taker minimum" do
+    expect(order.remaining_volume_is_above_taker_minimum?).to be(true)
     order.filled = '0.955'.to_wei
-    expect(order.has_sufficient_remaining_volume?).to be(false)
+    expect(order.remaining_volume_is_above_taker_minimum?).to be(false)
   end
 
-  it "is a sell order with insufficient volume" do
-    order = build(:order, :sell)
-    expect(order.has_sufficient_remaining_volume?).to be(true)
+  it "is a sell order with volume below taker minimum" do
+    order = build(:order, :sell, take_amount: ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i / 2)
+    expect(order.remaining_volume_is_above_taker_minimum?).to be(true)
     order.filled = '0.88'.to_wei
-    expect(order.has_sufficient_remaining_volume?).to be(false)
+    expect(order.remaining_volume_is_above_taker_minimum?).to be(false)
+  end
+
+  it 'must have a volume above maker minimum as a buy order on create' do
+    order = build(:order, :buy)
+    order.give_amount = maker_minimum - 1
+    expect(order.valid?).to eq(false)
+    expect(order.errors.messages[:give_amount]).to include("must be greater than #{maker_minimum}")
+  end
+
+  it 'must have a volume above maker minium as a sell order on create' do
+    order = build(:order, :sell)
+    order.take_amount = maker_minimum - 1
+    expect(order.valid?).to eq(false)
+    expect(order.errors.messages[:take_amount]).to include("must be greater than #{maker_minimum}")
+  end
+
+  it 'must not be filled on create' do
+    order.filled = order.give_amount.to_i / 2
+    expect(order.valid?).to eq(false)
+    expect(order.errors.messages[:filled]).to include('must be equal to 0')
+  end
+
+  it 'must have a non-open status on create' do
+    order.status = 'closed'
+    expect(order.valid?).to eq(false)
+    expect(order.errors.messages[:status]).to include('must be open')
   end
 
   it 'must have non-zero amounts' do
@@ -84,5 +111,13 @@ RSpec.describe Order, type: :model do
     order.market.disable
     expect(order.valid?).to eq(false)
     expect(order.errors.messages[:market]).to include('has been disabled')
+  end
+
+  it 'does not get invalidated when MAKER_MINIMUM_ETH_IN_WEI is updated' do
+    order = create(:order)
+    new_minimum = (order.remaining_volume * 2).to_s
+    with_modified_env MAKER_MINIMUM_ETH_IN_WEI: new_minimum do
+      expect(order.valid?).to eq(true)
+    end
   end
 end

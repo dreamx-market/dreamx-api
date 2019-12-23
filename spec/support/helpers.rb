@@ -132,3 +132,7 @@ def create_onchain_deposit(token_address, amount, account_address)
   tx = client.eth_get_transaction_by_hash(tx_hash)["result"].convert_keys_to_underscore_symbols!
   return tx
 end
+
+def with_modified_env(options, &block)
+  ClimateControl.modify(options, &block)
+end
