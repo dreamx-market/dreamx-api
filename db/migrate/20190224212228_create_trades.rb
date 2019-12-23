@@ -7,6 +7,7 @@ class CreateTrades < ActiveRecord::Migration[5.2]
       t.string :nonce
       t.string :trade_hash
       t.string :signature
+      t.uuid :uuid, default: 'gen_random_uuid()'
 
       t.timestamps
     end
