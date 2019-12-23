@@ -12,7 +12,8 @@ class Withdraw < ApplicationRecord
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balance_must_exist_and_is_sufficient, on: :create
 
-  before_create :remove_checksum, :collect_fee_and_debit_balance, :build_transaction
+  after_initialize :build_transaction, if: :new_record?
+  before_create :remove_checksum, :collect_fee_and_debit_balance
   
   def balance
     self.account.balance(self.token_address)

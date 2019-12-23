@@ -1,5 +1,5 @@
 RSpec.configure do |config|
-  RSpec::Matchers.define :have_decreased do
+  RSpec::Matchers.define :decrease do
     supports_block_expectations
 
     match do |block|
@@ -19,7 +19,7 @@ RSpec.configure do |config|
     end
   end
 
-  RSpec::Matchers.define :have_increased do
+  RSpec::Matchers.define :increase do
     supports_block_expectations
 
     match do |block|

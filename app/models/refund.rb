@@ -8,6 +8,9 @@ class Refund < ApplicationRecord
   private
 
     def credit_balance
-      self.balance.credit(self.amount)
+      balance = self.balance
+      balance.with_lock do
+        balance.credit(self.amount)
+      end
     end
 end

@@ -13,9 +13,9 @@ RSpec.describe "OrderCancels", type: :request do
         order.reload
         expect(response).to be_successful
         expect(order.status).to eq('closed')
-      }.to have_increased { order.balance.balance }.by(order.remaining_give_amount)
-      }.to have_decreased { order.balance.hold_balance }.by(order.remaining_give_amount)
-      }.to have_increased { OrderCancel.count }.by(1)
+      }.to increase { order.balance.balance }.by(order.remaining_give_amount)
+      }.to decrease { order.balance.hold_balance }.by(order.remaining_give_amount)
+      }.to increase { OrderCancel.count }.by(1)
     end
 
     it "cancels multiple orders" do
@@ -24,7 +24,7 @@ RSpec.describe "OrderCancels", type: :request do
       expect {
         post order_cancels_url, params: order_cancels, as: :json
         expect(response).to be_successful
-      }.to have_increased { OrderCancel.count }.by(3)
+      }.to increase { OrderCancel.count }.by(3)
     end
 
     it "rollbacks the whole batch if there is an invalid order cancel" do
@@ -34,7 +34,7 @@ RSpec.describe "OrderCancels", type: :request do
       expect {
         post order_cancels_url, params: order_cancels, as: :json
         expect(response).to_not be_successful
-      }.to have_increased { OrderCancel.count }.by(0)
+      }.to increase { OrderCancel.count }.by(0)
     end
   end
 end

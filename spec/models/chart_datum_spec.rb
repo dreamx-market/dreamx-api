@@ -4,7 +4,7 @@ RSpec.describe ChartDatum, type: :model do
   it 'aggregates new data for each market' do
     expect {
       ChartDatum.aggregate(1.hour)
-    }.to have_increased { ChartDatum.count }.by(markets.count)
+    }.to increase { ChartDatum.count }.by(markets.count)
   end
 
   it 'removes expired data' do
@@ -12,6 +12,6 @@ RSpec.describe ChartDatum, type: :model do
 
     expect {
       ChartDatum.remove_expired
-    }.to have_decreased { ChartDatum.count }.by(1)
+    }.to decrease { ChartDatum.count }.by(1)
   end
 end

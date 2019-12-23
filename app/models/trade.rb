@@ -13,7 +13,8 @@ class Trade < ApplicationRecord
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum, :account_must_not_be_ejected
 
-  before_create :remove_checksum, :trade_balances, :build_transaction
+  after_initialize :build_transaction, if: :new_record?
+  before_create :remove_checksum, :trade_balances
   after_create :enqueue_update_ticker
 
   # debugging only, remove logging before going live

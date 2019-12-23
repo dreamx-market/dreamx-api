@@ -25,7 +25,7 @@ RSpec.describe Deposit, type: :model do
 
     expect {
       Deposit.aggregate(block_number)
-    }.to have_increased { Deposit.count }.by(1)
+    }.to increase { Deposit.count }.by(1)
   end
 
   it 'must belong to an existing account' do
@@ -55,6 +55,6 @@ RSpec.describe Deposit, type: :model do
 
     expect {
       deposit.save
-    }.to have_increased { balance.reload.balance }.by(deposit.amount)
+    }.to increase { balance.reload.balance }.by(deposit.amount)
   end
 end

@@ -12,9 +12,9 @@ RSpec.describe "Withdraws", type: :request do
         post withdraws_url, params: withdraw, as: :json
         expect(response).to have_http_status(201)
         expect(balance.reload.onchain_delta).to eq(0)
-      }.to have_increased { Withdraw.count }.by(1)
-      }.to have_increased { Transaction.count }.by(1)
-      }.to have_decreased { balance.reload.balance }.by(withdraw.amount)
+      }.to increase { Withdraw.count }.by(1)
+      }.to increase { Transaction.count }.by(1)
+      }.to decrease { balance.reload.balance }.by(withdraw.amount)
     end
   end
 end

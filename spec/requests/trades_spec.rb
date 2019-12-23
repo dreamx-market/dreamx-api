@@ -63,14 +63,14 @@ RSpec.describe "Trades", type: :request do
         expect(taker_take.onchain_delta).to eq(0)
         expect(fee_give.onchain_delta).to eq(0)
         expect(fee_take.onchain_delta).to eq(0)
-      }.to have_increased { Trade.count }.by(1)
-      }.to have_increased { Transaction.count }.by(1)
-      }.to have_decreased { maker_give.hold_balance }.by(trade.amount)
-      }.to have_increased { maker_take.balance }.by(trade.maker_receiving_amount_after_fee)
-      }.to have_increased { taker_give.balance }.by(trade.taker_receiving_amount_after_fee)
-      }.to have_decreased { taker_take.balance }.by(trade.take_amount)
-      }.to have_increased { fee_give.balance }.by(trade.taker_fee)
-      }.to have_increased { fee_take.balance }.by(trade.maker_fee)
+      }.to increase { Trade.count }.by(1)
+      }.to increase { Transaction.count }.by(1)
+      }.to decrease { maker_give.hold_balance }.by(trade.amount)
+      }.to increase { maker_take.balance }.by(trade.maker_receiving_amount_after_fee)
+      }.to increase { taker_give.balance }.by(trade.taker_receiving_amount_after_fee)
+      }.to decrease { taker_take.balance }.by(trade.take_amount)
+      }.to increase { fee_give.balance }.by(trade.taker_fee)
+      }.to increase { fee_take.balance }.by(trade.maker_fee)
     end
 
     it "batch-creates an array of trades" do
@@ -79,7 +79,7 @@ RSpec.describe "Trades", type: :request do
       expect {
         post trades_url, params: trades, as: :json
         expect(response).to have_http_status(:created)
-      }.to have_increased { Trade.count }.by(3)
+      }.to increase { Trade.count }.by(3)
     end
 
     it "rollbacks all trades if one is invalid" do
@@ -96,7 +96,7 @@ RSpec.describe "Trades", type: :request do
         post trades_url, params: trades, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         expect(json).to eq(expected_response)
-      }.to have_increased { Trade.count }.by(0)
+      }.to increase { Trade.count }.by(0)
     end
 
     it "closes the order after filling if remaining volume doesn't meet minimum volume" do
@@ -108,7 +108,7 @@ RSpec.describe "Trades", type: :request do
         post trades_url, params: [trade], as: :json
         expect(response).to have_http_status(:created)
         order.reload
-      }.to have_increased { Trade.count }.by(1)
+      }.to increase { Trade.count }.by(1)
       }.to change { order.status }.to('closed')
     end
   end

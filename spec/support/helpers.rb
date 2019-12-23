@@ -140,3 +140,9 @@ end
 def with_modified_env(options, &block)
   ClimateControl.modify(options, &block)
 end
+
+def get_last_confirmed_nonce
+  client = Ethereum::Singleton.instance
+  key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
+  last_confirmed_nonce = client.get_nonce(key.address) - 1
+end

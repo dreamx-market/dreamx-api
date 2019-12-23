@@ -61,7 +61,7 @@ RSpec.describe Balance, type: :model do
     balance = create(:balance)
     expect {
       balance.refund("1".to_wei)
-    }.to have_increased { Refund.count }.by(1)
+    }.to increase { Refund.count }.by(1)
     expect(balance.reload.authentic?).to be(true)
   end
 
@@ -78,9 +78,9 @@ RSpec.describe Balance, type: :model do
     expect {
     expect {
       trade.save
-    }.to have_decreased {balance_with_sell_order.total_traded}.by(order.give_amount)
-    }.to have_increased {balance_with_buy_order.total_traded}.by(trade.maker_receiving_amount_after_fee)
-    }.to have_decreased {balance_with_buy_trade.total_traded}.by(trade.take_amount)
-    }.to have_increased {balance_with_sell_trade.total_traded}.by(trade.taker_receiving_amount_after_fee)
+    }.to decrease {balance_with_sell_order.total_traded}.by(order.give_amount)
+    }.to increase {balance_with_buy_order.total_traded}.by(trade.maker_receiving_amount_after_fee)
+    }.to decrease {balance_with_buy_trade.total_traded}.by(trade.take_amount)
+    }.to increase {balance_with_sell_trade.total_traded}.by(trade.taker_receiving_amount_after_fee)
   end
 end

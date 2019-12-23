@@ -27,9 +27,9 @@ RSpec.describe "Orders", type: :request do
       expect {
         post orders_url, params: order, as: :json
         expect(response).to be_successful
-      }.to have_decreased { order.balance.balance }.by(order.give_amount)
-      }.to have_increased { order.balance.hold_balance }.by(order.give_amount)
-      }.to have_increased { Order.count }.by(1)
+      }.to decrease { order.balance.balance }.by(order.give_amount)
+      }.to increase { order.balance.hold_balance }.by(order.give_amount)
+      }.to increase { Order.count }.by(1)
     end
   end
 end

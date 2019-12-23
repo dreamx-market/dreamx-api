@@ -1,6 +1,5 @@
 class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
-  has_many :transaction_logs
 
   before_create :assign_nonce, :sign
   after_create_commit :broadcast
@@ -70,15 +69,10 @@ class Transaction < ApplicationRecord
     # debugging only, remove this in production
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
-      AppLogger.log("#{transaction.transaction_hash} has been replaced")
+      AppLogger.log("#{self.transaction_hash} has been replaced")
       return
     end
 
-    log_message = "replaced, last_onchain_nonce: #{last_onchain_nonce}, nonce: #{self.nonce}"
-    if self.transaction_hash
-      log_message = log_message + ", transaction_hash: #{self.transaction_hash}"
-    end
-    self.transaction_logs.build({ message: log_message })
     self.status = 'replaced'
     Config.set('read_only', 'true')
   end
@@ -87,11 +81,10 @@ class Transaction < ApplicationRecord
     # debugging only, remove this before going live
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
-      AppLogger.log("#{self.id} failed")
+      AppLogger.log("#{self.transaction_hash} failed")
       return
     end
 
-    self.transaction_logs.build({ message: "failed" })
     self.status = 'failed'
     self.transactable.refund
   end
@@ -100,11 +93,10 @@ class Transaction < ApplicationRecord
     # debugging only, remove this before going live
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
-      AppLogger.log("#{self.id} ran out of gas")
+      AppLogger.log("#{self.transaction_hash} ran out of gas")
       return
     end
 
-    self.transaction_logs.build({ message: "out_of_gas" })
     self.status = 'out_of_gas'
   end
 
@@ -137,7 +129,7 @@ class Transaction < ApplicationRecord
   end
 
   def self.broadcast_expired_transactions
-    if (!self.has_unconfirmed_and_pending_transactions? and self.has_replaced_transactions?)
+    if (self.has_replaced_transactions?)
       self.regenerate_replaced_transactions
     end
 
@@ -155,6 +147,10 @@ class Transaction < ApplicationRecord
   end
 
   def self.regenerate_replaced_transactions
+    if (self.has_unconfirmed_and_pending_transactions?)
+      return
+    end
+
     self.sync_nonce
     replaced_transactions = self.replaced.sort_by { |transaction| transaction.nonce.to_i }
     replaced_transactions.each do |transaction|
@@ -231,6 +227,10 @@ class Transaction < ApplicationRecord
   end
 
   def expired?
+    if (self.status == 'confirmed')
+      return false
+    end
+
     if (!self.broadcasted_at)
       return true
     end
