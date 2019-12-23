@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_23_131027) do
+ActiveRecord::Schema.define(version: 2019_12_23_131357) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -164,14 +164,6 @@ ActiveRecord::Schema.define(version: 2019_12_23_131027) do
     t.index ["trade_hash"], name: "index_trades_on_trade_hash"
   end
 
-  create_table "transaction_logs", force: :cascade do |t|
-    t.bigint "transaction_id"
-    t.text "message"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["transaction_id"], name: "index_transaction_logs_on_transaction_id"
-  end
-
   create_table "transactions", force: :cascade do |t|
     t.string "transactable_type"
     t.integer "transactable_id"
@@ -211,5 +203,4 @@ ActiveRecord::Schema.define(version: 2019_12_23_131027) do
   end
 
   add_foreign_key "refunds", "balances"
-  add_foreign_key "transaction_logs", "transactions"
 end
