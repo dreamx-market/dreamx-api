@@ -1,13 +1,11 @@
 class Withdraw < ApplicationRecord
-  attr_accessor :mock_balance_onchain_balance
-
   include AccountNonEjectable
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
   has_one :tx, class_name: 'Transaction', as: :transactable
 
-  validates :nonce, nonce: true, on: :create
+  validates :nonce, uniqueness: true
   validates :withdraw_hash, signature: true, uniqueness: true
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balance_must_exist_and_is_sufficient, on: :create
@@ -21,16 +19,11 @@ class Withdraw < ApplicationRecord
 
   # used when there are failing transactions
   def refund
-    # mock_balance_onchain_balance is used for testing only
-    if self.mock_balance_onchain_balance
-      onchain_balance = self.mock_balance_onchain_balance.to_i
-    else
-      onchain_balance = self.balance.onchain_balance.to_i
-    end
+    onchain_balance = self.balance.onchain_balance.to_i
     withdraw_amount = self.amount.to_i
-    difference = withdraw_amount - onchain_balance
+    delta = withdraw_amount - onchain_balance
     # fake coins removal: if user is withdrawing more than he has, refund only what he has
-    refund_amount = difference > 0 ? withdraw_amount - difference : withdraw_amount
+    refund_amount = delta > 0 ? withdraw_amount - delta : withdraw_amount
     self.account.balance(self.token_address).refund(refund_amount)
   end
 
@@ -73,7 +66,7 @@ class Withdraw < ApplicationRecord
   def withdraw_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
     if (!calculated_hash or calculated_hash != withdraw_hash) then
-      errors.add(:withdraw_hash, "invalid")
+      errors.add(:withdraw_hash, "is invalid")
     end
   end
 
@@ -97,7 +90,7 @@ class Withdraw < ApplicationRecord
     end
 
     if (self.amount.to_i < self.token.withdraw_minimum.to_i)
-      errors.add(:amount, "must be greater than #{self.token.withdraw_minimum.from_wei}")
+      errors.add(:amount, "must be greater than #{self.token.withdraw_minimum}")
     end
   end
 
@@ -108,7 +101,7 @@ class Withdraw < ApplicationRecord
 
     balance = self.account.balances.find_by(token_address: self.token_address)
     if !balance || balance.balance.to_i < self.amount.to_i then
-      errors.add(:account_address, 'insufficient balance')
+      errors.add(:account, 'has insufficient balance')
     end
   end
 

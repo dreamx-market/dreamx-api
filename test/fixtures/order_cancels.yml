@@ -1,8 +1,0 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  order_hash: "0x0af93d915d9a51b02decd8aa3eb178834ef27e2bde33356989e834c742e27f4e"
-  account_address: "0xbfd525710ecb49a266337683971bac0d72d746a6"
-  nonce: "1551351258000"
-  cancel_hash: "0xc832fa1532fb59ee696ca2168ae6d95368373357070a75f5d09b555027a60cf1"
-  signature: "0x948950ff55b7dd02a623ba7ad0eaf83fc838ea2dc34de671519650b4f86f39924506f56a6beed3b25f421d49d3329a5df114db8ddaf2ef132bd2e6cfc4c31e641b"
