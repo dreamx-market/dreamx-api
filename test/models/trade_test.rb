@@ -11,10 +11,6 @@ class TradeTest < ActiveSupport::TestCase
 		ENV['CONTRACT_ADDRESS'] = @old_contract_address
 	end
 
-	test "must have a uuid" do
-		assert_not_nil @trade.uuid
-	end
-
 	test "account_address must have sufficient balance" do
     new_trade = Trade.new({ :account_address => @trade.account_address, :order_hash => @trade.order_hash, :amount => @trade.amount.to_i * 1000 })
 		assert_not new_trade.valid?
