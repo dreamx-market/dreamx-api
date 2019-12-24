@@ -83,4 +83,23 @@ RSpec.describe Withdraw, type: :model do
     }.to increase { Refund.count }.by(1)
     }.to increase { non_stubbed_balance.reload.balance }.by(onchain_balance)
   end
+
+  it 'debits balance after created with lock' do
+    balance = withdraw.balance
+
+    expect_any_instance_of(Balance).to receive(:with_lock).once do |&block|
+      block.call
+    end
+
+    expect {
+      withdraw.save
+      expect(withdraw.reload.fee).to_not be_nil
+    }.to decrease { balance.reload.balance }.by(withdraw.amount)
+  end
+
+  it 'calculates withdrawal fee' do
+    withdraw.token.update({ withdraw_fee: '0.03'.to_wei })
+    withdraw.amount = '1'.to_wei
+    expect(withdraw.calculate_fee.to_s).to eq('0.03'.to_wei)
+  end
 end

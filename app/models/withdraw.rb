@@ -13,7 +13,7 @@ class Withdraw < ApplicationRecord
   validate :balance_must_exist_and_is_sufficient, on: :create
 
   after_initialize :build_transaction, if: :new_record?
-  before_create :remove_checksum, :collect_fee_and_debit_balance
+  before_create :remove_checksum, :set_fee_and_debit_balance_with_lock
   
   def balance
     self.account.balance(self.token_address)
@@ -107,13 +107,19 @@ class Withdraw < ApplicationRecord
     end
   end
 
+  def calculate_fee
+    return (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
+  end
+
   private
 
-  def collect_fee_and_debit_balance
-    fee_balance = Balance.fee(self.token_address)
-    self.fee = (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
-    self.account.balance(self.token_address).debit(self.amount)
-    fee_balance.credit(self.fee)
+  def set_fee_and_debit_balance_with_lock
+    self.fee = self.calculate_fee
+
+    balance = self.balance
+    balance.with_lock do
+      self.account.balance(self.token_address).debit(self.amount)
+    end
   end
 
   def build_transaction
