@@ -41,10 +41,10 @@ class Deposit < ApplicationRecord
         :account_address => deposit['account'],
         :token_address => deposit['token'],
         :amount => deposit['amount'],
-        :status => 'confirmed',
         :transaction_hash => deposit['transaction_hash'],
         :block_hash => deposit['block_hash'],
-        :block_number => deposit['block_number']
+        :block_number => deposit['block_number'],
+        :status => 'confirmed'
       }
       begin
         self.create!(new_deposit)

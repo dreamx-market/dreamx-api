@@ -322,14 +322,6 @@ class Trade < ApplicationRecord
     return self.amount.to_i - self.taker_fee.to_i
   end
 
-  def give_amount
-    self.amount
-  end
-
-  def take_amount
-    return self.order.calculate_take_amount(self.amount)
-  end
-
   private
 
   def build_transaction
