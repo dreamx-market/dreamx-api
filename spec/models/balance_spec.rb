@@ -83,4 +83,16 @@ RSpec.describe Balance, type: :model do
     }.to decrease {balance_with_buy_trade.total_traded}.by(trade.take_amount)
     }.to increase {balance_with_sell_trade.total_traded}.by(trade.taker_receiving_amount_after_fee)
   end
+
+  it 'marks balance fraud with lock' do
+    balance = create(:balance)
+
+    expect_any_instance_of(Balance).to receive(:with_lock).once do |&block|
+      block.call
+    end
+
+    expect {
+      balance.mark_fraud
+    }.to change { balance.reload.fraud }
+  end
 end

@@ -46,7 +46,7 @@ RSpec.describe Deposit, type: :model do
     expect(deposit.errors.messages[:amount]).to include('must be greater than 0')
   end
 
-  it 'credits balance with pessimistic lock after created' do
+  it 'credits balance after created with lock' do
     balance = deposit.balance
 
     expect_any_instance_of(Balance).to receive(:with_lock).once do |&block|
