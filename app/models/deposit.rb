@@ -6,7 +6,7 @@ class Deposit < ApplicationRecord
   validates :amount, numericality: { greater_than: 0 }
   validates :transaction_hash, uniqueness: true, on: :create
 
-  before_create :remove_checksum, :credit_balance
+  before_create :remove_checksum, :credit_balance_with_lock
   after_commit { AccountTransfersRelayJob.perform_later(self) }
 
   def balance
@@ -24,7 +24,7 @@ class Deposit < ApplicationRecord
 
   private
 
-  def credit_balance
+  def credit_balance_with_lock
     balance = self.balance
     balance.with_lock do
       balance.credit(self.amount)

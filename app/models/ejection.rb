@@ -2,6 +2,8 @@ class Ejection < ApplicationRecord
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   has_one :tx, class_name: 'Transaction', as: :transactable
 
+  validates :account_address, uniqueness: true
+
   after_initialize :build_transaction, if: :new_record?
 
   def payload
