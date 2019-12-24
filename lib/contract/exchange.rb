@@ -26,7 +26,6 @@ module Contract
       deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
 
       incoming_transactions = []
-      deposit_logs = []
       (from..to).step(1) do |i|
         block = client.eth_get_block_by_number(i, true)['result']
         if block
@@ -41,6 +40,8 @@ module Contract
           end
         end
       end
+
+      deposit_logs = []
       incoming_transactions.each do |t|
         transaction = client.eth_get_transaction_receipt(t['hash'])
         transaction['result']['logs'].each do |log|
