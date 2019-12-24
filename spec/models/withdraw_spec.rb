@@ -93,7 +93,6 @@ RSpec.describe Withdraw, type: :model do
 
     expect {
       withdraw.save
-      expect(withdraw.reload.fee).to_not be_nil
     }.to decrease { balance.reload.balance }.by(withdraw.amount)
   end
 

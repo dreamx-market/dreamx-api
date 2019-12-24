@@ -91,27 +91,27 @@ class Order < ApplicationRecord
 
   # order altering operations
 
-  def fill(amount, fee)
-    self.with_lock do
-      self.filled = self.filled.to_i + amount.to_i
-      self.fee = self.fee.to_i + fee.to_i
+  def fill(amount, fee=0)
+    self.filled = self.filled.to_i + amount.to_i
+    self.fee = self.fee.to_i + fee.to_i
 
-      if self.filled.to_i == self.give_amount.to_i or !self.remaining_volume_is_above_taker_minimum? then
-        remaining = self.give_amount.to_i - self.filled.to_i
-        self.account.balance(self.give_token_address).release(remaining)
-        self.status = 'closed'
-        self.save!
-      else
-        self.status = 'partially_filled'
-        self.save!
-      end
+    if self.remaining_give_amount == 0 or !self.remaining_volume_is_above_taker_minimum? then
+      self.balance.release(self.remaining_give_amount)
+      self.status = 'closed'
+      self.save!
+    else
+      self.status = 'partially_filled'
+      self.save!
     end
+  end
+
+  def remaining_give_amount
+    self.give_amount.to_i - self.filled.to_i
   end
 
   def cancel
     self.with_lock do
-      remaining = self.give_amount.to_i - self.filled.to_i
-      self.account.balance(self.give_token_address).release(remaining)
+      self.balance.release(self.remaining_give_amount)
       self.status = 'closed'
       self.save!
     end

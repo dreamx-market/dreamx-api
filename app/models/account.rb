@@ -21,6 +21,10 @@ class Account < ApplicationRecord
     Balance.find_or_create_by({ :account_address => self.address, :token_address => token_address })
   end
 
+  def create_balance_if_not_exist(token_address_or_symbol)
+    self.balance(token_address_or_symbol)
+  end
+
   def eject
     self.with_lock do
       self.close_all_open_orders

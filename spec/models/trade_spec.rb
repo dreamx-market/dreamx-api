@@ -54,7 +54,19 @@ RSpec.describe Trade, type: :model do
     expect(trade.errors.messages[:order]).to include('must have sufficient volume')
   end
 
-  # it 'trades balances with locks' do
+  it 'trades balances with locks' do
+    allow(Balance).to receive(:lock).and_call_original
+    
+    trade.trade_balances_with_lock
 
-  # end
+    expect(Balance).to have_received(:lock).once
+  end
+
+  it 'fills order with locks' do
+    allow(trade.order).to receive(:with_lock).and_call_original
+
+    trade.fill_order_with_lock
+
+    expect(trade.order).to have_received(:with_lock).once
+  end
 end

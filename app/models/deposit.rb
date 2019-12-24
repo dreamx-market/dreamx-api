@@ -23,14 +23,14 @@ class Deposit < ApplicationRecord
     self.account.address
   end
 
-  private
-
   def credit_balance_with_lock
     balance = self.balance
     balance.with_lock do
       balance.credit(self.amount)
     end
   end
+
+  private
 
   def self.aggregate(block_number)
     exchange = Contract::Exchange.singleton

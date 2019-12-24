@@ -13,7 +13,7 @@ class Trade < ApplicationRecord
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum, :account_must_not_be_ejected
 
   after_initialize :build_transaction, if: :new_record?
-  before_create :remove_checksum, :trade_balances
+  before_create :remove_checksum, :calculate_fees_and_total, :fill_order_with_lock, :trade_balances_with_lock
   after_create :enqueue_update_ticker
 
   # debugging only, remove logging before going live
@@ -50,22 +50,6 @@ class Trade < ApplicationRecord
 
   def taker_balance
     self.balance
-  end
-
-  def maker_give_balance
-    self.order.account.balance(self.order.give_token_address)
-  end
-
-  def maker_take_balance
-    self.order.account.balance(self.order.take_token_address)
-  end
-
-  def taker_give_balance
-    self.account.balance(self.order.give_token_address)
-  end
-
-  def taker_take_balance
-    self.account.balance(self.order.take_token_address)
   end
 
   def fee_give_balance
@@ -243,36 +227,52 @@ class Trade < ApplicationRecord
     end
   end
 
-  def trade_balances
-    formatter = Ethereum::Formatter.new
-    one_ether = formatter.to_wei(1)
-    maker_address = order.account_address
-    taker_address = account_address
-    fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
-    maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
-    taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
-    trade_amount_equivalence_in_take_tokens = order.calculate_take_amount(amount)
-    maker_fee_amount = (trade_amount_equivalence_in_take_tokens * maker_fee.to_i) / one_ether.to_i
-    taker_fee_amount = (amount.to_i * taker_fee.to_i) / one_ether.to_i
+  def maker_give_balance
+    self.order.account.balance(self.order.give_token_address)
+  end
 
-    maker_give_balance = Balance.find_by({ :account_address => maker_address, :token_address => order.give_token_address })
-    maker_give_balance.spend(amount)
+  def maker_take_balance
+    self.order.account.balance(self.order.take_token_address)
+  end
 
-    taker_give_balance = Balance.find_or_create_by({ :account_address => taker_address, :token_address => order.give_token_address })
-    taker_receiving_amount_minus_fee = amount.to_i - taker_fee_amount.to_i
-    taker_give_balance.credit(taker_receiving_amount_minus_fee)
-    self.fee = taker_fee_amount
-    self.maker_fee = maker_fee_amount
+  def taker_give_balance
+    self.account.balance(self.order.give_token_address)
+  end
 
-    maker_take_balance = Balance.find_or_create_by({ :account_address => maker_address, :token_address => order.take_token_address })
-    maker_receiveing_amount_minus_fee = trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
-    maker_take_balance.credit(maker_receiveing_amount_minus_fee)
-    order.fill(amount, maker_fee_amount)
+  def taker_take_balance
+    self.account.balance(self.order.take_token_address)
+  end
 
-    taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.take_token_address })
-    taker_take_balance.debit(trade_amount_equivalence_in_take_tokens)
+  def maker
+    self.order.account
+  end
 
-    self.total = self.is_sell ? self.amount : trade_amount_equivalence_in_take_tokens
+  def taker
+    self.account
+  end
+
+  def fill_order_with_lock
+    order = self.order
+    order.with_lock do
+      order.fill(amount, self.maker_fee)
+    end
+  end
+
+  def trade_balances_with_lock
+    ActiveRecord::Base.transaction do
+      maker.create_balance_if_not_exist(take_token_address)
+      taker.create_balance_if_not_exist(give_token_address)
+      balances = Balance.lock.where({ account_address: [maker_address, taker_address], token_address: [give_token_address, take_token_address] }).includes([:token, :account])
+      maker_give_balance = balances.find { |b| b.account_address == maker_address && b.token_address == give_token_address }
+      taker_give_balance = balances.find { |b| b.account_address == taker_address && b.token_address == give_token_address }
+      maker_take_balance = balances.find { |b| b.account_address == maker_address && b.token_address == take_token_address }
+      taker_take_balance = balances.find { |b| b.account_address == taker_address && b.token_address == take_token_address }
+
+      maker_give_balance.spend(amount)
+      taker_give_balance.credit(self.taker_receiving_amount_after_fee)
+      maker_take_balance.credit(self.maker_receiving_amount_after_fee)
+      taker_take_balance.debit(self.take_amount)
+    end
   end
 
   def order_must_be_open
@@ -292,16 +292,14 @@ class Trade < ApplicationRecord
   end
 
   def calculate_maker_fee
-    formatter = Ethereum::Formatter.new
-    one_ether = formatter.to_wei(1)
+    one_ether = '1'.to_wei
     maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
     trade_amount_equivalence_in_take_tokens = self.order.calculate_take_amount(self.amount)
     return (trade_amount_equivalence_in_take_tokens * maker_fee.to_i) / one_ether.to_i
   end
 
   def calculate_taker_fee
-    formatter = Ethereum::Formatter.new
-    one_ether = formatter.to_wei(1)
+    one_ether = '1'.to_wei
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
     return (self.amount.to_i * taker_fee.to_i) / one_ether.to_i
   end
@@ -323,6 +321,12 @@ class Trade < ApplicationRecord
 
   def remove_checksum
     self.account_address = self.account_address.without_checksum
+  end
+
+  def calculate_fees_and_total
+    self.fee = self.calculate_taker_fee
+    self.maker_fee = self.calculate_maker_fee
+    self.total = self.is_sell ? self.amount : self.take_amount
   end
 
   def enqueue_update_ticker
