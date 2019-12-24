@@ -264,9 +264,6 @@ class Trade < ApplicationRecord
     self.fee = taker_fee_amount
     self.maker_fee = maker_fee_amount
 
-    fee_give_balance = Balance.find_or_create_by({ :account_address => fee_address, :token_address => order.give_token_address })
-    fee_give_balance.credit(taker_fee_amount)
-
     maker_take_balance = Balance.find_or_create_by({ :account_address => maker_address, :token_address => order.take_token_address })
     maker_receiveing_amount_minus_fee = trade_amount_equivalence_in_take_tokens - maker_fee_amount.to_i
     maker_take_balance.credit(maker_receiveing_amount_minus_fee)
@@ -274,9 +271,6 @@ class Trade < ApplicationRecord
 
     taker_take_balance = Balance.find_by({ :account_address => taker_address, :token_address => order.take_token_address })
     taker_take_balance.debit(trade_amount_equivalence_in_take_tokens)
-
-    fee_take_balance = Balance.find_or_create_by({ :account_address => fee_address, :token_address => order.take_token_address })
-    fee_take_balance.credit(maker_fee_amount)
 
     self.total = self.is_sell ? self.amount : trade_amount_equivalence_in_take_tokens
   end

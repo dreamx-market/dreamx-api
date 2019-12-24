@@ -36,8 +36,7 @@ class TradesController < ApplicationController
       @trades = []
       ActiveRecord::Base.transaction do
         trades_params.each do |trade_param|
-          trade = Trade.create!(trade_param)
-          @trades.push(trade)
+          @trades.push(Trade.create!(trade_param))
         end
       end
       render :show, status: :created

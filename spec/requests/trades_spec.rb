@@ -43,11 +43,7 @@ RSpec.describe "Trades", type: :request do
       maker_take = trade.maker_take_balance
       taker_give = trade.taker_give_balance
       taker_take = trade.taker_take_balance
-      fee_give = trade.fee_give_balance
-      fee_take = trade.fee_take_balance
 
-      expect {
-      expect {
       expect {
       expect {
       expect {
@@ -56,21 +52,17 @@ RSpec.describe "Trades", type: :request do
       expect {
         post trades_url, params: [trade], as: :json
         expect(response).to have_http_status(:created)
-        maker_give.reload; maker_take.reload; taker_give.reload; taker_take.reload; fee_give.reload; fee_take.reload
+        maker_give.reload; maker_take.reload; taker_give.reload; taker_take.reload
         expect(maker_give.onchain_delta).to eq(0)
         expect(maker_take.onchain_delta).to eq(0)
         expect(taker_give.onchain_delta).to eq(0)
         expect(taker_take.onchain_delta).to eq(0)
-        expect(fee_give.onchain_delta).to eq(0)
-        expect(fee_take.onchain_delta).to eq(0)
       }.to increase { Trade.count }.by(1)
       }.to increase { Transaction.count }.by(1)
       }.to decrease { maker_give.hold_balance }.by(trade.amount)
       }.to increase { maker_take.balance }.by(trade.maker_receiving_amount_after_fee)
       }.to increase { taker_give.balance }.by(trade.taker_receiving_amount_after_fee)
       }.to decrease { taker_take.balance }.by(trade.take_amount)
-      }.to increase { fee_give.balance }.by(trade.taker_fee)
-      }.to increase { fee_take.balance }.by(trade.maker_fee)
     end
 
     it "batch-creates an array of trades" do

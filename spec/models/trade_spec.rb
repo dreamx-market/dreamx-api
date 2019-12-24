@@ -53,4 +53,8 @@ RSpec.describe Trade, type: :model do
     expect(trade.valid?).to eq(false)
     expect(trade.errors.messages[:order]).to include('must have sufficient volume')
   end
+
+  # it 'trades balances with locks' do
+
+  # end
 end
