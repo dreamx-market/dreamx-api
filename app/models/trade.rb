@@ -3,6 +3,7 @@ class Trade < ApplicationRecord
 
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
+  belongs_to :balance
   has_one :tx, class_name: 'Transaction', as: :transactable
 
   validates :trade_hash, :nonce, uniqueness: true
@@ -12,7 +13,7 @@ class Trade < ApplicationRecord
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum, :account_must_not_be_ejected
 
-  after_initialize :build_transaction, if: :new_record?
+  before_validation :set_balance, :build_transaction, on: :create
   before_create :remove_checksum, :calculate_fees_and_total, :fill_order_with_lock, :trade_balances_with_lock
   after_create :enqueue_update_ticker
 
@@ -38,10 +39,6 @@ class Trade < ApplicationRecord
       taker_take_hold_balance: #{taker_take_balance.hold_balance.to_s.from_wei}, taker_take_real_hold_balance: #{taker_take_balance.real_hold_balance.to_s.from_wei}, difference: #{taker_take_balance.hold_balance.to_i - taker_take_balance.real_hold_balance.to_i}
     }
     AppLogger.log(log_message)
-  end
-
-  def balance
-    self.account.balance(self.order.take_token_address)
   end
 
   def maker_balance
@@ -315,10 +312,6 @@ class Trade < ApplicationRecord
 
   private
 
-  def build_transaction
-    self.tx = Transaction.new({ status: 'pending' })
-  end  
-
   def remove_checksum
     self.account_address = self.account_address.without_checksum
   end
@@ -331,5 +324,15 @@ class Trade < ApplicationRecord
 
   def enqueue_update_ticker
     UpdateMarketTickerJob.perform_later(self.market)
+  end
+
+  def set_balance
+    if self.account && self.order
+      self.balance = self.account.balance(self.order.take_token_address)
+    end
+  end
+
+  def build_transaction
+    self.tx ||= Transaction.new({ status: 'pending' })
   end
 end

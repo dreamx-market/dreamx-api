@@ -69,4 +69,8 @@ RSpec.describe Trade, type: :model do
 
     expect(trade.order).to have_received(:with_lock).once
   end
+
+  it 'belongs to a balance' do
+    expect(trade.balance).to_not be_nil
+  end
 end

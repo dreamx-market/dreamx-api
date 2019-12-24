@@ -1,18 +1,16 @@
 class Deposit < ApplicationRecord
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
+  belongs_to :balance
 
   validates :transaction_hash, uniqueness: true
   validates :transaction_hash, presence: true
   
   validates :amount, numericality: { greater_than: 0 }
 
+  before_validation :set_balance, on: :create
   before_create :remove_checksum, :credit_balance_with_lock
   after_commit { AccountTransfersRelayJob.perform_later(self) }
-
-  def balance
-    self.account.balance(self.token_address)
-  end
 
   # to distinguish this model from withdraws when being displayed a mixed collection of transfers
   def type
@@ -58,5 +56,11 @@ class Deposit < ApplicationRecord
   def remove_checksum
     self.account_address = self.account_address.without_checksum
     self.token_address = self.token_address.without_checksum
+  end
+
+  def set_balance
+    if self.account && self.token
+      self.balance = self.account.balance(self.token.address)
+    end
   end
 end

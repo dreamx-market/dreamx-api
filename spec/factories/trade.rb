@@ -6,6 +6,7 @@ FactoryBot.define do
     nonce { get_action_nonce }
 
     after(:build) do |trade|
+      trade.valid?
       trade.trade_hash = Trade.calculate_hash(trade)
       trade.signature = sign_message(trade.account_address, trade.trade_hash)
       trade.fee = trade.calculate_taker_fee

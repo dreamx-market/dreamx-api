@@ -120,4 +120,8 @@ RSpec.describe Order, type: :model do
       expect(order.valid?).to eq(true)
     end
   end
+
+  it 'belongs to a balance' do
+    expect(order.balance).to_not be_nil
+  end
 end

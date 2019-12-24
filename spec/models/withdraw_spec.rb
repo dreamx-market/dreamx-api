@@ -101,4 +101,8 @@ RSpec.describe Withdraw, type: :model do
     withdraw.amount = '1'.to_wei
     expect(withdraw.calculate_fee.to_s).to eq('0.03'.to_wei)
   end
+
+  it 'belongs to a balance' do
+    expect(withdraw.balance).to_not be_nil
+  end
 end

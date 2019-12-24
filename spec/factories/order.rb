@@ -13,6 +13,7 @@ FactoryBot.define do
     expiry_timestamp_in_milliseconds { 1.week.from_now.to_i * 1000 }
 
     after(:build) do |order|
+      order.valid?
       order.order_hash = Order.calculate_hash(order)
       order.signature = sign_message(order.account_address, order.order_hash)
     end

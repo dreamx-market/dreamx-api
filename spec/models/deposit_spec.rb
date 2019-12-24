@@ -46,11 +46,15 @@ RSpec.describe Deposit, type: :model do
     expect(deposit.errors.messages[:amount]).to include('must be greater than 0')
   end
 
-  # it 'credits balance after created with lock', :focus do
-  #   allow(deposit.balance).to receive(:with_lock).and_call_original
+  it 'belongs to a balance' do
+    expect(deposit.balance).to_not be_nil
+  end
 
-  #   deposit.credit_balance_with_lock
+  it 'credits balance after created with lock' do
+    allow(deposit.balance).to receive(:with_lock).and_call_original
 
-  #   expect(deposit.balance).to have_received(:with_lock).once
-  # end
+    deposit.credit_balance_with_lock
+
+    expect(deposit.balance).to have_received(:with_lock).once
+  end
 end

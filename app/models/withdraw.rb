@@ -3,6 +3,7 @@ class Withdraw < ApplicationRecord
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
+  belongs_to :balance
   has_one :tx, class_name: 'Transaction', as: :transactable
 
   validates :nonce, :withdraw_hash, uniqueness: true
@@ -12,12 +13,8 @@ class Withdraw < ApplicationRecord
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balance_must_exist_and_is_sufficient, on: :create
 
-  after_initialize :build_transaction, if: :new_record?
+  before_validation :set_balance, :build_transaction, on: :create
   before_create :remove_checksum, :set_fee, :debit_balance_with_lock
-  
-  def balance
-    self.account.balance(self.token_address)
-  end
 
   # used when there are failing transactions
   def refund
@@ -124,12 +121,18 @@ class Withdraw < ApplicationRecord
     end
   end
 
-  def build_transaction
-    self.tx = Transaction.new({ status: 'pending' })
-  end
-
   def remove_checksum
     self.account_address = self.account_address.without_checksum
     self.token_address = self.token_address.without_checksum
+  end
+
+  def set_balance
+    if self.account && self.token
+      self.balance = self.account.balance(self.token.address)
+    end
+  end
+
+  def build_transaction
+    self.tx ||= Transaction.new({ status: 'pending' })
   end
 end

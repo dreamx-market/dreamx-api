@@ -3,6 +3,7 @@ class OrderCancel < ApplicationRecord
   
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
   belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
+  belongs_to :balance
 
   validates :cancel_hash, :nonce, uniqueness: true
   validates :order_hash, :account_address, :nonce, :cancel_hash, :signature, presence: true
@@ -10,12 +11,9 @@ class OrderCancel < ApplicationRecord
   validates :cancel_hash, signature: true
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid, :order_must_be_valid, :account_must_not_be_ejected
 
+  before_validation :set_balance, on: :create
   before_create :remove_checksum, :cancel_order
   after_create :enqueue_update_ticker
-
-  def balance
-    self.account.balance(self.order.give_token_address)
-  end
 
   def order_must_be_open
     if (!self.order)
@@ -78,6 +76,12 @@ class OrderCancel < ApplicationRecord
       self.order.errors.full_messages.each do |msg|
         errors.add(:order, msg.downcase)
       end
+    end
+  end
+
+  def set_balance
+    if self.account && self.order
+      self.balance = self.account.balance(self.order.give_token.address)
     end
   end
 end

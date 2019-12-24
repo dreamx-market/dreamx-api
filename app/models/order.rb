@@ -2,7 +2,10 @@ class Order < ApplicationRecord
   include AccountNonEjectable
 
   has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
+  has_one :give_token, class_name: 'Token', foreign_key: 'address', primary_key: 'give_token_address'
+  has_one :take_token, class_name: 'Token', foreign_key: 'address', primary_key: 'take_token_address'
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
+  belongs_to :balance
   
   validates :order_hash, :nonce, uniqueness: true
   validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
@@ -16,6 +19,7 @@ class Order < ApplicationRecord
 	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
   validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_meet_maker_minimum, on: :create
 
+  before_validation :set_balance, on: :create
 	before_create :remove_checksum, :hold_balance
   after_create :enqueue_update_ticker
   after_commit { 
@@ -34,18 +38,6 @@ class Order < ApplicationRecord
 
   def type
     return self.is_sell ? 'sell' : 'buy'
-  end
-
-  def give_token
-    Token.find_by({ address: self.give_token_address })
-  end
-
-  def take_token
-    Token.find_by({ address: self.take_token_address })
-  end
-
-  def balance
-    self.account.balance(self.give_token_address)
   end
 
   def remaining_give_amount
@@ -230,6 +222,12 @@ class Order < ApplicationRecord
 
     if self.market.disabled?
       self.errors.add(:market, 'has been disabled')
+    end
+  end
+
+  def set_balance
+    if self.account && self.give_token
+      self.balance = self.account.balance(self.give_token.address)
     end
   end
 end

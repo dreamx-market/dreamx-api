@@ -4,7 +4,7 @@ class Ejection < ApplicationRecord
 
   validates :account_address, uniqueness: true
 
-  after_initialize :build_transaction, if: :new_record?
+  before_validation :build_transaction, on: :create
 
   def payload
     exchange = Contract::Exchange.singleton
@@ -15,7 +15,7 @@ class Ejection < ApplicationRecord
 
   private
 
-  def build_transaction
-    self.tx = Transaction.new({ status: 'pending' })
-  end
+    def build_transaction
+      self.tx = Transaction.new({ status: 'pending' })
+    end
 end
