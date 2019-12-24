@@ -2,9 +2,10 @@ class Deposit < ApplicationRecord
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
 
+  validates :transaction_hash, uniqueness: true
   validates :transaction_hash, presence: true
+  
   validates :amount, numericality: { greater_than: 0 }
-  validates :transaction_hash, uniqueness: true, on: :create
 
   before_create :remove_checksum, :credit_balance_with_lock
   after_commit { AccountTransfersRelayJob.perform_later(self) }
