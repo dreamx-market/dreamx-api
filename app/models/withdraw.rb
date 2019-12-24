@@ -5,8 +5,10 @@ class Withdraw < ApplicationRecord
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
   has_one :tx, class_name: 'Transaction', as: :transactable
 
-  validates :nonce, uniqueness: true
-  validates :withdraw_hash, signature: true, uniqueness: true
+  validates :nonce, :withdraw_hash, uniqueness: true
+  validates :account_address, :amount, :token_address, :nonce, :withdraw_hash, :signature, presence: true
+
+  validates :withdraw_hash, signature: true
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balance_must_exist_and_is_sufficient, on: :create
 

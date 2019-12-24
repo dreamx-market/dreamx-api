@@ -190,7 +190,7 @@ ActiveRecord::Schema.define(version: 2019_12_23_131357) do
   end
 
   create_table "withdraws", force: :cascade do |t|
-    t.string "account_address"
+    t.string "account_address", null: false
     t.string "amount"
     t.string "token_address"
     t.string "nonce"
