@@ -5,11 +5,10 @@ class Trade < ApplicationRecord
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
   has_one :tx, class_name: 'Transaction', as: :transactable
 
-	NON_VALIDATABLE_ATTRS = ["id", "created_at", "updated_at", "gas_fee", "transaction_hash"]
-  VALIDATABLE_ATTRS = attribute_names.reject{|attr| NON_VALIDATABLE_ATTRS.include?(attr)}
-  validates_presence_of VALIDATABLE_ATTRS
-	validates :nonce, uniqueness: true
-  validates :trade_hash, signature: true, uniqueness: true
+  validates :trade_hash, :nonce, uniqueness: true
+  validates :account_address, :order_hash, :amount, :nonce, :trade_hash, :signature, :fee, :total, :maker_fee, presence: true
+
+  validates :trade_hash, signature: true
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum, :account_must_not_be_ejected
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_23_131357) do
+ActiveRecord::Schema.define(version: 2019_12_24_112751) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -62,17 +62,17 @@ ActiveRecord::Schema.define(version: 2019_12_23_131357) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status"
-    t.string "transaction_hash"
+    t.string "transaction_hash", null: false
     t.string "block_hash"
     t.string "block_number"
-    t.index ["transaction_hash"], name: "index_deposits_on_transaction_hash"
+    t.index ["transaction_hash"], name: "index_deposits_on_transaction_hash", unique: true
   end
 
   create_table "ejections", force: :cascade do |t|
     t.string "account_address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_address"], name: "index_ejections_on_account_address"
+    t.index ["account_address"], name: "index_ejections_on_account_address", unique: true
   end
 
   create_table "markets", force: :cascade do |t|
@@ -87,32 +87,32 @@ ActiveRecord::Schema.define(version: 2019_12_23_131357) do
   end
 
   create_table "order_cancels", force: :cascade do |t|
-    t.string "order_hash"
-    t.string "account_address"
-    t.string "nonce"
-    t.string "cancel_hash"
-    t.string "signature"
+    t.string "order_hash", null: false
+    t.string "account_address", null: false
+    t.string "nonce", null: false
+    t.string "cancel_hash", null: false
+    t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["cancel_hash"], name: "index_order_cancels_on_cancel_hash"
+    t.index ["cancel_hash", "nonce"], name: "index_order_cancels_on_cancel_hash_and_nonce", unique: true
   end
 
   create_table "orders", force: :cascade do |t|
-    t.string "account_address"
-    t.string "give_token_address"
-    t.string "give_amount"
-    t.string "take_token_address"
-    t.string "take_amount"
-    t.string "nonce"
-    t.string "expiry_timestamp_in_milliseconds"
-    t.string "order_hash"
-    t.string "signature"
+    t.string "account_address", null: false
+    t.string "give_token_address", null: false
+    t.string "give_amount", null: false
+    t.string "take_token_address", null: false
+    t.string "take_amount", null: false
+    t.string "nonce", null: false
+    t.string "expiry_timestamp_in_milliseconds", null: false
+    t.string "order_hash", null: false
+    t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "filled", default: "0"
     t.string "status", default: "open", comment: "open, partially_filled, closed"
     t.string "fee", default: "0"
-    t.index ["order_hash"], name: "index_orders_on_order_hash"
+    t.index ["order_hash", "nonce"], name: "index_orders_on_order_hash_and_nonce", unique: true
   end
 
   create_table "refunds", force: :cascade do |t|
@@ -150,18 +150,18 @@ ActiveRecord::Schema.define(version: 2019_12_23_131357) do
   end
 
   create_table "trades", force: :cascade do |t|
-    t.string "account_address"
-    t.string "order_hash"
-    t.string "amount"
-    t.string "nonce"
-    t.string "trade_hash"
-    t.string "signature"
+    t.string "account_address", null: false
+    t.string "order_hash", null: false
+    t.string "amount", null: false
+    t.string "nonce", null: false
+    t.string "trade_hash", null: false
+    t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "fee", default: "0"
-    t.string "total", default: "0"
-    t.string "maker_fee", default: "0"
-    t.index ["trade_hash"], name: "index_trades_on_trade_hash"
+    t.string "fee", default: "0", null: false
+    t.string "total", default: "0", null: false
+    t.string "maker_fee", default: "0", null: false
+    t.index ["trade_hash", "nonce"], name: "index_trades_on_trade_hash_and_nonce", unique: true
   end
 
   create_table "transactions", force: :cascade do |t|
@@ -191,15 +191,15 @@ ActiveRecord::Schema.define(version: 2019_12_23_131357) do
 
   create_table "withdraws", force: :cascade do |t|
     t.string "account_address", null: false
-    t.string "amount"
-    t.string "token_address"
-    t.string "nonce"
-    t.string "withdraw_hash"
-    t.string "signature"
+    t.string "amount", null: false
+    t.string "token_address", null: false
+    t.string "nonce", null: false
+    t.string "withdraw_hash", null: false
+    t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "fee"
-    t.index ["withdraw_hash"], name: "index_withdraws_on_withdraw_hash"
+    t.index ["withdraw_hash", "nonce"], name: "index_withdraws_on_withdraw_hash_and_nonce", unique: true
   end
 
   add_foreign_key "refunds", "balances"
