@@ -14,16 +14,26 @@ class Withdraw < ApplicationRecord
   validate :balance_must_exist_and_is_sufficient, on: :create
 
   before_validation :set_balance, :build_transaction, on: :create
-  before_create :remove_checksum, :set_fee, :debit_balance_with_lock
+  before_validation :remove_checksum
+  before_create :set_fee, :debit_balance_with_lock
+  before_save :remove_checksum
 
-  # used when there are failing transactions
+  # used by transaction.mark_failed
   def refund
+    if !self.persisted?
+      raise 'cannot refund unpersisted withdrawals'
+    end
+
     onchain_balance = self.balance.onchain_balance.to_i
     withdraw_amount = self.amount.to_i
     delta = withdraw_amount - onchain_balance
     # fake coins removal: if user is withdrawing more than he has, refund only what he has
-    refund_amount = delta > 0 ? withdraw_amount - delta : withdraw_amount
-    self.account.balance(self.token_address).refund(refund_amount)
+    refund_amount = delta > 0 ? onchain_balance : withdraw_amount
+
+    balance = self.balance
+    balance.with_lock do
+      balance.refund(refund_amount)
+    end
   end
 
   def transaction_hash
@@ -122,8 +132,10 @@ class Withdraw < ApplicationRecord
   end
 
   def remove_checksum
-    self.account_address = self.account_address.without_checksum
-    self.token_address = self.token_address.without_checksum
+    if self.account_address.is_a_valid_address? && self.token_address.is_a_valid_address?
+      self.account_address = self.account_address.without_checksum
+      self.token_address = self.token_address.without_checksum
+    end
   end
 
   def set_balance

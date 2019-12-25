@@ -4,21 +4,18 @@ class Deposit < ApplicationRecord
   belongs_to :balance
 
   validates :transaction_hash, uniqueness: true
-  validates :transaction_hash, presence: true
+  validates :transaction_hash, :account_address, :token_address, :amount, :status, :block_hash, :block_number, presence: true
   
   validates :amount, numericality: { greater_than: 0 }
 
   before_validation :set_balance, on: :create
-  before_create :remove_checksum, :credit_balance_with_lock
+  before_validation :remove_checksum
+  before_create :credit_balance_with_lock
   after_commit { AccountTransfersRelayJob.perform_later(self) }
 
   # to distinguish this model from withdraws when being displayed a mixed collection of transfers
   def type
     'deposit'
-  end
-
-  def account_address
-    self.account.address
   end
 
   def credit_balance_with_lock
@@ -54,8 +51,10 @@ class Deposit < ApplicationRecord
   end
 
   def remove_checksum
-    self.account_address = self.account_address.without_checksum
-    self.token_address = self.token_address.without_checksum
+    if self.account_address.is_a_valid_address? && self.token_address.is_a_valid_address?
+      self.account_address = self.account_address.without_checksum
+      self.token_address = self.token_address.without_checksum
+    end
   end
 
   def set_balance

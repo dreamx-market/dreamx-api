@@ -3,7 +3,9 @@ class Trade < ApplicationRecord
 
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
-  belongs_to :balance
+  belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
+  belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
+  alias_attribute :balance, :take_balance
   has_one :tx, class_name: 'Transaction', as: :transactable
 
   validates :trade_hash, :nonce, uniqueness: true
@@ -14,7 +16,8 @@ class Trade < ApplicationRecord
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum, :account_must_not_be_ejected
 
   before_validation :set_balance, :build_transaction, on: :create
-  before_create :remove_checksum, :calculate_fees_and_total, :fill_order_with_lock, :trade_balances_with_lock
+  before_validation :remove_checksum
+  before_create :calculate_fees_and_total, :fill_order_with_lock, :trade_balances_with_lock
   after_create :enqueue_update_ticker
 
   # debugging only, remove logging before going live
@@ -57,22 +60,28 @@ class Trade < ApplicationRecord
     Balance.fee(self.order.take_token_address)
   end
 
-  # used only when a failed transaction is detected
+  # used by transaction.mark_failed
   def refund
-    exchange = Contract::Exchange.singleton
-    maker_balance = self.order.account.balance(self.order.give_token_address)
-    maker_onchain_balance = exchange.balances(self.order.give_token_address, self.order.account_address)
-    maker_give_amount = self.order.give_amount.to_i
-    maker_difference = maker_give_amount - maker_onchain_balance
+    if !self.persisted?
+      raise 'cannot refund unpersisted trades'
+    end
+
+    maker_onchain_balance = self.maker_balance.onchain_balance
+    maker_giving_amount = self.give_amount
+    maker_delta = maker_giving_amount.to_i - maker_onchain_balance.to_i
     # fake coins removal: if maker is giving more than he has, refund only what he has
-    maker_refund_amount = maker_difference > 0 ? maker_give_amount - maker_difference : maker_give_amount
-    taker_balance = self.account.balance(self.order.take_token_address)
-    taker_onchain_balance = exchange.balances(self.order.take_token_address, self.account_address)
-    taker_give_amount = self.amount.to_i
-    taker_difference = taker_give_amount - taker_onchain_balance
+    maker_refund_amount = maker_delta > 0 ? maker_onchain_balance : maker_giving_amount
+
+    taker_onchain_balance = self.taker_balance.onchain_balance
+    taker_giving_amount = self.take_amount
+    taker_delta = taker_giving_amount.to_i - taker_onchain_balance.to_i
     # fake coins removal: if taker is giving more than he has, refund only what he has
-    taker_refund_amount =  taker_difference > 0 ? taker_give_amount - taker_difference : taker_give_amount
+    taker_refund_amount =  taker_delta > 0 ? taker_onchain_balance : taker_giving_amount
+
     ActiveRecord::Base.transaction do
+      locked_balances = Balance.lock.where({ id: [self.maker_balance.id, self.taker_balance.id] }).includes([:token, :account])
+      maker_balance = locked_balances.find { |b| b.account_address == self.maker_address && b.token_address == self.give_token_address }
+      taker_balance = locked_balances.find { |b| b.account_address == self.taker_address && b.token_address == self.take_token_address }
       maker_balance.refund(maker_refund_amount)
       taker_balance.refund(taker_refund_amount)
     end
@@ -173,13 +182,11 @@ class Trade < ApplicationRecord
   end
 
 	def balance_must_exist_and_is_sufficient
-		if (!account || !order) then
+		if !self.balance || !self.order
 			return
 		end
 
-		balance = account.balances.find_by(token_address: order.take_token_address)
-		required_balance = order.calculate_take_amount(amount)
-		if !balance || balance.balance.to_i < required_balance.to_i then
+		if self.balance.balance.to_i < self.take_amount.to_i
 			errors.add(:balance, 'is insufficient')
 		end
 	end
@@ -225,19 +232,19 @@ class Trade < ApplicationRecord
   end
 
   def maker_give_balance
-    self.order.account.balance(self.order.give_token_address)
+    self.order.give_balance
   end
 
   def maker_take_balance
-    self.order.account.balance(self.order.take_token_address)
+    self.order.take_balance
   end
 
   def taker_give_balance
-    self.account.balance(self.order.give_token_address)
+    self.give_balance
   end
 
   def taker_take_balance
-    self.account.balance(self.order.take_token_address)
+    self.take_balance
   end
 
   def maker
@@ -259,13 +266,13 @@ class Trade < ApplicationRecord
     ActiveRecord::Base.transaction do
       maker.create_balance_if_not_exist(take_token_address)
       taker.create_balance_if_not_exist(give_token_address)
-      balances = Balance.lock.where({ account_address: [maker_address, taker_address], token_address: [give_token_address, take_token_address] }).includes([:token, :account])
-      maker_give_balance = balances.find { |b| b.account_address == maker_address && b.token_address == give_token_address }
-      taker_give_balance = balances.find { |b| b.account_address == taker_address && b.token_address == give_token_address }
-      maker_take_balance = balances.find { |b| b.account_address == maker_address && b.token_address == take_token_address }
-      taker_take_balance = balances.find { |b| b.account_address == taker_address && b.token_address == take_token_address }
+      locked_balances = Balance.lock.where({ account_address: [maker_address, taker_address], token_address: [give_token_address, take_token_address] }).includes([:token, :account])
+      maker_give_balance = locked_balances.find { |b| b.account_address == maker_address && b.token_address == give_token_address }
+      taker_give_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == give_token_address }
+      maker_take_balance = locked_balances.find { |b| b.account_address == maker_address && b.token_address == take_token_address }
+      taker_take_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == take_token_address }
 
-      maker_give_balance.spend(amount)
+      maker_give_balance.spend(self.amount)
       taker_give_balance.credit(self.taker_receiving_amount_after_fee)
       maker_take_balance.credit(self.maker_receiving_amount_after_fee)
       taker_take_balance.debit(self.take_amount)
@@ -313,7 +320,9 @@ class Trade < ApplicationRecord
   private
 
   def remove_checksum
-    self.account_address = self.account_address.without_checksum
+    if self.account_address.is_a_valid_address?
+      self.account_address = self.account_address.without_checksum
+    end
   end
 
   def calculate_fees_and_total
@@ -328,7 +337,8 @@ class Trade < ApplicationRecord
 
   def set_balance
     if self.account && self.order
-      self.balance = self.account.balance(self.order.take_token_address)
+      self.give_balance = self.account.balance(self.order.give_token.address)
+      self.take_balance = self.account.balance(self.order.take_token.address)
     end
   end
 

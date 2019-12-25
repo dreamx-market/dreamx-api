@@ -56,15 +56,15 @@ ActiveRecord::Schema.define(version: 2019_12_24_213226) do
   end
 
   create_table "deposits", force: :cascade do |t|
-    t.string "account_address"
-    t.string "token_address"
-    t.string "amount"
+    t.string "account_address", null: false
+    t.string "token_address", null: false
+    t.string "amount", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "status"
+    t.string "status", null: false
     t.string "transaction_hash", null: false
-    t.string "block_hash"
-    t.string "block_number"
+    t.string "block_hash", null: false
+    t.string "block_number", null: false
     t.bigint "balance_id", null: false
     t.index ["transaction_hash"], name: "index_deposits_on_transaction_hash", unique: true
   end
@@ -114,7 +114,8 @@ ActiveRecord::Schema.define(version: 2019_12_24_213226) do
     t.string "filled", default: "0"
     t.string "status", default: "open", comment: "open, partially_filled, closed"
     t.string "fee", default: "0"
-    t.bigint "balance_id", null: false
+    t.bigint "give_balance_id", null: false
+    t.bigint "take_balance_id", null: false
     t.index ["order_hash", "nonce"], name: "index_orders_on_order_hash_and_nonce", unique: true
   end
 
@@ -164,7 +165,8 @@ ActiveRecord::Schema.define(version: 2019_12_24_213226) do
     t.string "fee", default: "0", null: false
     t.string "total", default: "0", null: false
     t.string "maker_fee", default: "0", null: false
-    t.bigint "balance_id", null: false
+    t.bigint "give_balance_id", null: false
+    t.bigint "take_balance_id", null: false
     t.index ["trade_hash", "nonce"], name: "index_trades_on_trade_hash_and_nonce", unique: true
   end
 
@@ -194,7 +196,7 @@ ActiveRecord::Schema.define(version: 2019_12_24_213226) do
   end
 
   create_table "withdraws", force: :cascade do |t|
-    t.string "account_address"
+    t.string "account_address", null: false
     t.string "amount", null: false
     t.string "token_address", null: false
     t.string "nonce", null: false

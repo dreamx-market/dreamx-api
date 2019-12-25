@@ -5,7 +5,9 @@ class Order < ApplicationRecord
   has_one :give_token, class_name: 'Token', foreign_key: 'address', primary_key: 'give_token_address'
   has_one :take_token, class_name: 'Token', foreign_key: 'address', primary_key: 'take_token_address'
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
-  belongs_to :balance
+  belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
+  belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
+  alias_attribute :balance, :give_balance
   
   validates :order_hash, :nonce, uniqueness: true
   validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
@@ -226,8 +228,9 @@ class Order < ApplicationRecord
   end
 
   def set_balance
-    if self.account && self.give_token
-      self.balance = self.account.balance(self.give_token.address)
+    if self.account && self.give_token && self.take_token
+      self.give_balance = self.account.balance(self.give_token.address)
+      self.take_balance = self.account.balance(self.take_token.address)
     end
   end
 end

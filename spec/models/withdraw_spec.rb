@@ -64,24 +64,36 @@ RSpec.describe Withdraw, type: :model do
     expect(withdraw.errors.messages[:account]).to include('has been ejected')
   end
 
-  it 'refunds with lock' do
+  it 'refunds with locks' do
+    withdraw = create(:withdraw)
+
     expect {
     expect {
+      allow(withdraw.balance).to receive(:with_lock).and_call_original
+
       withdraw.refund
+
+      expect(withdraw.balance).to have_received(:with_lock).once
     }.to increase { Refund.count }.by(1)
-    }.to increase { withdraw.balance.reload.balance }.by(withdraw.amount)
+    }.to increase { withdraw.reload.balance.balance }.by(withdraw.amount)
   end
 
-  it 'must not refund an amount exceeding onchain balance' do
-    non_stubbed_balance = withdraw.balance
+  it 'cannot refund if unpersisted' do
+    expect {
+      withdraw.refund
+    }.to raise_error('cannot refund unpersisted withdrawals')
+  end
+
+  it 'if withdrawing amount is greater than onchain balance, refunds only the onchain balance' do
+    withdraw = create(:withdraw)
     onchain_balance = withdraw.amount.to_i / 2
-    allow(withdraw).to receive_message_chain(:balance, :onchain_balance).and_return(onchain_balance)
+    allow(withdraw.balance).to receive(:onchain_balance).and_return(onchain_balance)
 
     expect {
     expect {
       withdraw.refund
     }.to increase { Refund.count }.by(1)
-    }.to increase { non_stubbed_balance.reload.balance }.by(onchain_balance)
+    }.to increase { withdraw.balance.reload.balance }.by(onchain_balance)
   end
 
   it 'debits balance after created with lock' do

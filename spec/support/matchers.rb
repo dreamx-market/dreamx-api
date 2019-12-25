@@ -2,7 +2,7 @@ RSpec.configure do |config|
   RSpec::Matchers.define :decrease do
     supports_block_expectations
 
-    match do |block|
+    match notify_expectation_failures: true do |block|
       @first = block_arg.call.to_i
       block.call
       @second = block_arg.call.to_i
@@ -22,7 +22,7 @@ RSpec.configure do |config|
   RSpec::Matchers.define :increase do
     supports_block_expectations
 
-    match do |block|
+    match notify_expectation_failures: true do |block|
       @first = block_arg.call.to_i
       block.call
       @second = block_arg.call.to_i

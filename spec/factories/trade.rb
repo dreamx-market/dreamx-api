@@ -16,5 +16,9 @@ FactoryBot.define do
         trade.order.save
       end
     end
+
+    trait :partial do
+      amount { order.give_amount.to_i / 2 }
+    end
   end
 end

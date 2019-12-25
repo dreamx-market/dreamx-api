@@ -121,7 +121,8 @@ RSpec.describe Order, type: :model do
     end
   end
 
-  it 'belongs to a balance' do
-    expect(order.balance).to_not be_nil
+  it 'belongs to a give balance and a take balance' do
+    expect(order.give_balance).to_not be_nil
+    expect(order.take_balance).to_not be_nil
   end
 end

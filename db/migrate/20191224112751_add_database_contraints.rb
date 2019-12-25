@@ -17,6 +17,13 @@ class AddDatabaseContraints < ActiveRecord::Migration[5.2]
 
     # presence validations must be backed by null: false contraints
     change_column_null :deposits, :transaction_hash, false
+    change_column_null :deposits, :account_address, false
+    change_column_null :deposits, :token_address, false
+    change_column_null :deposits, :amount, false
+    change_column_null :deposits, :status, false
+    change_column_null :deposits, :block_hash, false
+    change_column_null :deposits, :block_number, false
+    change_column_null :withdraws, :account_address, false
     change_column_null :withdraws, :amount, false
     change_column_null :withdraws, :token_address, false
     change_column_null :withdraws, :nonce, false
