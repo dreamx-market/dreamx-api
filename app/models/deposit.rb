@@ -25,6 +25,12 @@ class Deposit < ApplicationRecord
     end
   end
 
+  def set_balance
+    if self.account && self.token
+      self.balance = self.account.balance(self.token.address)
+    end
+  end
+
   private
 
   def self.aggregate(block_number)
@@ -54,12 +60,6 @@ class Deposit < ApplicationRecord
     if self.account_address.is_a_valid_address? && self.token_address.is_a_valid_address?
       self.account_address = self.account_address.without_checksum
       self.token_address = self.token_address.without_checksum
-    end
-  end
-
-  def set_balance
-    if self.account && self.token
-      self.balance = self.account.balance(self.token.address)
     end
   end
 end

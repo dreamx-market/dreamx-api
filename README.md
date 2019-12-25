@@ -87,3 +87,7 @@ require "whenever/capistrano"
 ## Logging
 
 * all non-default logs are written to `app.log`
+
+# Manual backups
+
+* always perform a manual backup before deploying: https://www.digitalocean.com/docs/databases/postgresql/how-to/import-databases/#export-an-existing-database
