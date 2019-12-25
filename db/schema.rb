@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_24_112751) do
+ActiveRecord::Schema.define(version: 2019_12_25_205517) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(version: 2019_12_24_112751) do
     t.string "transaction_hash", null: false
     t.string "block_hash", null: false
     t.string "block_number", null: false
+    t.bigint "balance_id", null: false
     t.index ["transaction_hash"], name: "index_deposits_on_transaction_hash", unique: true
   end
 
@@ -94,6 +95,7 @@ ActiveRecord::Schema.define(version: 2019_12_24_112751) do
     t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "balance_id", null: false
     t.index ["cancel_hash", "nonce"], name: "index_order_cancels_on_cancel_hash_and_nonce", unique: true
   end
 
@@ -112,6 +114,8 @@ ActiveRecord::Schema.define(version: 2019_12_24_112751) do
     t.string "filled", default: "0", null: false
     t.string "status", default: "open", null: false, comment: "open, partially_filled, closed"
     t.string "fee", default: "0", null: false
+    t.bigint "give_balance_id", null: false
+    t.bigint "take_balance_id", null: false
     t.index ["order_hash", "nonce"], name: "index_orders_on_order_hash_and_nonce", unique: true
   end
 
@@ -161,6 +165,8 @@ ActiveRecord::Schema.define(version: 2019_12_24_112751) do
     t.string "fee", default: "0", null: false
     t.string "total", default: "0", null: false
     t.string "maker_fee", default: "0", null: false
+    t.bigint "give_balance_id", null: false
+    t.bigint "take_balance_id", null: false
     t.index ["trade_hash", "nonce"], name: "index_trades_on_trade_hash_and_nonce", unique: true
   end
 
@@ -199,6 +205,7 @@ ActiveRecord::Schema.define(version: 2019_12_24_112751) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "fee"
+    t.bigint "balance_id", null: false
     t.index ["withdraw_hash", "nonce"], name: "index_withdraws_on_withdraw_hash_and_nonce", unique: true
   end
 
