@@ -22,7 +22,8 @@ class Order < ApplicationRecord
   validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_meet_maker_minimum, on: :create
 
   before_validation :set_balance, on: :create
-	before_create :remove_checksum, :hold_balance
+  before_validation :remove_checksum
+	before_create :hold_balance_with_lock
   after_create :enqueue_update_ticker
   after_commit { 
     MarketOrdersRelayJob.perform_later(self)
@@ -141,6 +142,13 @@ class Order < ApplicationRecord
     self.calculate_take_amount(self.filled).to_i - self.fee.to_i
   end
 
+  def hold_balance_with_lock
+    balance = self.balance
+    balance.with_lock do
+      balance.hold(give_amount)
+    end
+  end
+
 	private
 
   def status_must_be_open_closed_or_partially_filled
@@ -203,14 +211,12 @@ class Order < ApplicationRecord
 		end
 	end
 
-	def hold_balance
-    self.balance.hold(give_amount)
-	end
-
   def remove_checksum
-    self.account_address = self.account_address.without_checksum
-    self.give_token_address = self.give_token_address.without_checksum
-    self.take_token_address = self.take_token_address.without_checksum
+    if self.account_address.is_a_valid_address? && self.give_token_address.is_a_valid_address? && self.take_token_address.is_a_valid_address?
+      self.account_address = self.account_address.without_checksum
+      self.give_token_address = self.give_token_address.without_checksum
+      self.take_token_address = self.take_token_address.without_checksum
+    end
   end
 
   def enqueue_update_ticker

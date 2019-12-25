@@ -247,11 +247,11 @@ class Trade < ApplicationRecord
     self.take_balance
   end
 
-  def maker
+  def maker_account
     self.order.account
   end
 
-  def taker
+  def taker_account
     self.account
   end
 
@@ -264,14 +264,14 @@ class Trade < ApplicationRecord
 
   def trade_balances_with_lock
     ActiveRecord::Base.transaction do
-      maker.create_balance_if_not_exist(take_token_address)
-      taker.create_balance_if_not_exist(give_token_address)
+      maker_account.create_balance_if_not_exist(take_token_address)
+      taker_account.create_balance_if_not_exist(give_token_address)
       locked_balances = Balance.lock.where({ account_address: [maker_address, taker_address], token_address: [give_token_address, take_token_address] }).includes([:token, :account])
       maker_give_balance = locked_balances.find { |b| b.account_address == maker_address && b.token_address == give_token_address }
       taker_give_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == give_token_address }
       maker_take_balance = locked_balances.find { |b| b.account_address == maker_address && b.token_address == take_token_address }
       taker_take_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == take_token_address }
-
+      
       maker_give_balance.spend(self.amount)
       taker_give_balance.credit(self.taker_receiving_amount_after_fee)
       maker_take_balance.credit(self.maker_receiving_amount_after_fee)

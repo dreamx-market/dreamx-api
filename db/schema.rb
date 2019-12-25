@@ -111,9 +111,9 @@ ActiveRecord::Schema.define(version: 2019_12_24_213226) do
     t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "filled", default: "0"
-    t.string "status", default: "open", comment: "open, partially_filled, closed"
-    t.string "fee", default: "0"
+    t.string "filled", default: "0", null: false
+    t.string "status", default: "open", null: false, comment: "open, partially_filled, closed"
+    t.string "fee", default: "0", null: false
     t.bigint "give_balance_id", null: false
     t.bigint "take_balance_id", null: false
     t.index ["order_hash", "nonce"], name: "index_orders_on_order_hash_and_nonce", unique: true

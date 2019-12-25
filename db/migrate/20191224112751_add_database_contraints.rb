@@ -23,12 +23,14 @@ class AddDatabaseContraints < ActiveRecord::Migration[5.2]
     change_column_null :deposits, :status, false
     change_column_null :deposits, :block_hash, false
     change_column_null :deposits, :block_number, false
+
     change_column_null :withdraws, :account_address, false
     change_column_null :withdraws, :amount, false
     change_column_null :withdraws, :token_address, false
     change_column_null :withdraws, :nonce, false
     change_column_null :withdraws, :withdraw_hash, false
     change_column_null :withdraws, :signature, false
+
     change_column_null :orders, :account_address, false
     change_column_null :orders, :give_token_address, false
     change_column_null :orders, :give_amount, false
@@ -38,6 +40,10 @@ class AddDatabaseContraints < ActiveRecord::Migration[5.2]
     change_column_null :orders, :expiry_timestamp_in_milliseconds, false
     change_column_null :orders, :order_hash, false
     change_column_null :orders, :signature, false
+    change_column_null :orders, :filled, false
+    change_column_null :orders, :status, false
+    change_column_null :orders, :fee, false
+
     change_column_null :trades, :account_address, false
     change_column_null :trades, :order_hash, false
     change_column_null :trades, :amount, false
@@ -47,6 +53,7 @@ class AddDatabaseContraints < ActiveRecord::Migration[5.2]
     change_column_null :trades, :fee, false
     change_column_null :trades, :total, false
     change_column_null :trades, :maker_fee, false
+
     change_column_null :order_cancels, :order_hash, false
     change_column_null :order_cancels, :account_address, false
     change_column_null :order_cancels, :nonce, false

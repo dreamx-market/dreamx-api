@@ -59,7 +59,7 @@ RSpec.describe Trade, type: :model do
     
     trade.trade_balances_with_lock
 
-    expect(Balance).to have_received(:lock).once
+    expect(Balance).to have_received(:lock).twice # 1 for trading the balances, 1 for saving the order
   end
 
   it 'fills order with locks' do

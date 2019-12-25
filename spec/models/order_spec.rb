@@ -125,4 +125,12 @@ RSpec.describe Order, type: :model do
     expect(order.give_balance).to_not be_nil
     expect(order.take_balance).to_not be_nil
   end
+
+  it 'holds balance with locks' do
+    allow(order.balance).to receive(:with_lock).and_call_original
+
+    order.hold_balance_with_lock
+
+    expect(order.balance).to have_received(:with_lock).once
+  end
 end
