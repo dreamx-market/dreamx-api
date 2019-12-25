@@ -8,6 +8,9 @@ class Account < ApplicationRecord
   before_create :remove_checksum
 
   class << self
+    def generate_random_address
+      "0x#{SecureRandom.hex(20)}"
+    end
   end
 
   def balance(token_address_or_symbol)

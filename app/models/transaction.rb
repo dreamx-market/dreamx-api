@@ -16,6 +16,10 @@ class Transaction < ApplicationRecord
       key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
       client.get_nonce(key.address)
     end
+
+    def generate_random_hash
+      "0x#{SecureRandom.hex(32)}"
+    end
   end
 
   def self.confirm_mined_transactions

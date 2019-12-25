@@ -90,4 +90,4 @@ require "whenever/capistrano"
 
 # Manual backups
 
-* always perform a manual backup before deploying: https://www.digitalocean.com/docs/databases/postgresql/how-to/import-databases/#export-an-existing-database
+* always shut down the service and perform a manual backup before deploying: https://www.digitalocean.com/docs/databases/postgresql/how-to/import-databases/#export-an-existing-database
