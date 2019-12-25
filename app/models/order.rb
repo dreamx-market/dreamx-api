@@ -148,6 +148,13 @@ class Order < ApplicationRecord
     end
   end
 
+  def set_balance
+    if self.account && self.give_token && self.take_token
+      self.give_balance = self.account.balance(self.give_token.address)
+      self.take_balance = self.account.balance(self.take_token.address)
+    end
+  end
+
 	private
 
   def status_must_be_open_closed_or_partially_filled
@@ -229,13 +236,6 @@ class Order < ApplicationRecord
 
     if self.market.disabled?
       self.errors.add(:market, 'has been disabled')
-    end
-  end
-
-  def set_balance
-    if self.account && self.give_token && self.take_token
-      self.give_balance = self.account.balance(self.give_token.address)
-      self.take_balance = self.account.balance(self.take_token.address)
     end
   end
 end

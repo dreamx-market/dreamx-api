@@ -315,6 +315,13 @@ class Trade < ApplicationRecord
     return self.amount.to_i - self.taker_fee.to_i
   end
 
+  def set_balance
+    if self.account && self.order
+      self.give_balance = self.account.balance(self.order.give_token.address)
+      self.take_balance = self.account.balance(self.order.take_token.address)
+    end
+  end
+
   private
 
   def remove_checksum
@@ -331,13 +338,6 @@ class Trade < ApplicationRecord
 
   def enqueue_update_ticker
     UpdateMarketTickerJob.perform_later(self.market)
-  end
-
-  def set_balance
-    if self.account && self.order
-      self.give_balance = self.account.balance(self.order.give_token.address)
-      self.take_balance = self.account.balance(self.order.take_token.address)
-    end
   end
 
   def build_transaction

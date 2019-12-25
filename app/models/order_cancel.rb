@@ -67,6 +67,12 @@ class OrderCancel < ApplicationRecord
     end
   end
 
+  def set_balance
+    if self.order
+      self.balance = self.order.balance
+    end
+  end
+
   private
 
   def remove_checksum
@@ -84,12 +90,6 @@ class OrderCancel < ApplicationRecord
       self.order.errors.full_messages.each do |msg|
         errors.add(:order, msg.downcase)
       end
-    end
-  end
-
-  def set_balance
-    if self.order
-      self.balance = self.order.balance
     end
   end
 end

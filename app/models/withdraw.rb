@@ -118,6 +118,12 @@ class Withdraw < ApplicationRecord
     return (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
   end
 
+  def set_balance
+    if self.account && self.token
+      self.balance = self.account.balance(self.token.address)
+    end
+  end
+
   private
 
   def set_fee
@@ -135,12 +141,6 @@ class Withdraw < ApplicationRecord
     if self.account_address.is_a_valid_address? && self.token_address.is_a_valid_address?
       self.account_address = self.account_address.without_checksum
       self.token_address = self.token_address.without_checksum
-    end
-  end
-
-  def set_balance
-    if self.account && self.token
-      self.balance = self.account.balance(self.token.address)
     end
   end
 
