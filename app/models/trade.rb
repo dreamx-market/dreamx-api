@@ -12,8 +12,8 @@ class Trade < ApplicationRecord
   validates :account_address, :order_hash, :amount, :nonce, :trade_hash, :signature, :fee, :total, :maker_fee, presence: true
 
   validates :trade_hash, signature: true
-  validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, on: :create
-  validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum, :account_must_not_be_ejected
+  validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
+  validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum
 
   before_validation :set_balance, :build_transaction, on: :create
   before_validation :remove_checksum
