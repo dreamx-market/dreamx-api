@@ -127,7 +127,7 @@ class Withdraw < ApplicationRecord
   def debit_balance_with_lock
     balance = self.balance
     balance.with_lock do
-      self.account.balance(self.token_address).debit(self.amount)
+      self.balance.debit(self.amount)
     end
   end
 
