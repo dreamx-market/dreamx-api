@@ -30,6 +30,9 @@ class Order < ApplicationRecord
     AccountOrdersRelayJob.perform_later(self)
   }
 
+  scope :open, -> { where.not({ status: 'closed' }) }
+  scope :closed, -> { where({ status: 'closed' }) }
+
   class << self
   end
 
@@ -90,14 +93,13 @@ class Order < ApplicationRecord
     self.filled = self.filled.to_i + amount.to_i
     self.fee = self.fee.to_i + fee.to_i
 
-    if self.remaining_give_amount == 0 or !self.remaining_volume_is_above_taker_minimum? then
-      self.balance.release(self.remaining_give_amount)
+    if self.remaining_give_amount == 0 or !self.remaining_volume_is_above_taker_minimum?
       self.status = 'closed'
-      self.save!
     else
       self.status = 'partially_filled'
-      self.save!
     end
+
+    self.save!
   end
 
   def remaining_give_amount
@@ -105,11 +107,8 @@ class Order < ApplicationRecord
   end
 
   def cancel
-    self.with_lock do
-      self.balance.release(self.remaining_give_amount)
-      self.status = 'closed'
-      self.save!
-    end
+    self.status = 'closed'
+    self.save!
   end
 
   def remaining_volume

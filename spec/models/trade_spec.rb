@@ -55,19 +55,14 @@ RSpec.describe Trade, type: :model do
   end
 
   it 'trades balances with locks' do
+    trade.order.save
     allow(Balance).to receive(:lock).and_call_original
+    allow(trade.order).to receive(:lock!).and_call_original
     
-    trade.trade_balances_with_lock
+    trade.trade_balances_and_fill_order_with_lock
 
-    expect(Balance).to have_received(:lock).twice # 1 for trading the balances, 1 for saving the order
-  end
-
-  it 'fills order with locks' do
-    allow(trade.order).to receive(:with_lock).and_call_original
-
-    trade.fill_order_with_lock
-
-    expect(trade.order).to have_received(:with_lock).once
+    expect(Balance).to have_received(:lock).once
+    expect(trade.order).to have_received(:lock!).once
   end
 
   it 'belongs to a give balance and a take balance' do

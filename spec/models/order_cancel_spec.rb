@@ -50,4 +50,23 @@ RSpec.describe OrderCancel, type: :model do
   it 'belongs to a balacne' do
     expect(order_cancel.balance).to_not be_nil
   end
+
+  it 'cancels order and releases balance with lock' do
+    balance = order_cancel.balance.reload
+
+    expect {
+    expect {
+    expect {
+      allow(order_cancel.order).to receive(:lock!).and_call_original
+      allow(order_cancel.balance).to receive(:lock!).and_call_original
+
+      order_cancel.cancel_order_and_realease_balance_with_lock
+      balance.reload
+
+      expect(order_cancel.order).to have_received(:lock!).once
+      expect(order_cancel.balance).to have_received(:lock!).once
+    }.to decrease { balance.hold_balance }.by(order_cancel.order.remaining_give_amount)
+    }.to increase { balance.balance }.by(order_cancel.order.remaining_give_amount)
+    }.to increase { Order.closed.count }.by(1)
+  end
 end

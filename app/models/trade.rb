@@ -17,7 +17,7 @@ class Trade < ApplicationRecord
 
   before_validation :set_balance, :build_transaction, on: :create
   before_validation :remove_checksum
-  before_create :calculate_fees_and_total, :fill_order_with_lock, :trade_balances_with_lock
+  before_create :calculate_fees_and_total, :trade_balances_and_fill_order_with_lock
   after_create :enqueue_update_ticker
 
   # debugging only, remove logging before going live
@@ -255,14 +255,7 @@ class Trade < ApplicationRecord
     self.account
   end
 
-  def fill_order_with_lock
-    order = self.order
-    order.with_lock do
-      order.fill(amount, self.maker_fee)
-    end
-  end
-
-  def trade_balances_with_lock
+  def trade_balances_and_fill_order_with_lock
     ActiveRecord::Base.transaction do
       maker_account.create_balance_if_not_exist(take_token_address)
       taker_account.create_balance_if_not_exist(give_token_address)
@@ -271,11 +264,16 @@ class Trade < ApplicationRecord
       taker_give_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == give_token_address }
       maker_take_balance = locked_balances.find { |b| b.account_address == maker_address && b.token_address == take_token_address }
       taker_take_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == take_token_address }
+      order = self.order.lock!
       
       maker_give_balance.spend(self.amount)
       taker_give_balance.credit(self.taker_receiving_amount_after_fee)
       maker_take_balance.credit(self.maker_receiving_amount_after_fee)
       taker_take_balance.debit(self.take_amount)
+      order.fill(amount, self.maker_fee)
+      if order.status == 'closed'
+        maker_give_balance.release(order.remaining_give_amount)
+      end
     end
   end
 

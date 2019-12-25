@@ -12,7 +12,8 @@ class OrderCancel < ApplicationRecord
   validate :order_must_be_open, :account_address_must_be_owner, :cancel_hash_must_be_valid, :order_must_be_valid, :account_must_not_be_ejected
 
   before_validation :set_balance, on: :create
-  before_create :remove_checksum, :cancel_order
+  before_validation :remove_checksum
+  before_create :cancel_order_and_realease_balance_with_lock
   after_create :enqueue_update_ticker
 
   def order_must_be_open
@@ -57,14 +58,21 @@ class OrderCancel < ApplicationRecord
     self.market.symbol
   end
 
-  private
-
-  def cancel_order
-    self.order.cancel
+  def cancel_order_and_realease_balance_with_lock
+    ActiveRecord::Base.transaction do
+      order = self.order.lock!
+      balance = self.balance.lock!
+      order.cancel
+      balance.release(order.remaining_give_amount)
+    end
   end
 
+  private
+
   def remove_checksum
-    self.account_address = self.account_address.without_checksum
+    if self.account
+      self.account_address = self.account_address.without_checksum
+    end
   end
 
   def enqueue_update_ticker
@@ -80,8 +88,8 @@ class OrderCancel < ApplicationRecord
   end
 
   def set_balance
-    if self.account && self.order
-      self.balance = self.account.balance(self.order.give_token.address)
+    if self.order
+      self.balance = self.order.balance
     end
   end
 end

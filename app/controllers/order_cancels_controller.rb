@@ -18,8 +18,7 @@ class OrderCancelsController < ApplicationController
   def create
     begin
       @order_cancels = []
-      # make this transaction independent of its parent transaction so it can be rollbacked during testing
-      ActiveRecord::Base.transaction(requires_new: true) do
+      ActiveRecord::Base.transaction do
         order_cancels_params.each do |order_cancel_param|
           order_cancel = OrderCancel.create!(order_cancel_param)
           @order_cancels.push(order_cancel)

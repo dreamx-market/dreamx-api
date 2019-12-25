@@ -51,4 +51,7 @@ Rails.application.configure do
     Bullet.raise = true # raise an error if n+1 query occurs
     Bullet.unused_eager_loading_enable = false
   end
+
+  # Use default logging formatter so that PID and timestamp are not suppressed.
+  config.log_formatter = ::Logger::Formatter.new
 end
