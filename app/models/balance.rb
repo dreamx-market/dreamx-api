@@ -94,7 +94,11 @@ class Balance < ApplicationRecord
   end
 
   def balance_authentic?
-    return self.reload.real_balance.to_i == self.balance.to_i
+    self.real_delta == 0
+  end
+
+  def hold_balance_authentic?
+    self.real_hold_delta == 0
   end
 
   def real_total_balance
@@ -111,10 +115,6 @@ class Balance < ApplicationRecord
 
   def total_balance
     self.balance.to_i + self.hold_balance.to_i
-  end
-
-  def hold_balance_authentic?
-    self.reload.real_hold_balance.to_i == self.hold_balance.to_i
   end
 
   def closed_and_partially_filled_sell_orders
