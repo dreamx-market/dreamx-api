@@ -105,4 +105,15 @@ RSpec.describe Balance, type: :model do
       balance.mark_fraud
     }.to change { balance.reload.fraud }
   end
+
+  it 'should preload trades and trade orders with .closed_and_partially_filled_buy_orders' do
+    trade = create(:trade)
+    balance = trade.maker_take_balance
+
+    order = balance.closed_and_partially_filled_buy_orders.first
+    expect(order.association(:trades).loaded?).to eq(true)
+
+    trade = order.trades.first
+    expect(trade.association(:order).loaded?).to eq(true)
+  end
 end

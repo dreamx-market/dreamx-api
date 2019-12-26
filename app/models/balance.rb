@@ -122,7 +122,7 @@ class Balance < ApplicationRecord
   end
 
   def closed_and_partially_filled_buy_orders
-    Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' }).includes(:trades)
+    Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' }).includes(trades: :order)
   end
 
   def trades
@@ -140,18 +140,18 @@ class Balance < ApplicationRecord
 
   def total_traded
     total = 0
-    closed_and_partially_filled_sell_orders.each do |order|
-      total -= order.filled.to_i
+    self.closed_and_partially_filled_sell_orders.each do |o|
+      total -= o.filled.to_i
     end
-    closed_and_partially_filled_buy_orders.each do |order|
-      order.trades.each do |t|
+    self.closed_and_partially_filled_buy_orders.each do |o|
+      o.trades.each do |t|
         total += t.maker_receiving_amount_after_fee.to_i
       end
     end
-    buy_trades.each do |t|
+    self.buy_trades.each do |t|
       total += t.taker_receiving_amount_after_fee.to_i
     end
-    sell_trades.each do |t|
+    self.sell_trades.each do |t|
       total -= t.take_amount.to_i
     end
     return total
