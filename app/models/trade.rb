@@ -26,10 +26,10 @@ class Trade < ApplicationRecord
     if ENV['RAILS_ENV'] == 'test'
       return
     end
-    maker_give_balance = self.maker_give_balance
-    maker_take_balance = self.maker_take_balance
-    taker_give_balance = self.taker_give_balance
-    taker_take_balance = self.taker_take_balance
+    maker_give_balance = self.maker_give_balance.reload
+    maker_take_balance = self.maker_take_balance.reload
+    taker_give_balance = self.taker_give_balance.reload
+    taker_take_balance = self.taker_take_balance.reload
     log_message = %{
       new trade, trade_hash: #{self.trade_hash}
       maker_give_balance: #{maker_give_balance.balance.to_s.from_wei}, maker_give_real_balance: #{maker_give_balance.real_balance.to_s.from_wei}, difference: #{maker_give_balance.balance.to_i - maker_give_balance.real_balance.to_i}
