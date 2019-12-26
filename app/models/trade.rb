@@ -267,8 +267,8 @@ class Trade < ApplicationRecord
       order = self.order.lock!
       
       maker_give_balance.spend(self.amount)
-      taker_give_balance.credit(self.taker_receiving_amount_after_fee)
       maker_take_balance.credit(self.maker_receiving_amount_after_fee)
+      taker_give_balance.credit(self.taker_receiving_amount_after_fee)
       taker_take_balance.debit(self.take_amount)
       order.fill(amount, self.maker_fee)
       if order.status == 'closed'
