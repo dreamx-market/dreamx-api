@@ -67,6 +67,10 @@ class Balance < ApplicationRecord
     self.total_balance.to_i - self.onchain_balance.to_i
   end
 
+  def real_delta
+    self.real_balance.to_i - self.balance.to_i
+  end
+
   def mark_fraud
     self.with_lock do
       self.fraud = true
