@@ -1,5 +1,10 @@
 class Balance < ApplicationRecord
   has_many :refunds, dependent: :destroy
+  has_many :deposits, dependent: :destroy
+  has_many :withdraws, dependent: :destroy
+  has_many :orders, foreign_key: 'give_balance_id', primary_key: 'id'
+  has_many :open_orders, -> { where.not({ status: 'closed' }) }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
+  has_many :closed_orders, -> { where({ status: 'closed' }) }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
 
@@ -102,22 +107,6 @@ class Balance < ApplicationRecord
 
   def hold_balance_authentic?
     return self.reload.real_hold_balance.to_i == self.hold_balance.to_i
-  end
-
-  def open_orders
-    Order.where({ :account_address => account_address, :give_token_address => token_address }).where.not({ status: 'closed' })
-  end
-
-  def closed_orders
-    Order.where({ :account_address => account_address, :give_token_address => token_address }).where({ status: 'closed' })
-  end
-
-  def deposits
-    Deposit.where({ :account_address => account_address, :token_address => token_address })
-  end
-
-  def withdraws
-    Withdraw.where({ :account_address => account_address, :token_address => token_address })
   end
 
   def closed_and_partially_filled_sell_orders
