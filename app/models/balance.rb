@@ -64,11 +64,15 @@ class Balance < ApplicationRecord
   end
 
   def onchain_delta
-    self.total_balance.to_i - self.onchain_balance.to_i
+    self.onchain_balance.to_i - self.total_balance.to_i
   end
 
   def real_delta
     self.real_balance.to_i - self.balance.to_i
+  end
+
+  def real_hold_delta
+    self.reload.real_hold_balance.to_i - self.hold_balance.to_i
   end
 
   def mark_fraud
@@ -110,7 +114,7 @@ class Balance < ApplicationRecord
   end
 
   def hold_balance_authentic?
-    return self.reload.real_hold_balance.to_i == self.hold_balance.to_i
+    self.reload.real_hold_balance.to_i == self.hold_balance.to_i
   end
 
   def closed_and_partially_filled_sell_orders
