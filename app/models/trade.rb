@@ -20,30 +20,6 @@ class Trade < ApplicationRecord
   before_create :calculate_fees_and_total, :trade_balances_and_fill_order_with_lock
   after_create :enqueue_update_ticker
 
-  # TEMPORARY
-  after_create { self.write_log }
-  def write_log
-    if ENV['RAILS_ENV'] == 'test'
-      return
-    end
-    maker_give_balance = self.maker_give_balance.reload
-    maker_take_balance = self.maker_take_balance.reload
-    taker_give_balance = self.taker_give_balance.reload
-    taker_take_balance = self.taker_take_balance.reload
-    log_message = %{
-      new trade, trade_hash: #{self.trade_hash}
-      maker_give_balance: #{maker_give_balance.balance.to_s.from_wei}, maker_give_real_balance: #{maker_give_balance.real_balance.to_s.from_wei}, difference: #{maker_give_balance.balance.to_i - maker_give_balance.real_balance.to_i}
-      maker_give_hold_balance: #{maker_give_balance.hold_balance.to_s.from_wei}, maker_give_real_hold_balance: #{maker_give_balance.real_hold_balance.to_s.from_wei}, difference: #{maker_give_balance.hold_balance.to_i - maker_give_balance.real_hold_balance.to_i}
-      maker_take_balance: #{maker_take_balance.balance.to_s.from_wei}, maker_take_real_balance: #{maker_take_balance.real_balance.to_s.from_wei}, difference: #{maker_take_balance.balance.to_i - maker_take_balance.real_balance.to_i}
-      maker_take_hold_balance: #{maker_take_balance.hold_balance.to_s.from_wei}, maker_take_real_hold_balance: #{maker_take_balance.real_hold_balance.to_s.from_wei}, difference: #{maker_take_balance.hold_balance.to_i - maker_take_balance.real_hold_balance.to_i}
-      taker_give_balance: #{taker_give_balance.balance.to_s.from_wei}, taker_give_real_balance: #{taker_give_balance.real_balance.to_s.from_wei}, difference: #{taker_give_balance.balance.to_i - taker_give_balance.real_balance.to_i}
-      taker_give_hold_balance: #{taker_give_balance.hold_balance.to_s.from_wei}, taker_give_real_hold_balance: #{taker_give_balance.real_hold_balance.to_s.from_wei}, difference: #{taker_give_balance.hold_balance.to_i - taker_give_balance.real_hold_balance.to_i}
-      taker_take_balance: #{taker_take_balance.balance.to_s.from_wei}, taker_take_real_balance: #{taker_take_balance.real_balance.to_s.from_wei}, difference: #{taker_take_balance.balance.to_i - taker_take_balance.real_balance.to_i}
-      taker_take_hold_balance: #{taker_take_balance.hold_balance.to_s.from_wei}, taker_take_real_hold_balance: #{taker_take_balance.real_hold_balance.to_s.from_wei}, difference: #{taker_take_balance.hold_balance.to_i - taker_take_balance.real_hold_balance.to_i}
-    }
-    AppLogger.log(log_message)
-  end
-
   def maker_balance
     self.order.balance
   end
