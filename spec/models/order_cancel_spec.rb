@@ -53,12 +53,6 @@ RSpec.describe OrderCancel, type: :model do
     expect(order_cancel.errors.messages[:signature]).to include('is invalid')
   end
 
-  it 'displays validation errors for the associated order' do
-    order_cancel.order.signature = 'INVALID'
-    expect(order_cancel.valid?).to eq(false)
-    expect(order_cancel.errors.messages[:order]).to include('signature is invalid')
-  end
-
   it 'belongs to a balacne' do
     expect(order_cancel.balance).to_not be_nil
   end

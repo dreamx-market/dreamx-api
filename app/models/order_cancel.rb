@@ -10,7 +10,7 @@ class OrderCancel < ApplicationRecord
 
   validates :cancel_hash, signature: true
   validate :order_must_be_open, :account_must_not_be_ejected, on: :create
-  validate :account_address_must_be_owner, :cancel_hash_must_be_valid, :order_must_be_valid
+  validate :account_address_must_be_owner, :cancel_hash_must_be_valid
 
   before_validation :set_balance, on: :create
   before_validation :remove_checksum
