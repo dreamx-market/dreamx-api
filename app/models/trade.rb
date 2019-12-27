@@ -20,7 +20,7 @@ class Trade < ApplicationRecord
   before_create :calculate_fees_and_total, :trade_balances_and_fill_order_with_lock
   after_create :enqueue_update_ticker
 
-  # debugging only, remove logging before going live
+  # TEMPORARY
   after_create { self.write_log }
   def write_log
     if ENV['RAILS_ENV'] == 'test'

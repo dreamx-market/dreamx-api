@@ -60,20 +60,17 @@ class Transaction < ApplicationRecord
             transaction.mark_out_of_gas
           end
         end
-        # debugging only, remove this in production
-        if transaction.status == 'confirmed'
-          AppLogger.log("#{transaction.transaction_hash} has been confirmed")
-        end
         transaction.save!
       end
     end
   end
 
   def mark_replaced(last_onchain_nonce)
-    # debugging only, remove this in production
+    # TEMPORARY
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
       AppLogger.log("#{self.transaction_hash} has been replaced")
+      self.status = 'replaced'
       return
     end
 
@@ -82,10 +79,11 @@ class Transaction < ApplicationRecord
   end
 
   def mark_failed
-    # debugging only, remove this before going live
+    # TEMPORARY
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
       AppLogger.log("#{self.transaction_hash} failed")
+      self.status = 'failed'
       return
     end
 
@@ -94,10 +92,11 @@ class Transaction < ApplicationRecord
   end
 
   def mark_out_of_gas
-    # debugging only, remove this before going live
+    # TEMPORARY
     if ENV['RAILS_ENV'] == 'production'
       Config.set('read_only', 'true')
       AppLogger.log("#{self.transaction_hash} ran out of gas")
+      self.status = 'out_of_gas'
       return
     end
 
@@ -133,9 +132,11 @@ class Transaction < ApplicationRecord
   end
 
   def self.broadcast_expired_transactions
-    if (self.has_replaced_transactions?)
-      self.regenerate_replaced_transactions
-    end
+    # TEMPORARY: disable automatic replaced transaction handling
+    # uncomment later when the work-flow becomes more stable
+    # if (self.has_replaced_transactions?)
+    #   self.regenerate_replaced_transactions
+    # end
 
     unconfirmed_transactions = self.unconfirmed_and_pending.sort_by { |transaction| transaction.nonce.to_i }
     unconfirmed_transactions.each do |transaction|
@@ -260,20 +261,12 @@ class Transaction < ApplicationRecord
   end
 
   def assign_nonce
-    # DEBUGGING ONLY
-    if (self.nonce)
-      AppLogger.log("overriding nonce ##{self.nonce}")
-    end
-
     self.nonce = Redis.current.incr('nonce') - 1
   end
 
   private
 
   def self.sync_nonce
-    # DEBUGGING ONLY
-    AppLogger.log("sync nonce, next_nonce: #{self.next_nonce}, next_onchain_nonce: #{self.next_onchain_nonce}")
-
     client = Ethereum::Singleton.instance
     key = Eth::Key.new priv: ENV['SERVER_PRIVATE_KEY'].hex
     Redis.current.set("nonce", client.get_nonce(key.address))

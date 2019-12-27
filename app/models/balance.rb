@@ -79,7 +79,6 @@ class Balance < ApplicationRecord
     self.with_lock do
       self.fraud = true
       self.save!
-      # debugging only, remove logging before going live
       AppLogger.log("marked balance ##{self.id} as fraud")
     end
   end
