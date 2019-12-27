@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_27_190807) do
+ActiveRecord::Schema.define(version: 2019_12_25_211345) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -96,8 +96,7 @@ ActiveRecord::Schema.define(version: 2019_12_27_190807) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "balance_id", null: false
-    t.index ["cancel_hash"], name: "index_order_cancels_on_cancel_hash", unique: true
-    t.index ["nonce"], name: "index_order_cancels_on_nonce", unique: true
+    t.index ["cancel_hash", "nonce"], name: "index_order_cancels_on_cancel_hash_and_nonce"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -117,8 +116,7 @@ ActiveRecord::Schema.define(version: 2019_12_27_190807) do
     t.string "fee", default: "0", null: false
     t.bigint "give_balance_id", null: false
     t.bigint "take_balance_id", null: false
-    t.index ["nonce"], name: "index_orders_on_nonce", unique: true
-    t.index ["order_hash"], name: "index_orders_on_order_hash", unique: true
+    t.index ["order_hash", "nonce"], name: "index_orders_on_order_hash_and_nonce"
   end
 
   create_table "refunds", force: :cascade do |t|
@@ -169,8 +167,7 @@ ActiveRecord::Schema.define(version: 2019_12_27_190807) do
     t.string "maker_fee", default: "0", null: false
     t.bigint "give_balance_id", null: false
     t.bigint "take_balance_id", null: false
-    t.index ["nonce"], name: "index_trades_on_nonce", unique: true
-    t.index ["trade_hash"], name: "index_trades_on_trade_hash", unique: true
+    t.index ["trade_hash", "nonce"], name: "index_trades_on_trade_hash_and_nonce"
   end
 
   create_table "transactions", force: :cascade do |t|
@@ -209,8 +206,7 @@ ActiveRecord::Schema.define(version: 2019_12_27_190807) do
     t.datetime "updated_at", null: false
     t.string "fee"
     t.bigint "balance_id", null: false
-    t.index ["nonce"], name: "index_withdraws_on_nonce", unique: true
-    t.index ["withdraw_hash"], name: "index_withdraws_on_withdraw_hash", unique: true
+    t.index ["withdraw_hash", "nonce"], name: "index_withdraws_on_withdraw_hash_and_nonce"
   end
 
   add_foreign_key "refunds", "balances"
