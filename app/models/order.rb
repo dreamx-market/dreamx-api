@@ -13,8 +13,7 @@ class Order < ApplicationRecord
   validates :account_address, :give_token_address, :give_amount, :take_token_address, :take_amount, :nonce, :expiry_timestamp_in_milliseconds, :order_hash, :signature, presence: true
   
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
-	validates :nonce, uniqueness: true
-  validates :order_hash, signature: true, uniqueness: true
+  validates :order_hash, signature: true
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }
   validates :filled, numericality: { :equal_to => 0 }, on: :create
   validate :status_must_be_open_on_create, on: :create
