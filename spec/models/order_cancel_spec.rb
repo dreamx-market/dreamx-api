@@ -25,8 +25,20 @@ RSpec.describe OrderCancel, type: :model do
     order_cancel = create(:order_cancel)
     new_order_cancel = build(:order_cancel)
     new_order_cancel.nonce = order_cancel.nonce
-    expect(new_order_cancel.valid?).to eq(false)
-    expect(new_order_cancel.errors.messages[:nonce]).to include('has already been taken')
+
+    expect {
+      new_order_cancel.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
+  end
+
+  it 'has a unique cancel_hash' do
+    order_cancel = create(:order_cancel)
+    new_order_cancel = build(:order_cancel)
+    new_order_cancel.cancel_hash = order_cancel.cancel_hash
+    
+    expect {
+      new_order_cancel.save(validate: false) # uniqueness validations must be tested at the database level
+    }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
   it 'has a valid cancel_hash' do

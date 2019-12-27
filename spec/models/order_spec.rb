@@ -61,8 +61,20 @@ RSpec.describe Order, type: :model do
     order = create(:order)
     new_order = build(:order)
     new_order.nonce = order.nonce
-    expect(new_order.valid?).to eq(false)
-    expect(new_order.errors.messages[:nonce]).to include('has already been taken')
+    
+    expect {
+      new_order.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
+  end
+
+  it 'must have a unique order_hash' do
+    order = create(:order)
+    new_order = build(:order)
+    new_order.order_hash = order.order_hash
+    
+    expect {
+      new_order.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
   it 'must belong to an existing market' do

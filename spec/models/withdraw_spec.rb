@@ -17,9 +17,12 @@ RSpec.describe Withdraw, type: :model do
 
   it 'must have a unique nonce' do
     withdraw1 = create(:withdraw)
-    withdraw2 = build(:withdraw, nonce: withdraw1.nonce)
-    expect(withdraw2.valid?).to eq(false)
-    expect(withdraw2.errors.messages[:nonce]).to include('has already been taken')
+    withdraw2 = build(:withdraw)
+    withdraw2.nonce = withdraw1.nonce
+
+    expect {
+      withdraw2.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
   it 'must be created by an account with sufficient balance' do
@@ -41,11 +44,14 @@ RSpec.describe Withdraw, type: :model do
     expect(withdraw.errors.messages[:withdraw_hash]).to include('is invalid')
   end
 
-  it 'it has a unique hash' do
+  it 'it has a unique withdraw_hash' do
     withdraw1 = create(:withdraw)
-    withdraw2 = build(:withdraw, withdraw_hash: withdraw1.withdraw_hash)
-    expect(withdraw2.valid?).to eq(false)
-    expect(withdraw2.errors.messages[:withdraw_hash]).to include('has already been taken')
+    withdraw2 = build(:withdraw)
+    withdraw2.withdraw_hash = withdraw1.withdraw_hash
+
+    expect {
+      withdraw2.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
   it 'must have a valid signature' do

@@ -13,8 +13,20 @@ RSpec.describe Trade, type: :model do
     trade = create(:trade)
     new_trade = build(:trade)
     new_trade.nonce = trade.nonce
-    expect(new_trade.valid?).to eq(false)
-    expect(new_trade.errors.messages[:nonce]).to include('has already been taken')
+
+    expect {
+      new_trade.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
+  end
+
+  it 'must have a unique trade_hash' do
+    trade = create(:trade)
+    new_trade = build(:trade)
+    new_trade.trade_hash = trade.trade_hash
+
+    expect {
+      new_trade.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
   it 'must belong to a valid order' do
