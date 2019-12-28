@@ -33,6 +33,7 @@ class Order < ApplicationRecord
   scope :closed, -> { where({ status: 'closed' }) }
 
   class << self
+    # TEMPORARY
     def duplicates
       self.select(:nonce).group(:nonce).having("count(*) > 1").size
     end

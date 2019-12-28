@@ -19,6 +19,7 @@ class Withdraw < ApplicationRecord
   before_save :remove_checksum
 
   class << self
+    # TEMPORARY
     def duplicates
       self.select(:nonce).group(:nonce).having("count(*) > 1").size
     end
