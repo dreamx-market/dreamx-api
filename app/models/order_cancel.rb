@@ -17,6 +17,12 @@ class OrderCancel < ApplicationRecord
   before_create :cancel_order_and_realease_balance_with_lock
   after_create :enqueue_update_ticker
 
+  class << self
+    def duplicates
+      self.select(:nonce).group(:nonce).having("count(*) > 1").size
+    end
+  end
+
   def order_must_be_open
     if (!self.order)
       return

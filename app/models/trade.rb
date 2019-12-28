@@ -20,6 +20,12 @@ class Trade < ApplicationRecord
   before_create :calculate_fees_and_total, :trade_balances_and_fill_order_with_lock
   after_create :enqueue_update_ticker
 
+  class << self
+    def duplicates
+      self.select(:nonce).group(:nonce).having("count(*) > 1").size
+    end
+  end
+
   def maker_balance
     self.order.balance
   end

@@ -18,6 +18,12 @@ class Withdraw < ApplicationRecord
   before_create :set_fee, :debit_balance_with_lock
   before_save :remove_checksum
 
+  class << self
+    def duplicates
+      self.select(:nonce).group(:nonce).having("count(*) > 1").size
+    end
+  end
+
   # used by transaction.mark_failed
   def refund
     if !self.persisted?

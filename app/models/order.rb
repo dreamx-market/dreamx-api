@@ -33,6 +33,9 @@ class Order < ApplicationRecord
   scope :closed, -> { where({ status: 'closed' }) }
 
   class << self
+    def duplicates
+      self.select(:nonce).group(:nonce).having("count(*) > 1").size
+    end
   end
 
   def status_must_be_open_on_create
