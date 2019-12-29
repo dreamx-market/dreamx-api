@@ -116,23 +116,28 @@ class Balance < ApplicationRecord
     self.balance.to_i + self.hold_balance.to_i
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def closed_and_partially_filled_sell_orders
     Order.where({ :account_address => account_address, :give_token_address => token_address }).where.not({ status: 'open' })
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def closed_and_partially_filled_buy_orders
     Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' }).includes(trades: :order)
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def trades
     # orders included for both sell and buy trades
     Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } ).includes(:order).or(Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :give_token_address => token_address } ).includes(:order))
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def sell_trades
     Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } ).includes(:order)
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def buy_trades
     Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :give_token_address => token_address } )
   end

@@ -57,11 +57,11 @@ class OrderCancel < ApplicationRecord
     end
     return result
   end
-
+  
   def market
     self.order.market
   end
-
+  
   def market_symbol
     self.market.symbol
   end

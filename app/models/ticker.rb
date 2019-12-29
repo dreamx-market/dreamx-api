@@ -9,15 +9,15 @@ class Ticker < ApplicationRecord
 
   def update_data
     self.with_lock do
-      ticker = self.build_ticker
-      self.assign_attributes(ticker)
+      data = self.aggregate
+      self.assign_attributes(data)
       if self.changed?
         self.save!
       end
     end
   end
 
-  def build_ticker
+  def aggregate
     last_price = self.market.last_price
     high = self.market.high
     low = self.market.low

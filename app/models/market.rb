@@ -15,6 +15,7 @@ class Market < ApplicationRecord
   class << self
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def ticker
     Ticker.find_or_create_by({ market_symbol: self.symbol })
   end
@@ -61,22 +62,27 @@ class Market < ApplicationRecord
 		errors.add(:quote_token_address, 'Market already exists') if existing_market
 	end
 
+  # INSTANCE METHOD ASSOCIATION
   def open_orders
     return self.open_buy_orders.or(self.open_sell_orders)
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def open_buy_orders
     return Order.where({ :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).where.not({ status: 'closed' })
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def open_sell_orders
     return Order.where({ :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address }).where.not({ status: 'closed' })
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def all_trades
     return Trade.joins(:order).where(:orders => { :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).or(Trade.joins(:order).where(:orders => { :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address }))
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def trades(period=nil)
     @memoized_current_time ||= Time.current
     trades = []
@@ -167,6 +173,7 @@ class Market < ApplicationRecord
     return self.chart_data_by(1.hour).last(24).sort_by { |chart_datum| chart_datum.created_at }.first.close
   end
 
+  # INSTANCE METHOD ASSOCIATION
   def chart_data_by(period)
     return self.chart_data.where({ :period => period.to_s })
   end
