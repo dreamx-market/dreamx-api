@@ -93,4 +93,10 @@ RSpec.describe Market, type: :model do
   it 'has a ticker' do
     expect(market.ticker).to_not be_nil
   end
+
+  # it 'sorts buy book by descending price and ascending date', :focus do
+  #   market = markets(:one)
+  #   create(:order, :buy)
+  #   buy_book = market.order_book[:buy_book]
+  # end
 end

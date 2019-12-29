@@ -21,13 +21,13 @@ class Market < ApplicationRecord
   end
 
   def order_book(page=nil, per_page=nil)
-    buybook = self.open_buy_orders
+    buy_book = self.open_buy_orders
                     .order(price: :desc, created_at: :asc)
                     .paginate(:page => page, :per_page => per_page)
-    sellbook = self.open_sell_orders
+    sell_book = self.open_sell_orders
                       .order(price: :asc, created_at: :asc)
                       .paginate(:page => page, :per_page => per_page)
-    return { buybook: buybook, sellbook: sellbook }
+    return { buy_book: buy_book, sell_book: sell_book }
   end
 
   def disabled?

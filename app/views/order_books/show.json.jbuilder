@@ -1,8 +1,6 @@
 json.bid do
-  # buybook is sorted by desc price and asc date
-  json.partial! "order_books/order_book", order_book: @order_book[:buybook]
+  json.partial! "order_books/order_book", order_book: @order_book[:buy_book]
 end
 json.ask do
-  # sellbook is sorted by asc price and asc date
-  json.partial! "order_books/order_book", order_book: @order_book[:sellbook]
+  json.partial! "order_books/order_book", order_book: @order_book[:sell_book]
 end
