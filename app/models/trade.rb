@@ -16,7 +16,7 @@ class Trade < ApplicationRecord
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum
 
-  before_validation :set_associations, :build_transaction, on: :create
+  before_validation :initialize_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
   before_create :calculate_fees_and_total, :trade_balances_and_fill_order_with_lock
   after_create :enqueue_update_ticker
@@ -145,10 +145,12 @@ class Trade < ApplicationRecord
     return self.account_address
   end
 
+  # FIX THIS
   def type
     return self.is_sell ? 'sell' : 'buy'
   end
 
+  # FIX THIS
   def is_sell
     return !self.order.is_sell
   end
@@ -291,7 +293,7 @@ class Trade < ApplicationRecord
     return self.amount.to_i - self.taker_fee.to_i
   end
 
-  def set_associations
+  def initialize_attributes
     if self.account && self.order
       self.give_balance = self.account.balance(self.order.give_token.address)
       self.take_balance = self.account.balance(self.order.take_token.address)

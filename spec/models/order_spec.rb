@@ -22,6 +22,20 @@ RSpec.describe Order, type: :model do
     order.give_amount = maker_minimum - 1
     expect(order.valid?).to eq(false)
     expect(order.errors.messages[:give_amount]).to include("must be greater than #{maker_minimum}")
+
+    # market = build(:order, :sell).market
+    # pp market.reload.open_sell_orders.count
+
+    # create(:order, :sell)
+    # pp market.reload.open_sell_orders.count
+
+    # create(:order, :buy)
+    # pp market.reload.open_sell_orders.count
+  end
+
+  it 'is either sell or buy' do
+    order = build(:order, :buy)
+    expect(order.sell).to eq(false)
   end
 
   it 'must have a volume above maker minium as a sell order on create' do

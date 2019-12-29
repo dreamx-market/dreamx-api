@@ -21,7 +21,7 @@ class Order < ApplicationRecord
 	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
   validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_meet_maker_minimum, on: :create
 
-  before_validation :set_associations, on: :create
+  before_validation :initialize_attributes, on: :create
   before_validation :remove_checksum
 	before_create :hold_balance_with_lock
   after_create :enqueue_update_ticker
@@ -31,6 +31,8 @@ class Order < ApplicationRecord
   }
 
   scope :open, -> { where.not({ status: 'closed' }) }
+  scope :open_buy, -> { where({ sell: false }).where.not({ status: 'closed' }) }
+  scope :open_sell, -> { where({ sell: true }).where.not({ status: 'closed' }) }
   scope :closed, -> { where({ status: 'closed' }) }
   scope :closed_and_partially_filled, -> { where.not({ status: 'open' }) }
 
@@ -45,10 +47,6 @@ class Order < ApplicationRecord
     if self.status != 'open'
       errors.add(:status, 'must be open')
     end
-  end
-
-  def type
-    return self.is_sell ? 'sell' : 'buy'
   end
 
   def remaining_give_amount
@@ -80,6 +78,12 @@ class Order < ApplicationRecord
     end
   end
 
+  # FIX THIS
+  def type
+    self.is_sell ? 'sell' : 'buy'
+  end
+
+  # FIX THIS
   def is_sell
     self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
   end
@@ -145,13 +149,17 @@ class Order < ApplicationRecord
     end
   end
 
-  def set_associations
+  def initialize_attributes
     if self.account && 
       self.give_token_address.is_a_valid_address? && 
       self.take_token_address.is_a_valid_address? then
       self.give_balance = self.account.balance(self.give_token_address)
       self.take_balance = self.account.balance(self.take_token_address)
       self.market = Market.find_by({ :base_token_address => self.take_token_address, :quote_token_address => self.give_token_address }) || Market.find_by({ :base_token_address => self.give_token_address, :quote_token_address => self.take_token_address })
+    end
+
+    if self.market
+      self.sell = self.give_token_address == self.market.base_token_address ? false : true
     end
   end
 

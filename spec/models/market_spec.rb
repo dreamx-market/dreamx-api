@@ -89,4 +89,8 @@ RSpec.describe Market, type: :model do
     market.disable
     expect(market.open_orders.count).to eq(0)
   end
+
+  it 'has a ticker' do
+    expect(market.ticker).to_not be_nil
+  end
 end

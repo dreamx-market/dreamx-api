@@ -13,6 +13,10 @@ FactoryBot.define do
       quote_token_address { token_addresses['ETH'] }
     end
 
+    after(:build) do |market|
+      market.valid?
+    end
+
     after(:create) do |market, evaluator|
       if evaluator.trades > 0
         if (market.status != 'active')
