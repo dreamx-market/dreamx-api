@@ -7,6 +7,7 @@ class Order < ApplicationRecord
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
   belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
   belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
+  belongs_to :market, class_name: 'Market', foreign_key: 'market_symbol', primary_key: 'symbol'
   alias_attribute :balance, :give_balance
   
   validates :order_hash, :nonce, uniqueness: true
@@ -17,10 +18,10 @@ class Order < ApplicationRecord
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }
   validates :filled, numericality: { :equal_to => 0 }, on: :create
   validate :status_must_be_open_on_create, on: :create
-	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :market_must_exist, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
+	validate :status_must_be_open_closed_or_partially_filled, :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
   validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_meet_maker_minimum, on: :create
 
-  before_validation :set_balance, on: :create
+  before_validation :set_associations, on: :create
   before_validation :remove_checksum
 	before_create :hold_balance_with_lock
   after_create :enqueue_update_ticker
@@ -63,14 +64,6 @@ class Order < ApplicationRecord
 
   def s
     Eth::Utils.hex_to_bin('0x' + signature[66..-3])
-  end
-
-  def market
-    return Market.find_by({ :base_token_address => self.take_token_address, :quote_token_address => self.give_token_address }) || Market.find_by({ :base_token_address => self.give_token_address, :quote_token_address => self.take_token_address })
-  end
-
-  def market_symbol
-    return self.market.symbol
   end
 
   def calculate_take_amount(give_amount)
@@ -151,10 +144,13 @@ class Order < ApplicationRecord
     end
   end
 
-  def set_balance
-    if self.account && self.give_token && self.take_token
-      self.give_balance = self.account.balance(self.give_token.address)
-      self.take_balance = self.account.balance(self.take_token.address)
+  def set_associations
+    if self.account && 
+      self.give_token_address.is_a_valid_address? && 
+      self.take_token_address.is_a_valid_address? then
+      self.give_balance = self.account.balance(self.give_token_address)
+      self.take_balance = self.account.balance(self.take_token_address)
+      self.market = Market.find_by({ :base_token_address => self.take_token_address, :quote_token_address => self.give_token_address }) || Market.find_by({ :base_token_address => self.give_token_address, :quote_token_address => self.take_token_address })
     end
   end
 
@@ -179,13 +175,6 @@ class Order < ApplicationRecord
 	def balance_must_exist_and_is_sufficient
 		if !self.balance || self.balance.reload.balance.to_i < give_amount.to_i then
 			errors.add(:account, 'insufficient balance')
-		end
-	end
-
-	def market_must_exist
-		market = Market.find_by(:base_token_address => take_token_address, :quote_token_address => give_token_address) || Market.find_by(:base_token_address => give_token_address, :quote_token_address => take_token_address)
-		if (!market) then
-			errors.add(:market, 'market does not exist')
 		end
 	end
 

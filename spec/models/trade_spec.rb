@@ -114,4 +114,8 @@ RSpec.describe Trade, type: :model do
     
     expect(Refund.last.amount.to_i).to eq(onchain_balance)
   end
+
+  it 'belongs to a market' do
+    expect(trade.market).to_not be_nil
+  end
 end

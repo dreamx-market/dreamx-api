@@ -5,6 +5,7 @@ class Trade < ApplicationRecord
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
   belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
   belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
+  belongs_to :market, class_name: 'Market', foreign_key: 'market_symbol', primary_key: 'symbol'
   alias_attribute :balance, :take_balance
   has_one :tx, class_name: 'Transaction', as: :transactable
 
@@ -15,7 +16,7 @@ class Trade < ApplicationRecord
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum
 
-  before_validation :set_balance, :build_transaction, on: :create
+  before_validation :set_associations, :build_transaction, on: :create
   before_validation :remove_checksum
   before_create :calculate_fees_and_total, :trade_balances_and_fill_order_with_lock
   after_create :enqueue_update_ticker
@@ -142,14 +143,6 @@ class Trade < ApplicationRecord
 
   def taker_address
     return self.account_address
-  end
-
-  def market
-    return self.order.market
-  end
-
-  def market_symbol
-    return self.market.symbol
   end
 
   def type
@@ -298,10 +291,11 @@ class Trade < ApplicationRecord
     return self.amount.to_i - self.taker_fee.to_i
   end
 
-  def set_balance
+  def set_associations
     if self.account && self.order
       self.give_balance = self.account.balance(self.order.give_token.address)
       self.take_balance = self.account.balance(self.order.take_token.address)
+      self.market = self.order.market
     end
   end
 

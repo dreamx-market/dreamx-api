@@ -78,9 +78,9 @@ RSpec.describe Order, type: :model do
   end
 
   it 'must belong to an existing market' do
-    order.take_token_address = 'INVALID'
+    order.take_token_address = generate_random_address
     expect(order.valid?).to eq(false)
-    expect(order.errors.messages[:market]).to include('market does not exist')
+    expect(order.errors.messages[:market]).to include('must exist')
   end
 
   it 'must have a valid order_hash' do
@@ -144,5 +144,9 @@ RSpec.describe Order, type: :model do
     order.hold_balance_with_lock
 
     expect(order.balance).to have_received(:with_lock).once
+  end
+
+  it 'belongs to a market' do
+    expect(order.market).to_not be_nil
   end
 end
