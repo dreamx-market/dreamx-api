@@ -20,6 +20,16 @@ class Market < ApplicationRecord
   class << self
   end
 
+  def order_book(page=nil, per_page=nil)
+    buybook = self.open_buy_orders
+                    .order(price: :desc, created_at: :asc)
+                    .paginate(:page => page, :per_page => per_page)
+    sellbook = self.open_sell_orders
+                      .order(price: :asc, created_at: :asc)
+                      .paginate(:page => page, :per_page => per_page)
+    return { buybook: buybook, sellbook: sellbook }
+  end
+
   def disabled?
     return self.status == 'disabled' ? true : false
   end
