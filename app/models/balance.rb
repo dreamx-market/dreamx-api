@@ -3,8 +3,9 @@ class Balance < ApplicationRecord
   has_many :deposits, dependent: :destroy
   has_many :withdraws, dependent: :destroy
   has_many :orders, foreign_key: 'give_balance_id', primary_key: 'id'
-  has_many :open_orders, -> { where.not({ status: 'closed' }) }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
-  has_many :closed_orders, -> { where({ status: 'closed' }) }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
+  has_many :open_orders, -> { open }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
+  has_many :closed_orders, -> { closed }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
+  # has_many :closed_and_partially_filled_sell_orders, 
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
 

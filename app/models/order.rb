@@ -32,6 +32,7 @@ class Order < ApplicationRecord
 
   scope :open, -> { where.not({ status: 'closed' }) }
   scope :closed, -> { where({ status: 'closed' }) }
+  scope :closed_and_partially_filled, -> { where.not({ status: 'open' }) }
 
   class << self
     # TEMPORARY

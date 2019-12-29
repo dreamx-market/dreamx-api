@@ -83,6 +83,10 @@ RSpec.describe Balance, type: :model do
     balance_with_sell_trade = trades.first.taker_give_balance
     balance_with_buy_trade = trades.first.taker_take_balance
 
+    # pp balance_with_sell_order.open_orders.length
+    # trades.each(&:save)
+    # pp balance_with_sell_order.open_orders.length
+
     expect {
     expect {
     expect {
