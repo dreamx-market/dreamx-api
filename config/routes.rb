@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   resources :order_cancels, defaults: { format: :json }, only: [:create, :show]
   resources :trades, defaults: { format: :json }, only: [:create, :index, :show]
   resources :balances, defaults: { format: :json }, param: :account_address, only: [:show]
-  resources :orders, defaults: { format: :json }, param: :order_hash, only: [:index, :show, :create]
+  resources :orders, defaults: { format: :json }, param: :order_hash, only: [:index, :create]
   resources :markets, defaults: { format: :json }, only: [:index]
   resources :tokens, defaults: { format: :json }, only: [:index]
   mount ActionCable.server => '/cable'

@@ -5,8 +5,15 @@ RSpec.describe "OrderBooks", type: :request do
     @market_symbol = "ONE_ETH"
   end
 
-  it "GET /order_books/:market_symbol" do
-    get order_book_url(@market_symbol), as: :json
-    expect(response).to be_successful
+  describe 'GET /order_books/:market_symbol' do
+    it "returns an order book" do
+      get order_book_url(@market_symbol), as: :json
+      expect(response).to be_successful
+    end
+
+    it 'returns 404 response' do
+      get order_book_url({ market_symbol: 'invalid' }), as: :json
+      expect(response).to have_http_status(:not_found)
+    end
   end
 end
