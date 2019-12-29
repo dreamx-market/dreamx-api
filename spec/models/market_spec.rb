@@ -94,9 +94,31 @@ RSpec.describe Market, type: :model do
     expect(market.ticker).to_not be_nil
   end
 
-  # it 'sorts buy book by descending price and ascending date', :focus do
-  #   market = markets(:one)
-  #   create(:order, :buy)
-  #   buy_book = market.order_book[:buy_book]
-  # end
+  it 'sorts buy book by descending price and ascending date' do
+    market = markets(:one)
+    order1 = create(:order, :buy, give_amount: '1'.to_wei, take_amount: '1'.to_wei, created_at: 1.days.ago)
+    order2 = create(:order, :buy, give_amount: '1'.to_wei, take_amount: '1'.to_wei, created_at: 2.days.ago)
+    order3 = create(:order, :buy, give_amount: '1.5'.to_wei, take_amount: '1'.to_wei)
+    order4 = create(:order, :buy, give_amount: '2'.to_wei, take_amount: '1'.to_wei)
+    buy_book = market.order_book[:buy_book]
+
+    expect(buy_book[0]).to eq(order4)
+    expect(buy_book[1]).to eq(order3)
+    expect(buy_book[2]).to eq(order2)
+    expect(buy_book[3]).to eq(order1)
+  end
+
+  it 'sorts sell book by ascending price and ascending date' do
+    market = markets(:one)
+    order1 = create(:order, :sell, give_amount: '1'.to_wei, take_amount: '1'.to_wei, created_at: 1.days.ago)
+    order2 = create(:order, :sell, give_amount: '1'.to_wei, take_amount: '1'.to_wei, created_at: 2.days.ago)
+    order3 = create(:order, :sell, give_amount: '1.5'.to_wei, take_amount: '1'.to_wei)
+    order4 = create(:order, :sell, give_amount: '2'.to_wei, take_amount: '1'.to_wei)
+    sell_book = market.order_book[:sell_book]
+
+    expect(sell_book[0]).to eq(order4)
+    expect(sell_book[1]).to eq(order3)
+    expect(sell_book[2]).to eq(order2)
+    expect(sell_book[3]).to eq(order1)
+  end
 end
