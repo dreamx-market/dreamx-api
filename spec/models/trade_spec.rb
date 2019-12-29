@@ -118,4 +118,13 @@ RSpec.describe Trade, type: :model do
   it 'belongs to a market' do
     expect(trade.market).to_not be_nil
   end
+
+  it 'is either a sell or buy trade' do
+    trade = build(:trade, :sell)
+    expect(trade.sell).to eq(true)
+  end
+
+  it 'has a price' do
+    expect(trade.price).to_not be_nil
+  end
 end

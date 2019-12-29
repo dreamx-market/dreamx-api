@@ -131,7 +131,7 @@ class Market < ApplicationRecord
 
     result = 0
     @trades_within_period.each do |trade|
-      if trade.is_sell
+      if trade.sell
         result += trade.amount.to_i
       else
         result += trade.order.calculate_take_amount(trade.amount)
@@ -145,7 +145,7 @@ class Market < ApplicationRecord
 
     result = 0
     @trades_within_period.each do |trade|
-      if trade.is_sell
+      if trade.sell
         result += trade.order.calculate_take_amount(trade.amount)
       else
         result += trade.amount.to_i

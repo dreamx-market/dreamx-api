@@ -145,20 +145,6 @@ class Trade < ApplicationRecord
     return self.account_address
   end
 
-  # FIX THIS
-  def type
-    return self.is_sell ? 'sell' : 'buy'
-  end
-
-  # FIX THIS
-  def is_sell
-    return !self.order.is_sell
-  end
-
-  def price
-    return self.order.price
-  end
-
 	def balance_must_exist_and_is_sufficient
 		if !self.balance || !self.order
 			return
@@ -191,7 +177,7 @@ class Trade < ApplicationRecord
   end
 
   def volume
-    if (order.is_sell) then
+    if (order.sell) then
       return order.take_amount.to_i * amount.to_i / order.give_amount.to_i
     else
       return amount.to_i
@@ -298,6 +284,8 @@ class Trade < ApplicationRecord
       self.give_balance = self.account.balance(self.order.give_token.address)
       self.take_balance = self.account.balance(self.order.take_token.address)
       self.market = self.order.market
+      self.price = self.order.price
+      self.sell = !self.order.sell
     end
   end
 
@@ -312,7 +300,7 @@ class Trade < ApplicationRecord
   def calculate_fees_and_total
     self.fee = self.calculate_taker_fee
     self.maker_fee = self.calculate_maker_fee
-    self.total = self.is_sell ? self.amount : self.take_amount
+    self.total = self.sell ? self.amount : self.take_amount
   end
 
   def enqueue_update_ticker

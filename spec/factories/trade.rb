@@ -20,5 +20,13 @@ FactoryBot.define do
     trait :partial do
       amount { order.give_amount.to_i / 2 }
     end
+
+    trait :buy do
+      association :order, :sell
+    end
+
+    trait :sell do
+      association :order, :buy
+    end
   end
 end

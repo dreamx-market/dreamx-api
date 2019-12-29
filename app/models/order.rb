@@ -70,16 +70,6 @@ class Order < ApplicationRecord
     return take_amount
   end
 
-  # FIX THIS
-  def type
-    self.is_sell ? 'sell' : 'buy'
-  end
-
-  # FIX THIS
-  def is_sell
-    self.take_token_address == "0x0000000000000000000000000000000000000000" ? true : false
-  end
-
   # order altering operations
 
   def fill(amount, fee=0)
@@ -105,7 +95,7 @@ class Order < ApplicationRecord
   end
 
   def remaining_volume
-    if (self.is_sell) then
+    if (self.sell) then
       return self.take_amount.to_i - self.calculate_take_amount(self.filled.to_i)
     else
       return self.give_amount.to_i - self.filled.to_i
@@ -113,7 +103,7 @@ class Order < ApplicationRecord
   end
 
   def volume_must_meet_maker_minimum
-    if (self.is_sell) then
+    if (self.sell) then
       attribute = :take_amount
     else
       attribute = :give_amount
