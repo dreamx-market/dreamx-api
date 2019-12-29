@@ -43,7 +43,7 @@ class ChartDataController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_chart_datum
-      start_timestamp = params[:start] || 0
+      start_timestamp = params[:start] || 7.days.ago
       end_timestamp = params[:end] || Time.current
       period = params[:period] || 1.hour.to_i
       @chart_data = ChartDatum.where({ :market_symbol => params[:market_symbol], :period => period, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) }).order(:created_at)

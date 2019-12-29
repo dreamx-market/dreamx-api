@@ -7,7 +7,7 @@ class TradesController < ApplicationController
   def index
     start_timestamp = params[:start] || 0
     end_timestamp = params[:end] || Time.current + 1.second # + 1 second to include trades created at this exact moment
-    filters = extract_filters_from_query_params([ :account_address ])
+    filters = extract_filters_from_query_params([:account_address])
     if filters.empty?
       @trades = Trade.where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) }).includes([:order, :tx])
     else

@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::API
-  before_action :authorize_request
+  before_action :authorize_request, :validate_pagination_params
 
   def authorize_request
     @limit = ENV['RATE_LIMIT'].to_i
@@ -59,7 +59,7 @@ class ApplicationController < ActionController::API
 	private
 
 		def validate_pagination_params
-			unless !params[:per_page] || Integer(params[:per_page]) < ENV['MAX_PER_PAGE'].to_i then
+			unless !params[:per_page] || Integer(params[:per_page]) <= ENV['MAX_PER_PAGE'].to_i then
 	  		raise Error::ValidationError.new([
 	  			{
 	  				:field => 'per_page',
