@@ -22,15 +22,6 @@ RSpec.describe Order, type: :model do
     order.give_amount = maker_minimum - 1
     expect(order.valid?).to eq(false)
     expect(order.errors.messages[:give_amount]).to include("must be greater than #{maker_minimum}")
-
-    # market = build(:order, :sell).market
-    # pp market.reload.open_sell_orders.count
-
-    # create(:order, :sell)
-    # pp market.reload.open_sell_orders.count
-
-    # create(:order, :buy)
-    # pp market.reload.open_sell_orders.count
   end
 
   it 'is either sell or buy' do
@@ -162,5 +153,9 @@ RSpec.describe Order, type: :model do
 
   it 'belongs to a market' do
     expect(order.market).to_not be_nil
+  end
+
+  it 'has a price' do
+    expect(order.price).to eq('2.5'.to_d)
   end
 end

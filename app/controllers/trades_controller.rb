@@ -12,13 +12,13 @@ class TradesController < ApplicationController
     if filters.empty?
       @trades = Trade.where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
                 .includes([:order, :tx])
-                .order("trades.created_at DESC")
+                .order(created_at: :desc)
                 .paginate(:page => params[:page], :per_page => params[:per_page])
     else
       @trades = Trade.joins(:order).where({ :trades => filters, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
                 .or(Trade.joins(:order).where({ :orders => filters, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) }))
                 .includes([:order, :tx])
-                .order("trades.created_at DESC")
+                .order(created_at: :desc)
                 .paginate(:page => params[:page], :per_page => params[:per_page])
     end
   end

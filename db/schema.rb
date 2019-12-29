@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_29_184227) do
+ActiveRecord::Schema.define(version: 2019_12_29_213232) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -119,6 +119,7 @@ ActiveRecord::Schema.define(version: 2019_12_29_184227) do
     t.bigint "take_balance_id", null: false
     t.string "market_symbol", null: false
     t.boolean "sell"
+    t.decimal "price", precision: 32, scale: 16
     t.index ["nonce"], name: "index_orders_on_nonce", unique: true
     t.index ["order_hash"], name: "index_orders_on_order_hash", unique: true
   end

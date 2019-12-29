@@ -70,14 +70,6 @@ class Order < ApplicationRecord
     return take_amount
   end
 
-  def price
-    if (is_sell)
-      (self.take_amount.to_f / self.give_amount.to_f)
-    else
-      (self.give_amount.to_f / self.take_amount.to_f)
-    end
-  end
-
   # FIX THIS
   def type
     self.is_sell ? 'sell' : 'buy'
@@ -160,6 +152,12 @@ class Order < ApplicationRecord
 
     if self.market
       self.sell = self.give_token_address == self.market.base_token_address ? false : true
+    end
+
+    if (self.sell)
+      self.price = self.take_amount.to_d / self.give_amount.to_d
+    else
+      self.price = self.give_amount.to_d / self.take_amount.to_d
     end
   end
 
