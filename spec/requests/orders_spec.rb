@@ -10,14 +10,6 @@ RSpec.describe "Orders", type: :request do
     end
   end
 
-  describe "GET /orders/:order_hash" do
-    it "shows an order" do
-      order = create(:order)
-      get order_url(order.order_hash), as: :json
-      expect(response).to be_successful
-    end
-  end
-
   describe "POST /orders" do
     it "creates an order" do
       order = build(:order)

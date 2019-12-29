@@ -12,7 +12,7 @@ class OrdersController < ApplicationController
     @order = Order.new(order_params)
 
     if @order.save
-      render :show, status: :created, location: @order
+      render :show, status: :created
     else
     	serialize_active_record_validation_error @order.errors.messages
     end
