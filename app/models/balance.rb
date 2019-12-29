@@ -2,10 +2,13 @@ class Balance < ApplicationRecord
   has_many :refunds, dependent: :destroy
   has_many :deposits, dependent: :destroy
   has_many :withdraws, dependent: :destroy
-  has_many :orders, foreign_key: 'give_balance_id', primary_key: 'id'
-  has_many :open_orders, -> { open }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
-  has_many :closed_orders, -> { closed }, class_name: 'Order', foreign_key: 'give_balance_id', primary_key: 'id'
-  # has_many :closed_and_partially_filled_sell_orders, 
+  has_many :orders, foreign_key: 'give_balance_id'
+  has_many :open_orders, -> { open }, class_name: 'Order', foreign_key: 'give_balance_id'
+  has_many :closed_orders, -> { closed }, class_name: 'Order', foreign_key: 'give_balance_id'
+  has_many :closed_and_partially_filled_sell_orders, -> { closed_and_partially_filled }, class_name: 'Order', foreign_key: 'give_balance_id'
+  has_many :closed_and_partially_filled_buy_orders, -> { closed_and_partially_filled }, class_name: 'Order', foreign_key: 'take_balance_id'
+  has_many :buy_trades, class_name: 'Trade', foreign_key: 'give_balance_id'
+  has_many :sell_trades, class_name: 'Trade', foreign_key: 'take_balance_id'
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
 
@@ -117,38 +120,12 @@ class Balance < ApplicationRecord
     self.balance.to_i + self.hold_balance.to_i
   end
 
-  # INSTANCE METHOD ASSOCIATION
-  def closed_and_partially_filled_sell_orders
-    Order.where({ :account_address => account_address, :give_token_address => token_address }).where.not({ status: 'open' })
-  end
-
-  # INSTANCE METHOD ASSOCIATION
-  def closed_and_partially_filled_buy_orders
-    Order.where({ :account_address => account_address, :take_token_address => token_address }).where.not({ status: 'open' }).includes(trades: :order)
-  end
-
-  # INSTANCE METHOD ASSOCIATION
-  def trades
-    # orders included for both sell and buy trades
-    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } ).includes(:order).or(Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :give_token_address => token_address } ).includes(:order))
-  end
-
-  # INSTANCE METHOD ASSOCIATION
-  def sell_trades
-    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :take_token_address => token_address } ).includes(:order)
-  end
-
-  # INSTANCE METHOD ASSOCIATION
-  def buy_trades
-    Trade.joins(:order).where( :trades => { :account_address => account_address }, :orders => { :give_token_address => token_address } )
-  end
-
   def total_traded
     total = 0
     self.closed_and_partially_filled_sell_orders.each do |o|
       total -= o.filled.to_i
     end
-    self.closed_and_partially_filled_buy_orders.each do |o|
+    self.closed_and_partially_filled_buy_orders.includes(trades: :order).each do |o|
       o.trades.each do |t|
         total += t.maker_receiving_amount_after_fee.to_i
       end
@@ -156,7 +133,7 @@ class Balance < ApplicationRecord
     self.buy_trades.each do |t|
       total += t.taker_receiving_amount_after_fee.to_i
     end
-    self.sell_trades.each do |t|
+    self.sell_trades.includes(:order).each do |t|
       total -= t.take_amount.to_i
     end
     return total

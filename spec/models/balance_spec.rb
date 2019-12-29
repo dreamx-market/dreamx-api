@@ -80,12 +80,8 @@ RSpec.describe Balance, type: :model do
     end
     balance_with_sell_order = trades.first.maker_give_balance
     balance_with_buy_order = trades.first.maker_take_balance
-    balance_with_sell_trade = trades.first.taker_give_balance
-    balance_with_buy_trade = trades.first.taker_take_balance
-
-    # pp balance_with_sell_order.open_orders.length
-    # trades.each(&:save)
-    # pp balance_with_sell_order.open_orders.length
+    balance_with_sell_trade = trades.first.taker_take_balance
+    balance_with_buy_trade = trades.first.taker_give_balance
 
     expect {
     expect {
@@ -93,9 +89,9 @@ RSpec.describe Balance, type: :model do
     expect {
       trades.each(&:save)
     }.to decrease {balance_with_sell_order.reload.total_traded}.by(total_give_amount)
-    }.to increase {balance_with_buy_order.total_traded}.by(total_maker_receiving_amount_after_fee)
-    }.to decrease {balance_with_buy_trade.total_traded}.by(total_take_amount)
-    }.to increase {balance_with_sell_trade.total_traded}.by(total_taker_receiving_amount_after_fee)
+    }.to increase {balance_with_buy_order.reload.total_traded}.by(total_maker_receiving_amount_after_fee)
+    }.to increase {balance_with_buy_trade.reload.total_traded}.by(total_taker_receiving_amount_after_fee)
+    }.to decrease {balance_with_sell_trade.reload.total_traded}.by(total_take_amount)
   end
 
   it 'marks balance fraud with lock' do
@@ -108,16 +104,5 @@ RSpec.describe Balance, type: :model do
     expect {
       balance.mark_fraud
     }.to change { balance.reload.fraud }
-  end
-
-  it 'should preload trades and trade orders with .closed_and_partially_filled_buy_orders' do
-    trade = create(:trade)
-    balance = trade.maker_take_balance
-
-    order = balance.closed_and_partially_filled_buy_orders.first
-    expect(order.association(:trades).loaded?).to eq(true)
-
-    trade = order.trades.first
-    expect(trade.association(:order).loaded?).to eq(true)
   end
 end
