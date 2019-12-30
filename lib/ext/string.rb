@@ -9,12 +9,12 @@ class String
 
   def from_wei
     formatter = Ethereum::Formatter.new
-    formatter.from_wei(self.to_f).to_s
+    formatter.from_wei(self.to_d).to_s
   end
 
   def to_wei
     formatter = Ethereum::Formatter.new
-    formatter.to_wei(self.to_f).to_s
+    formatter.to_wei(self.to_d).to_s
   end
 
   def is_a_valid_address?

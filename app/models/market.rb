@@ -73,7 +73,7 @@ class Market < ApplicationRecord
       return nil
     end
 
-    return ((self.high(period).to_f + self.low(period).to_f) / 2).to_s
+    return ((self.high(period).to_d + self.low(period).to_d) / 2).to_s
   end
 
 	def base_and_quote_must_not_equal
@@ -139,10 +139,10 @@ class Market < ApplicationRecord
     last = self.last_price
 
     if !previous_24h or !last
-      return 0.to_f
+      return 0.to_d
     end
 
-    return ((last.to_f * 100) / previous_24h.to_f) - 100
+    return ((last.to_d * 100) / previous_24h.to_d) - 100
   end
 
   # TO BE TESTED
