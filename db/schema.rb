@@ -90,7 +90,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
   create_table "order_cancels", force: :cascade do |t|
     t.string "order_hash", null: false
     t.string "account_address", null: false
-    t.string "nonce", null: false
+    t.bigint "nonce", null: false
     t.string "cancel_hash", null: false
     t.string "signature", null: false
     t.datetime "created_at", null: false
@@ -106,7 +106,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
     t.string "give_amount", null: false
     t.string "take_token_address", null: false
     t.string "take_amount", null: false
-    t.string "nonce", null: false
+    t.bigint "nonce", null: false
     t.string "expiry_timestamp_in_milliseconds", null: false
     t.string "order_hash", null: false
     t.string "signature", null: false
@@ -162,7 +162,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
     t.string "account_address", null: false
     t.string "order_hash", null: false
     t.string "amount", null: false
-    t.string "nonce", null: false
+    t.bigint "nonce", null: false
     t.string "trade_hash", null: false
     t.string "signature", null: false
     t.datetime "created_at", null: false
@@ -192,7 +192,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "gas"
-    t.integer "nonce"
+    t.bigint "nonce", null: false
     t.datetime "broadcasted_at"
     t.text "hex"
     t.index ["transactable_id"], name: "index_transactions_on_transactable_id"
@@ -209,7 +209,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
     t.string "account_address", null: false
     t.string "amount", null: false
     t.string "token_address", null: false
-    t.string "nonce", null: false
+    t.bigint "nonce", null: false
     t.string "withdraw_hash", null: false
     t.string "signature", null: false
     t.datetime "created_at", null: false
