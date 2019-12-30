@@ -4,11 +4,16 @@ class Market < ApplicationRecord
   non_updatable_attrs :symbol, :base_token_address, :quote_token_address
   validate :immutable_attributes_cannot_be_updated, on: :update
 
-  has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol'
+  has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol' do
+    def by_period(period)
+      where({ period: period })
+    end
+  end
   has_many :open_orders, -> { open }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_many :open_buy_orders, -> { open_buy }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_many :open_sell_orders, -> { open_sell }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_many :trades, foreign_key: 'market_symbol', primary_key: 'symbol' do
+    # TO BE TESTED: test cacheing
     def within_period(period=nil)
       @to ||= Time.current
       from = period ? @to - period : Time.at(0)
@@ -81,38 +86,32 @@ class Market < ApplicationRecord
 	end
 
   def last_price(period=1.day)
-    # FIX THIS
-    trades_sorted_by_nonce_asc = self.trades.within_period(period).sort_by { |trade| trade.nonce.to_i }
+    trades_sorted_by_nonce_asc = self.trades.within_period(period).order(:nonce)
     return trades_sorted_by_nonce_asc.empty? ? nil : trades_sorted_by_nonce_asc.last.price.to_s
   end
 
   def high(period=1.day)
-    # FIX THIS
-    trades_within_period_sorted_by_price_asc = self.trades.within_period(period).sort_by { |trade| trade.price }
+    trades_within_period_sorted_by_price_asc = self.trades.within_period(period).order(:price)
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.last.price.to_s
   end
 
   def low(period=1.day)
-    # FIX THIS
-    trades_within_period_sorted_by_price_asc = self.trades.within_period(period).sort_by { |trade| trade.price }
+    trades_within_period_sorted_by_price_asc = self.trades.within_period(period).order(:price)
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.first.price.to_s
   end
 
-  def lowest_ask    
-    # FIX THIS
-    sell_orders_sorted_by_price_asc = self.open_sell_orders.sort_by { |order| order.price }
+  def lowest_ask   
+    sell_orders_sorted_by_price_asc = self.open_sell_orders.order(:price)
     return sell_orders_sorted_by_price_asc.empty? ? nil : sell_orders_sorted_by_price_asc.first.price
   end
 
-  def highest_bid   
-    # FIX THIS
-    buy_orders_sorted_by_price_asc = self.open_buy_orders.sort_by { |order| order.price }
+  def highest_bid
+    buy_orders_sorted_by_price_asc = self.open_buy_orders.order(:price)
     return buy_orders_sorted_by_price_asc.empty? ? nil : buy_orders_sorted_by_price_asc.last.price
   end
 
   def volume(period=1.day)
     result = 0
-    # FIX THIS
     self.trades.within_period(period).each do |trade|
       if trade.sell
         result += trade.amount.to_i
@@ -125,7 +124,6 @@ class Market < ApplicationRecord
 
   def quote_volume(period=1.day)
     result = 0
-    # FIX THIS
     self.trades.within_period(period).each do |trade|
       if trade.sell
         result += trade.take_amount.to_i
@@ -147,18 +145,10 @@ class Market < ApplicationRecord
     return ((last.to_f * 100) / previous_24h.to_f) - 100
   end
 
+  # TO BE TESTED
   def price_previous_24h
-    if (self.chart_data_by(1.hour).count < 24)
-      return nil
-    end
-    
-    # FIX THIS
-    return self.chart_data_by(1.hour).last(24).sort_by { |chart_datum| chart_datum.created_at }.first.close
-  end
-
-  # INSTANCE METHOD ASSOCIATION
-  def chart_data_by(period)
-    return self.chart_data.where({ :period => period.to_s })
+    hourly_candle_from_previous_24h = self.chart_data.by_period(1.hour).order(:created_at).last(24).first
+    return hourly_candle_from_previous_24h ? hourly_candle_from_previous_24h.close : nil
   end
 
   def initialize_attributes
