@@ -8,6 +8,13 @@ class Market < ApplicationRecord
   has_many :open_orders, -> { open }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_many :open_buy_orders, -> { open_buy }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_many :open_sell_orders, -> { open_sell }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
+  has_many :trades, foreign_key: 'market_symbol', primary_key: 'symbol' do
+    def within_period(period=nil)
+      @to ||= Time.current
+      from = period ? @to - period : Time.at(0)
+      where({ :created_at => from..@to })
+    end
+  end
   has_one :ticker, foreign_key: 'market_symbol', primary_key: 'symbol'
 	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
@@ -72,45 +79,21 @@ class Market < ApplicationRecord
 		errors.add(:quote_token_address, 'Market already exists') if existing_market
 	end
 
-  # INSTANCE METHOD ASSOCIATION
-  def all_trades
-    return Trade.joins(:order).where(:orders => { :give_token_address => self.base_token_address, :take_token_address => self.quote_token_address }).or(Trade.joins(:order).where(:orders => { :give_token_address => self.quote_token_address, :take_token_address => self.base_token_address }))
-  end
-
-  # INSTANCE METHOD ASSOCIATION
-  def trades(period=nil)
-    @memoized_current_time ||= Time.current
-    trades = []
-
-    if (!period)
-      # return all trades
-      trades = self.all_trades
-    else
-      # return trades within the period
-      trades = self.all_trades.where({ :created_at => (@memoized_current_time - period)..@memoized_current_time })
-    end
-
-    trades.includes(:order)
-  end
-
   def last_price(period=1.day)
-    @trades_within_period ||= self.trades(period)   
     # FIX THIS
-    trades_sorted_by_nonce_asc = @trades_within_period.sort_by { |trade| trade.nonce.to_i }
+    trades_sorted_by_nonce_asc = self.trades.within_period(period).sort_by { |trade| trade.nonce.to_i }
     return trades_sorted_by_nonce_asc.empty? ? nil : trades_sorted_by_nonce_asc.last.price.to_s
   end
 
   def high(period=1.day)
-    @trades_within_period ||= self.trades(period)   
     # FIX THIS
-    trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
+    trades_within_period_sorted_by_price_asc = self.trades.within_period(period).sort_by { |trade| trade.price }
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.last.price.to_s
   end
 
   def low(period=1.day)
-    @trades_within_period ||= self.trades(period)   
     # FIX THIS
-    trades_within_period_sorted_by_price_asc = @trades_within_period.sort_by { |trade| trade.price }
+    trades_within_period_sorted_by_price_asc = self.trades.within_period(period).sort_by { |trade| trade.price }
     return trades_within_period_sorted_by_price_asc.empty? ? nil : trades_within_period_sorted_by_price_asc.first.price.to_s
   end
 
@@ -127,10 +110,8 @@ class Market < ApplicationRecord
   end
 
   def volume(period=1.day)
-    @trades_within_period ||= self.trades(period)
-
     result = 0
-    @trades_within_period.each do |trade|
+    self.trades.within_period(period).includes(:order).each do |trade|
       if trade.sell
         result += trade.amount.to_i
       else
@@ -141,10 +122,8 @@ class Market < ApplicationRecord
   end
 
   def quote_volume(period=1.day)
-    @trades_within_period ||= self.trades(period)
-
     result = 0
-    @trades_within_period.each do |trade|
+    self.trades.within_period(period).includes(:order).each do |trade|
       if trade.sell
         result += trade.order.calculate_take_amount(trade.amount)
       else

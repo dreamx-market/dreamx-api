@@ -33,7 +33,7 @@ class Ticker < ApplicationRecord
       :highest_bid => highest_bid ? highest_bid.to_s : nil,
       :percent_change => self.market.percent_change_24h.to_s,
       :base_volume => self.market.volume.to_s,
-      :quote_volume => self.market.quote_volume.to_s
+      :quote_volume => self.market.quote_volume.to_s,
     }
     return ticker
   end

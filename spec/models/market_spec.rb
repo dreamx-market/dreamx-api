@@ -79,11 +79,6 @@ RSpec.describe Market, type: :model do
     expect(market.valid?).to be(false)
   end
 
-  it 'eager-loads orders when .trades is called' do
-    market = create(:market, trades: 1)
-    expect(market.trades.first.association(:order).loaded?).to eq(true)
-  end
-
   it 'cancels all open orders upon disabling' do
     market = create(:market, orders: 3)
     market.disable
