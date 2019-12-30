@@ -6,6 +6,11 @@ class Transaction < ApplicationRecord
   after_commit :relay_account_transactable, on: :create
   after_commit :relay_market_transactable, on: :create
 
+  scope :replaced, -> { where(status: 'replaced') }
+  scope :unconfirmed_and_pending, -> { where(status: ['unconfirmed', 'pending']) }
+  scope :unconfirmed, -> { where(status: 'unconfirmed') }
+  scope :pending, -> { where(status: 'pending') }
+
   class << self
     def next_nonce
       Redis.current.get('nonce')
@@ -138,7 +143,7 @@ class Transaction < ApplicationRecord
     #   self.regenerate_replaced_transactions
     # end
 
-    unconfirmed_transactions = self.unconfirmed_and_pending.sort_by { |transaction| transaction.nonce.to_i }
+    unconfirmed_transactions = self.unconfirmed_and_pending.order(:nonce)
     unconfirmed_transactions.each do |transaction|
       if !transaction.expired?
         next
@@ -157,7 +162,7 @@ class Transaction < ApplicationRecord
     end
 
     self.sync_nonce
-    replaced_transactions = self.replaced.sort_by { |transaction| transaction.nonce.to_i }
+    replaced_transactions = self.replaced.order(:nonce)
     replaced_transactions.each do |transaction|
       transaction.with_lock do
         transaction.assign_nonce
@@ -171,7 +176,7 @@ class Transaction < ApplicationRecord
   def self.regenerate_unconfirmed_transactions
     Config.set('read_only', 'true')
     self.sync_nonce
-    unconfirmed_transactions = self.unconfirmed.sort_by { |transaction| transaction.nonce.to_i }
+    unconfirmed_transactions = self.unconfirmed.order(:nonce)
     unconfirmed_transactions.each do |transaction|
       transaction.with_lock do
         transaction.assign_nonce
@@ -183,15 +188,15 @@ class Transaction < ApplicationRecord
   end
 
   def self.has_unconfirmed_and_pending_transactions?
-    self.unconfirmed_and_pending.first ? true : false
+    self.unconfirmed_and_pending.length > 0 ? true : false
   end
 
   def self.has_replaced_transactions?
-    self.where({ :status => 'replaced' }).first ? true : false
+    self.replaced.length > 0 ? true : false
   end
 
   def self.broadcast_pending_transactions
-    pending_transactions = self.pending.sort_by { |transaction| transaction.nonce.to_i }
+    pending_transactions = self.pending.order(:nonce)
     pending_transactions.each do |transaction|
       begin
         BroadcastTransactionJob.perform_later(transaction)
@@ -213,22 +218,6 @@ class Transaction < ApplicationRecord
         end
       end
     end
-  end
-
-  def self.unconfirmed_and_pending
-    self.where({ :status => ["unconfirmed", "pending"] })
-  end
-
-  def self.unconfirmed
-    self.where({ :status => "unconfirmed" })
-  end
-
-  def self.replaced
-    self.where({ :status => ["replaced"] })
-  end
-
-  def self.pending
-    self.where({ :status => ["pending"] })
   end
 
   def expired?
