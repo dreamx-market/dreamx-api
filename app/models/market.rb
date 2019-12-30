@@ -111,11 +111,12 @@ class Market < ApplicationRecord
 
   def volume(period=1.day)
     result = 0
-    self.trades.within_period(period).includes(:order).each do |trade|
+    # FIX THIS
+    self.trades.within_period(period).each do |trade|
       if trade.sell
         result += trade.amount.to_i
       else
-        result += trade.order.calculate_take_amount(trade.amount)
+        result += trade.take_amount.to_i
       end
     end
     return result.to_s.from_wei
@@ -123,9 +124,10 @@ class Market < ApplicationRecord
 
   def quote_volume(period=1.day)
     result = 0
-    self.trades.within_period(period).includes(:order).each do |trade|
+    # FIX THIS
+    self.trades.within_period(period).each do |trade|
       if trade.sell
-        result += trade.order.calculate_take_amount(trade.amount)
+        result += trade.take_amount.to_i
       else
         result += trade.amount.to_i
       end

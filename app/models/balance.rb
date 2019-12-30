@@ -125,7 +125,11 @@ class Balance < ApplicationRecord
     self.closed_and_partially_filled_sell_orders.each do |o|
       total -= o.filled.to_i
     end
-    self.closed_and_partially_filled_buy_orders.includes(trades: :order).each do |o|
+    # FIX THIS: 
+    # can bigdecimals reliably reproduce the same result for both of these scenarios:
+    # adding up maker_receiving_amount_after_fee from each trade within the orders
+    # adding up filled_take_minus_fee driectly the orders
+    self.closed_and_partially_filled_buy_orders.includes(:trades).each do |o|
       o.trades.each do |t|
         total += t.maker_receiving_amount_after_fee.to_i
       end
@@ -133,7 +137,7 @@ class Balance < ApplicationRecord
     self.buy_trades.each do |t|
       total += t.taker_receiving_amount_after_fee.to_i
     end
-    self.sell_trades.includes(:order).each do |t|
+    self.sell_trades.each do |t|
       total -= t.take_amount.to_i
     end
     return total

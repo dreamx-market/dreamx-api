@@ -133,10 +133,6 @@ class Trade < ApplicationRecord
     return self.amount
   end
 
-  def take_amount
-    return self.order.calculate_take_amount(self.amount).to_s
-  end
-
   def maker_address
     return self.order.account_address
   end
@@ -258,25 +254,23 @@ class Trade < ApplicationRecord
   end
 
   def calculate_maker_fee
-    one_ether = '1'.to_wei
-    maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI']
-    trade_amount_equivalence_in_take_tokens = self.order.calculate_take_amount(self.amount)
-    return (trade_amount_equivalence_in_take_tokens * maker_fee.to_i) / one_ether.to_i
+    one_ether = '1'.to_wei.to_d
+    maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI'].to_d
+    (self.take_amount * maker_fee) / one_ether
   end
 
   def calculate_taker_fee
-    one_ether = '1'.to_wei
-    taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI']
-    return (self.amount.to_i * taker_fee.to_i) / one_ether.to_i
+    one_ether = '1'.to_wei.to_d
+    taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI'].to_d
+    (self.amount.to_d * taker_fee) / one_ether
   end
 
   def maker_receiving_amount_after_fee
-    trade_amount_equivalence_in_take_tokens = self.order.calculate_take_amount(self.amount)
-    return trade_amount_equivalence_in_take_tokens.to_i - self.maker_fee.to_i
+    return self.take_amount.to_d - self.maker_fee.to_d
   end
 
   def taker_receiving_amount_after_fee
-    return self.amount.to_i - self.taker_fee.to_i
+    return self.amount.to_d - self.taker_fee.to_d
   end
 
   def initialize_attributes
@@ -286,6 +280,7 @@ class Trade < ApplicationRecord
       self.market = self.order.market
       self.price = self.order.price
       self.sell = !self.order.sell
+      self.take_amount = self.order.calculate_take_amount(self.amount).to_d
     end
   end
 

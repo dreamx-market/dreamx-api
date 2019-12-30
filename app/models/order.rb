@@ -66,8 +66,7 @@ class Order < ApplicationRecord
   end
 
   def calculate_take_amount(give_amount)
-    take_amount = give_amount.to_i * self.take_amount.to_i / self.give_amount.to_i
-    return take_amount
+    return give_amount.to_i * self.take_amount.to_i / self.give_amount.to_i
   end
 
   # order altering operations
@@ -120,10 +119,6 @@ class Order < ApplicationRecord
     return self.remaining_volume >= minimum_volume
   end
 
-  def filled_take_minus_fee
-    self.calculate_take_amount(self.filled).to_i - self.fee.to_i
-  end
-
   def hold_balance_with_lock
     balance = self.balance
     balance.with_lock do
@@ -149,6 +144,10 @@ class Order < ApplicationRecord
     else
       self.price = self.give_amount.to_d / self.take_amount.to_d
     end
+  end
+
+  def filled_take_minus_fee
+    self.calculate_take_amount(self.filled).to_i - self.fee.to_i
   end
 
 	private

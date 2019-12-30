@@ -37,7 +37,7 @@ RSpec.describe Balance, type: :model do
     balance = create(:balance, funded: true)
     trade = create(:trade, account: balance.account)
     expect(balance.reload.authentic?).to be(true)
-    trade.amount = trade.amount.to_i / 2
+    trade.take_amount = trade.take_amount / 2
     trade.save(validate: false)
     expect(balance.reload.authentic?).to_not be(true)
   end

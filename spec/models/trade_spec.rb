@@ -77,11 +77,6 @@ RSpec.describe Trade, type: :model do
     expect(trade.order).to have_received(:lock!).once
   end
 
-  it 'belongs to a give balance and a take balance' do
-    expect(trade.give_balance).to_not be_nil
-    expect(trade.take_balance).to_not be_nil
-  end
-
   it 'refunds a partial trade with locks, should not refund the entire order' do
     trade = create(:trade, :partial)
     trade.reload
@@ -115,16 +110,12 @@ RSpec.describe Trade, type: :model do
     expect(Refund.last.amount.to_i).to eq(onchain_balance)
   end
 
-  it 'belongs to a market' do
+  it 'is initialized with attributes' do
     expect(trade.market).to_not be_nil
-  end
-
-  it 'is either a sell or buy trade' do
-    trade = build(:trade, :sell)
-    expect(trade.sell).to eq(true)
-  end
-
-  it 'has a price' do
+    expect(trade.sell).to_not be_nil
     expect(trade.price).to_not be_nil
+    expect(trade.give_balance).to_not be_nil
+    expect(trade.take_balance).to_not be_nil
+    expect(trade.take_amount).to_not be_nil
   end
 end
