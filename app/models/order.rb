@@ -72,8 +72,8 @@ class Order < ApplicationRecord
   # order altering operations
 
   def fill(amount, fee=0)
-    self.filled = self.filled.to_i + amount.to_i
-    self.fee = self.fee.to_i + fee.to_i
+    self.filled += amount.to_d
+    self.fee += fee.to_d
 
     if self.remaining_give_amount == 0 or !self.remaining_volume_is_above_taker_minimum?
       self.status = 'closed'

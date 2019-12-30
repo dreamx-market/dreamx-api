@@ -63,8 +63,7 @@ class Balance < ApplicationRecord
 
   def onchain_balance
     exchange = Contract::Exchange.singleton
-    onchain_balance = exchange.balances(self.token_address, self.account_address)
-    return onchain_balance.to_s
+    return exchange.balances(self.token_address, self.account_address)
   end
 
   def onchain_delta
@@ -186,29 +185,29 @@ class Balance < ApplicationRecord
   # balance altering operations
 
   def credit(amount)
-    self.balance = self.balance.to_i + amount.to_i
+    self.balance += amount.to_d
     self.save!
   end
 
   def debit(amount)
-    self.balance = self.balance.to_i - amount.to_i
+    self.balance -= amount.to_d
     self.save!
   end
 
   def hold(amount)
-    self.balance = balance.to_i - amount.to_i
-    self.hold_balance = hold_balance.to_i + amount.to_i
+    self.balance -= amount.to_d
+    self.hold_balance += amount.to_d
     self.save!
   end
 
   def release(amount)
-    self.balance = balance.to_i + amount.to_i
-    self.hold_balance = hold_balance.to_i - amount.to_i
+    self.balance += amount.to_d
+    self.hold_balance -= amount.to_d
     self.save!
   end
 
   def spend(amount)
-    self.hold_balance = hold_balance.to_i - amount.to_i
+    self.hold_balance -= amount.to_d
     self.save!
   end
 

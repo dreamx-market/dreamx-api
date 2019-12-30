@@ -5,18 +5,18 @@ class TradesController < ApplicationController
   # GET /trades
   # GET /trades.json
   def index
-    start_timestamp = params[:start] || 0
-    end_timestamp = params[:end] || Time.current + 1.second # + 1 second to include trades created at this exact moment
+    from = params[:start] ? Time.at(params[:start].to_i) : Time.at(0)
+    to = params[:end] ? Time.at(params[:end].to_i) : Time.current + 1.second # + 1 second to include trades created at this exact moment
     filters = extract_filters_from_query_params([:account_address, :market_symbol])
 
     if filters.empty?
-      @trades = Trade.where({ :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
+      @trades = Trade.where({ :created_at => from..to })
                 .includes([:order, :tx])
                 .order(created_at: :desc)
                 .paginate(:page => params[:page], :per_page => params[:per_page])
     else
-      @trades = Trade.joins(:order).where({ :trades => filters, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) })
-                .or(Trade.joins(:order).where({ :orders => filters, :created_at => Time.zone.at(start_timestamp.to_i)..Time.zone.at(end_timestamp.to_i) }))
+      @trades = Trade.joins(:order).where({ :trades => filters, :created_at => from..to })
+                .or(Trade.joins(:order).where({ :orders => filters, :created_at => from..to }))
                 .includes([:order, :tx])
                 .order(created_at: :desc)
                 .paginate(:page => params[:page], :per_page => params[:per_page])

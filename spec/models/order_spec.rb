@@ -156,6 +156,6 @@ RSpec.describe Order, type: :model do
   end
 
   it 'has a price' do
-    expect(order.price).to eq('2.5'.to_d)
+    expect(order.price.to_s).to eq('2.5')
   end
 end

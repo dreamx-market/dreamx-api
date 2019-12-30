@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_30_125505) do
+ActiveRecord::Schema.define(version: 2019_12_30_162600) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 2019_12_30_125505) do
   create_table "balances", force: :cascade do |t|
     t.string "account_address"
     t.string "token_address"
-    t.string "balance", default: "0"
-    t.string "hold_balance", default: "0"
+    t.decimal "balance", default: "0.0", null: false
+    t.decimal "hold_balance", default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "fraud", default: false
@@ -112,9 +112,9 @@ ActiveRecord::Schema.define(version: 2019_12_30_125505) do
     t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "filled", default: "0", null: false
+    t.decimal "filled", default: "0.0", null: false
     t.string "status", default: "open", null: false, comment: "open, partially_filled, closed"
-    t.string "fee", default: "0", null: false
+    t.decimal "fee", default: "0.0", null: false
     t.bigint "give_balance_id", null: false
     t.bigint "take_balance_id", null: false
     t.string "market_symbol", null: false
