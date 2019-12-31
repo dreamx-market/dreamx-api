@@ -3,8 +3,8 @@ class FixDatatypes < ActiveRecord::Migration[5.2]
     change_table :balances do |t|
       t.change_default :balance, nil
       t.change_default :hold_balance, nil
-      t.change :balance, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'balance::integer'
-      t.change :hold_balance, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'balance::integer'
+      t.change :balance, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'balance::decimal'
+      t.change :hold_balance, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'balance::decimal'
     end
 
     change_table :blocks do |t|
@@ -25,9 +25,9 @@ class FixDatatypes < ActiveRecord::Migration[5.2]
 
     change_table :deposits do |t|
       t.index :created_at
-      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::integer'
+      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::decimal'
       t.remove :status
-      t.change :block_number, :bigint, null: false, using: 'block_number::integer'
+      t.change :block_number, :bigint, null: false, using: 'block_number::bigint'
     end
 
     change_table :markets do |t|
@@ -44,17 +44,17 @@ class FixDatatypes < ActiveRecord::Migration[5.2]
       t.change_default :give_amount, nil
       t.change_default :take_amount, nil
       t.change_default :expiry_timestamp_in_milliseconds, nil
-      t.change :fee, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'fee::integer'
-      t.change :filled, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'filled::integer'
-      t.change :nonce, :bigint, null: false, using: 'nonce::integer'
-      t.change :give_amount, :decimal, precision: 1000, scale: 0, null: false, using: 'give_amount::integer'
-      t.change :take_amount, :decimal, precision: 1000, scale: 0, null: false, using: 'take_amount::integer'
-      t.change :expiry_timestamp_in_milliseconds, :bigint, null: false, using: 'expiry_timestamp_in_milliseconds::integer'
+      t.change :fee, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'fee::decimal'
+      t.change :filled, :decimal, precision: 1000, scale: 0, default: 0, null: false, using: 'filled::decimal'
+      t.change :nonce, :bigint, null: false, using: 'nonce::bigint'
+      t.change :give_amount, :decimal, precision: 1000, scale: 0, null: false, using: 'give_amount::decimal'
+      t.change :take_amount, :decimal, precision: 1000, scale: 0, null: false, using: 'take_amount::decimal'
+      t.change :expiry_timestamp_in_milliseconds, :bigint, null: false, using: 'expiry_timestamp_in_milliseconds::bigint'
       t.change :status, :string, default: 'open', null: false, comment: nil
     end
 
     change_table :refunds do |t|
-      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::integer'
+      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::decimal'
     end
 
     change_table :tickers do |t|
@@ -62,31 +62,31 @@ class FixDatatypes < ActiveRecord::Migration[5.2]
       t.change_default :base_volume, nil
       t.change_default :quote_volume, nil
       t.change :market_symbol, :string, null: false
-      t.change :last, :decimal, precision: 32, scale: 16, using: 'last::integer'
-      t.change :high, :decimal, precision: 32, scale: 16, using: 'high::integer'
-      t.change :low, :decimal, precision: 32, scale: 16, using: 'low::integer'
-      t.change :lowest_ask, :decimal, precision: 32, scale: 16, using: 'lowest_ask::integer'
-      t.change :highest_bid, :decimal, precision: 32, scale: 16, using: 'highest_bid::integer'
-      t.change :percent_change, :decimal, precision: 32, scale: 16, default: 0, using: 'percent_change::integer'
-      t.change :base_volume, :decimal, precision: 32, scale: 16, default: 0, using: 'base_volume::integer'
-      t.change :quote_volume, :decimal, precision: 32, scale: 16, default: 0, using: 'quote_volume::integer'
+      t.change :last, :decimal, precision: 32, scale: 16, using: 'last::decimal'
+      t.change :high, :decimal, precision: 32, scale: 16, using: 'high::decimal'
+      t.change :low, :decimal, precision: 32, scale: 16, using: 'low::decimal'
+      t.change :lowest_ask, :decimal, precision: 32, scale: 16, using: 'lowest_ask::decimal'
+      t.change :highest_bid, :decimal, precision: 32, scale: 16, using: 'highest_bid::decimal'
+      t.change :percent_change, :decimal, precision: 32, scale: 16, default: 0, using: 'percent_change::decimal'
+      t.change :base_volume, :decimal, precision: 32, scale: 16, default: 0, using: 'base_volume::decimal'
+      t.change :quote_volume, :decimal, precision: 32, scale: 16, default: 0, using: 'quote_volume::decimal'
     end
 
     change_table :tokens do |t|
       t.change :decimals, :integer, using: 'decimals::integer'
-      t.change :withdraw_minimum, :decimal, precision: 1000, scale: 0, using: 'withdraw_minimum::integer'
-      t.change :withdraw_fee, :decimal, precision: 1000, scale: 0, using: 'withdraw_fee::integer'
+      t.change :withdraw_minimum, :decimal, precision: 1000, scale: 0, using: 'withdraw_minimum::decimal'
+      t.change :withdraw_fee, :decimal, precision: 1000, scale: 0, using: 'withdraw_fee::decimal'
     end
 
     change_table :trades do |t|
       t.change_default :fee, nil
       t.change_default :total, nil
       t.change_default :maker_fee, nil
-      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::integer'
-      t.change :nonce, :bigint, null: false, using: 'nonce::integer'
-      t.change :fee, :decimal, precision: 1000, scale: 0, null: false, using: 'fee::integer'
-      t.change :total, :decimal, precision: 1000, scale: 0, null: false, using: 'total::integer'
-      t.change :maker_fee, :decimal, precision: 1000, scale: 0, null: false, using: 'maker_fee::integer'
+      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::decimal'
+      t.change :nonce, :bigint, null: false, using: 'nonce::bigint'
+      t.change :fee, :decimal, precision: 1000, scale: 0, null: false, using: 'fee::decimal'
+      t.change :total, :decimal, precision: 1000, scale: 0, null: false, using: 'total::decimal'
+      t.change :maker_fee, :decimal, precision: 1000, scale: 0, null: false, using: 'maker_fee::decimal'
       t.column :sell, :bool
       t.column :price, :decimal, precision: 32, scale: 16
       t.column :take_amount, :decimal, precision: 1000, scale: 0
@@ -95,20 +95,20 @@ class FixDatatypes < ActiveRecord::Migration[5.2]
 
     change_table :transactions do |t|
       t.change :transactable_id, :bigint
-      t.change :gas_limit, :decimal, precision: 1000, scale: 0, null: false, using: 'gas_limit::integer'
-      t.change :gas_price, :decimal, precision: 1000, scale: 0, null: false, using: 'gas_price::integer'
-      t.change :block_number, :bigint, using: 'block_number::integer'
+      t.change :gas_limit, :decimal, precision: 1000, scale: 0, null: false, using: 'gas_limit::decimal'
+      t.change :gas_price, :decimal, precision: 1000, scale: 0, null: false, using: 'gas_price::decimal'
+      t.change :block_number, :bigint, using: 'block_number::bigint'
       t.change :status, :string, comment: nil
-      t.change :gas, :decimal, precision: 1000, scale: 0, null: true, using: 'gas::integer'
+      t.change :gas, :decimal, precision: 1000, scale: 0, null: true, using: 'gas::decimal'
       t.change :nonce, :bigint, null: false
     end
 
     drop_table :transfers
 
     change_table :withdraws do |t|
-      t.change :nonce, :bigint, null: false, using: 'nonce::integer'
-      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::integer'
-      t.change :fee, :decimal, precision: 1000, scale: 0, null: false, using: 'fee::integer'
+      t.change :nonce, :bigint, null: false, using: 'nonce::bigint'
+      t.change :amount, :decimal, precision: 1000, scale: 0, null: false, using: 'amount::decimal'
+      t.change :fee, :decimal, precision: 1000, scale: 0, null: false, using: 'fee::decimal'
       t.index :created_at
     end
   end
