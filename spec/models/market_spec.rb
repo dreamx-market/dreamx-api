@@ -75,7 +75,7 @@ RSpec.describe Market, type: :model do
     expect(market.valid?).to be(true)
     market.status = 'active'
     expect(market.valid?).to be(true)
-    market.status = 'INVALID'
+    market.status = 'invalid'
     expect(market.valid?).to be(false)
   end
 

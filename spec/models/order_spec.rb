@@ -119,9 +119,9 @@ RSpec.describe Order, type: :model do
   end
 
   it 'must have a valid status' do
-    order.status = 'INVALID'
+    order.status = 'invalid'
     expect(order.valid?).to eq(false)
-    expect(order.errors.messages[:status]).to include('must be open, closed or partially_filled')
+    expect(order.errors.messages[:status]).to include('is not included in the list')
   end
 
   it 'must belong to an active market' do

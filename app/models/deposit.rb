@@ -4,7 +4,7 @@ class Deposit < ApplicationRecord
   belongs_to :balance
 
   validates :transaction_hash, uniqueness: true
-  validates :transaction_hash, :account_address, :token_address, :amount, :status, :block_hash, :block_number, presence: true
+  validates :transaction_hash, :account_address, :token_address, :amount, :block_hash, :block_number, presence: true
   
   validates :amount, numericality: { greater_than: 0 }
 
@@ -46,7 +46,6 @@ class Deposit < ApplicationRecord
         :transaction_hash => deposit['transaction_hash'],
         :block_hash => deposit['block_hash'],
         :block_number => deposit['block_number'],
-        :status => 'confirmed'
       }
       begin
         self.create!(new_deposit)

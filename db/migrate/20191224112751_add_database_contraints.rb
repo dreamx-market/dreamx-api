@@ -59,7 +59,5 @@ class AddDatabaseContraints < ActiveRecord::Migration[5.2]
     change_column_null :order_cancels, :nonce, false
     change_column_null :order_cancels, :cancel_hash, false
     change_column_null :order_cancels, :signature, false
-
-    # inclusion validations must be backed by check contraints
   end
 end

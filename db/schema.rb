@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_30_162600) do
+ActiveRecord::Schema.define(version: 2019_12_31_095442) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
   create_table "balances", force: :cascade do |t|
     t.string "account_address"
     t.string "token_address"
-    t.decimal "balance", default: "0.0", null: false
-    t.decimal "hold_balance", default: "0.0", null: false
+    t.decimal "balance", precision: 1000, default: "0", null: false
+    t.decimal "hold_balance", precision: 1000, default: "0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "fraud", default: false
@@ -36,36 +36,37 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
   create_table "blocks", force: :cascade do |t|
     t.string "block_hash"
     t.string "parent_hash"
-    t.integer "block_number"
+    t.bigint "block_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "chart_data", force: :cascade do |t|
-    t.string "high"
-    t.string "low"
-    t.string "open"
-    t.string "close"
-    t.string "volume"
-    t.string "quote_volume"
-    t.string "average"
-    t.string "period"
+    t.decimal "high", precision: 32, scale: 16
+    t.decimal "low", precision: 32, scale: 16
+    t.decimal "open", precision: 32, scale: 16
+    t.decimal "close", precision: 32, scale: 16
+    t.decimal "volume", precision: 32, scale: 16
+    t.decimal "quote_volume", precision: 32, scale: 16
+    t.decimal "average", precision: 32, scale: 16
+    t.integer "period"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "market_symbol"
+    t.index ["created_at"], name: "index_chart_data_on_created_at"
   end
 
   create_table "deposits", force: :cascade do |t|
     t.string "account_address", null: false
     t.string "token_address", null: false
-    t.string "amount", null: false
+    t.decimal "amount", precision: 1000, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "status", null: false
     t.string "transaction_hash", null: false
     t.string "block_hash", null: false
-    t.string "block_number", null: false
+    t.bigint "block_number", null: false
     t.bigint "balance_id", null: false
+    t.index ["created_at"], name: "index_deposits_on_created_at"
     t.index ["transaction_hash"], name: "index_deposits_on_transaction_hash", unique: true
   end
 
@@ -82,7 +83,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "symbol"
-    t.string "status", default: "disabled", comment: "active, disabled"
+    t.string "status", default: "disabled"
     t.index ["base_token_address"], name: "index_markets_on_base_token_address"
     t.index ["quote_token_address"], name: "index_markets_on_quote_token_address"
   end
@@ -103,18 +104,18 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
   create_table "orders", force: :cascade do |t|
     t.string "account_address", null: false
     t.string "give_token_address", null: false
-    t.string "give_amount", null: false
+    t.decimal "give_amount", precision: 1000, null: false
     t.string "take_token_address", null: false
-    t.string "take_amount", null: false
+    t.decimal "take_amount", precision: 1000, null: false
     t.bigint "nonce", null: false
-    t.string "expiry_timestamp_in_milliseconds", null: false
+    t.bigint "expiry_timestamp_in_milliseconds", null: false
     t.string "order_hash", null: false
     t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "filled", default: "0.0", null: false
-    t.string "status", default: "open", null: false, comment: "open, partially_filled, closed"
-    t.decimal "fee", default: "0.0", null: false
+    t.decimal "filled", precision: 1000, default: "0", null: false
+    t.string "status", default: "open", null: false
+    t.decimal "fee", precision: 1000, default: "0", null: false
     t.bigint "give_balance_id", null: false
     t.bigint "take_balance_id", null: false
     t.string "market_symbol", null: false
@@ -126,7 +127,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
 
   create_table "refunds", force: :cascade do |t|
     t.bigint "balance_id"
-    t.string "amount"
+    t.decimal "amount", precision: 1000, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["balance_id"], name: "index_refunds_on_balance_id"
@@ -135,63 +136,64 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
   create_table "tickers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "market_symbol"
-    t.string "last"
-    t.string "high"
-    t.string "low"
-    t.string "lowest_ask"
-    t.string "highest_bid"
-    t.string "percent_change", default: "0"
-    t.string "base_volume", default: "0"
-    t.string "quote_volume", default: "0"
+    t.string "market_symbol", null: false
+    t.decimal "last", precision: 32, scale: 16
+    t.decimal "high", precision: 32, scale: 16
+    t.decimal "low", precision: 32, scale: 16
+    t.decimal "lowest_ask", precision: 32, scale: 16
+    t.decimal "highest_bid", precision: 32, scale: 16
+    t.decimal "percent_change", precision: 32, scale: 16, default: "0.0"
+    t.decimal "base_volume", precision: 32, scale: 16, default: "0.0"
+    t.decimal "quote_volume", precision: 32, scale: 16, default: "0.0"
   end
 
   create_table "tokens", force: :cascade do |t|
     t.string "name"
     t.string "address"
     t.string "symbol"
-    t.string "decimals"
+    t.integer "decimals"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "withdraw_minimum"
-    t.string "withdraw_fee"
+    t.decimal "withdraw_minimum", precision: 1000
+    t.decimal "withdraw_fee", precision: 1000
     t.index ["address"], name: "index_tokens_on_address"
   end
 
   create_table "trades", force: :cascade do |t|
     t.string "account_address", null: false
     t.string "order_hash", null: false
-    t.string "amount", null: false
+    t.decimal "amount", precision: 1000, null: false
     t.bigint "nonce", null: false
     t.string "trade_hash", null: false
     t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "fee", default: "0", null: false
-    t.string "total", default: "0", null: false
-    t.string "maker_fee", default: "0", null: false
+    t.decimal "fee", precision: 1000, null: false
+    t.decimal "total", precision: 1000, null: false
+    t.decimal "maker_fee", precision: 1000, null: false
     t.bigint "give_balance_id", null: false
     t.bigint "take_balance_id", null: false
     t.string "market_symbol", null: false
     t.boolean "sell"
-    t.decimal "price"
-    t.decimal "take_amount"
+    t.decimal "price", precision: 32, scale: 16
+    t.decimal "take_amount", precision: 1000
+    t.index ["created_at"], name: "index_trades_on_created_at"
     t.index ["nonce"], name: "index_trades_on_nonce", unique: true
     t.index ["trade_hash"], name: "index_trades_on_trade_hash", unique: true
   end
 
   create_table "transactions", force: :cascade do |t|
     t.string "transactable_type"
-    t.integer "transactable_id"
-    t.string "gas_limit"
-    t.string "gas_price"
+    t.bigint "transactable_id"
+    t.decimal "gas_limit", precision: 1000, null: false
+    t.decimal "gas_price", precision: 1000, null: false
     t.string "transaction_hash"
     t.string "block_hash"
-    t.string "block_number"
-    t.string "status", comment: "confirmed, unconfirmed, pending, replaced, failed, out_of_gas"
+    t.bigint "block_number"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "gas"
+    t.decimal "gas", precision: 1000, null: false
     t.bigint "nonce", null: false
     t.datetime "broadcasted_at"
     t.text "hex"
@@ -200,22 +202,18 @@ ActiveRecord::Schema.define(version: 2019_12_30_162600) do
     t.index ["transaction_hash"], name: "index_transactions_on_transaction_hash"
   end
 
-  create_table "transfers", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "withdraws", force: :cascade do |t|
     t.string "account_address", null: false
-    t.string "amount", null: false
+    t.decimal "amount", precision: 1000, null: false
     t.string "token_address", null: false
     t.bigint "nonce", null: false
     t.string "withdraw_hash", null: false
     t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "fee"
+    t.decimal "fee", precision: 1000, null: false
     t.bigint "balance_id", null: false
+    t.index ["created_at"], name: "index_withdraws_on_created_at"
     t.index ["nonce"], name: "index_withdraws_on_nonce", unique: true
     t.index ["withdraw_hash"], name: "index_withdraws_on_withdraw_hash", unique: true
   end

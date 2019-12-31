@@ -8,7 +8,7 @@ FactoryBot.define do
     volume { "64.36480422" }
     quote_volume { "2055.56810329" }
     average { "0.03131241" }
-    period { 1.hour.to_i }
+    period { 1.hour }
     created_at { Time.now }
 
     trait :expired do

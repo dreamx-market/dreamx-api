@@ -2,7 +2,6 @@ class Market < ApplicationRecord
   include NonDestroyable
   include NonUpdatable
   non_updatable_attrs :symbol, :base_token_address, :quote_token_address
-  validate :immutable_attributes_cannot_be_updated, on: :update
 
   has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol' do
     def by_period(period)
@@ -24,8 +23,11 @@ class Market < ApplicationRecord
   has_one :ticker, foreign_key: 'market_symbol', primary_key: 'symbol'
 	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
 	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
+
+  validates :status, inclusion: { in: ['active', 'disabled'] }
+  validate :immutable_attributes_cannot_be_updated, on: :update
 	validates_uniqueness_of :base_token_address, scope: [:quote_token_address]
-	validate :status_must_be_active_or_disabled, :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
+	validate :base_and_quote_must_not_equal, :cannot_be_the_reverse_of_an_existing_market
 
   before_validation :initialize_attributes, on: :create
   before_create :remove_checksum, :assign_symbol
@@ -57,14 +59,6 @@ class Market < ApplicationRecord
         order.cancel
       end
       self.update!({ :status => 'disabled' })
-    end
-  end
-
-  def status_must_be_active_or_disabled
-    valid_states = ['active', 'disabled']
-
-    if (!valid_states.include?(self.status))
-      errors.add(:status, 'Must be active or disabled')
     end
   end
 

@@ -1,4 +1,6 @@
 class ChartDatum < ApplicationRecord
+  validates :period, inclusion: { in: [5.minutes, 15.minutes, 1.hour, 1.day] }
+
   after_commit { MarketChartDataRelayJob.perform_later(self) }
 
   def self.aggregate(period)

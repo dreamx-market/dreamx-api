@@ -1,6 +1,8 @@
 class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
 
+  validates :status, inclusion: { in: ['confirmed', 'unconfirmed', 'pending', 'replaced', 'failed', 'out_of_gas'] }
+
   before_create :assign_nonce, :sign
   after_create_commit :broadcast
   after_commit :relay_account_transactable, on: :create
