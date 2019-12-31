@@ -9,6 +9,7 @@ RSpec.describe Ticker, type: :model do
     end
 
     expect {
+      create(:trade)
       ticker.update_data
     }.to change { ticker.reload.updated_at }
   end

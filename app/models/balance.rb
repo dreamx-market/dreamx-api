@@ -185,29 +185,29 @@ class Balance < ApplicationRecord
   # balance altering operations
 
   def credit(amount)
-    self.balance += amount.to_d
+    self.balance += amount.to_i
     self.save!
   end
 
   def debit(amount)
-    self.balance -= amount.to_d
+    self.balance -= amount.to_i
     self.save!
   end
 
   def hold(amount)
-    self.balance -= amount.to_d
-    self.hold_balance += amount.to_d
+    self.balance -= amount.to_i
+    self.hold_balance += amount.to_i
     self.save!
   end
 
   def release(amount)
-    self.balance += amount.to_d
-    self.hold_balance -= amount.to_d
+    self.balance += amount.to_i
+    self.hold_balance -= amount.to_i
     self.save!
   end
 
   def spend(amount)
-    self.hold_balance -= amount.to_d
+    self.hold_balance -= amount.to_i
     self.save!
   end
 

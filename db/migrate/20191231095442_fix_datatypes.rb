@@ -99,7 +99,7 @@ class FixDatatypes < ActiveRecord::Migration[5.2]
       t.change :gas_price, :decimal, precision: 1000, scale: 0, null: false, using: 'gas_price::integer'
       t.change :block_number, :bigint, using: 'block_number::integer'
       t.change :status, :string, comment: nil
-      t.change :gas, :decimal, precision: 1000, scale: 0, null: false, using: 'gas::integer'
+      t.change :gas, :decimal, precision: 1000, scale: 0, null: true, using: 'gas::integer'
       t.change :nonce, :bigint, null: false
     end
 

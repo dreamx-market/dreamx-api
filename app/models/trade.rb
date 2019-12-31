@@ -18,7 +18,7 @@ class Trade < ApplicationRecord
 
   before_validation :initialize_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
-  before_create :calculate_fees_and_total, :trade_balances_and_fill_order_with_lock
+  before_create :trade_balances_and_fill_order_with_lock
   after_create :enqueue_update_ticker
 
   class << self
@@ -281,6 +281,9 @@ class Trade < ApplicationRecord
       self.price = self.order.price
       self.sell = !self.order.sell
       self.take_amount = self.order.calculate_take_amount(self.amount).to_i
+      self.fee = self.calculate_taker_fee
+      self.maker_fee = self.calculate_maker_fee
+      self.total = self.sell ? self.amount : self.take_amount
     end
   end
 
@@ -290,12 +293,6 @@ class Trade < ApplicationRecord
     if self.account_address.is_a_valid_address?
       self.account_address = self.account_address.without_checksum
     end
-  end
-
-  def calculate_fees_and_total
-    self.fee = self.calculate_taker_fee
-    self.maker_fee = self.calculate_maker_fee
-    self.total = self.sell ? self.amount : self.take_amount
   end
 
   def enqueue_update_ticker

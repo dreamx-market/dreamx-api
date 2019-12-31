@@ -6,7 +6,6 @@ FactoryBot.define do
     transaction_hash { generate_random_transaction_hash }
     block_hash { generate_random_transaction_hash }
     block_number { 1 }
-    status { 'confirmed' }
 
     after(:build) do |deposit|
       deposit.valid?

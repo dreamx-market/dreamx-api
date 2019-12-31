@@ -193,7 +193,7 @@ ActiveRecord::Schema.define(version: 2019_12_31_095442) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "gas", precision: 1000, null: false
+    t.decimal "gas", precision: 1000
     t.bigint "nonce", null: false
     t.datetime "broadcasted_at"
     t.text "hex"

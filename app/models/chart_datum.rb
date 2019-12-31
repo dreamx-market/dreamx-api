@@ -30,11 +30,11 @@ class ChartDatum < ApplicationRecord
   end
 
   def expired?
-    if (self.period == 5.minutes.to_s)
+    if (self.period == 5.minutes)
       return self.created_at < Time.current - ENV['CHART_DATUM_EXPIRY_5M'].to_i
-    elsif (self.period == 15.minutes.to_s)
+    elsif (self.period == 15.minutes)
       return self.created_at < Time.current - ENV['CHART_DATUM_EXPIRY_15M'].to_i
-    elsif (self.period == 1.hour.to_s)
+    elsif (self.period == 1.hour)
       return self.created_at < Time.current - ENV['CHART_DATUM_EXPIRY_1H'].to_i
     else
       return false
