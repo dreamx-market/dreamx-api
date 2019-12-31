@@ -35,7 +35,7 @@ class FixDatatypes < ActiveRecord::Migration[5.2]
     end
 
     change_table :order_cancels do |t|
-      t.change :nonce, :bigint, null: false, using: 'nonce::integer'
+      t.change :nonce, :bigint, null: false, using: 'nonce::bigint'
     end
 
     change_table :orders do |t|
