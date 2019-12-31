@@ -9,6 +9,7 @@ class Balance < ApplicationRecord
   has_many :closed_and_partially_filled_buy_orders, -> { closed_and_partially_filled }, class_name: 'Order', foreign_key: 'take_balance_id'
   has_many :buy_trades, class_name: 'Trade', foreign_key: 'give_balance_id'
   has_many :sell_trades, class_name: 'Trade', foreign_key: 'take_balance_id'
+  alias_attribute :trades, :sell_trades
   belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
   belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
 
