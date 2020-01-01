@@ -1,13 +1,11 @@
 class TransfersController < ApplicationController
-  before_action :set_transfer, only: [:show]
-
   # GET /transfers/1
   def show
+    account = Account.find_by!(address: params[:account_address])
+    from = params[:start]
+    to = params[:end]
+    page = params[:page]
+    per_page = params[:per_page]
+    @transfers = account.transfers_within_period(from, to, page, per_page)
   end
-
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_transfer
-      @transfers = Transfer.find_transfers(params)
-    end
 end

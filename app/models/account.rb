@@ -13,6 +13,14 @@ class Account < ApplicationRecord
     end
   end
 
+  def transfers_within_period(from=nil, to=nil, page=nil, per_page=nil)
+    from = from ? Time.at(from.to_i) : Time.at(0)
+    to = to ? Time.at(to.to_i) : Time.current
+    deposits = self.deposits.order(created_at: :desc).where(created_at: from..to).paginate(page: page, per_page: per_page)
+    withdraws = self.withdraws.order(created_at: :desc).where(created_at: from..to).paginate(page: page, per_page: per_page)
+    return { deposits: deposits, withdraws: withdraws }
+  end
+
   def balance(token_address_or_symbol)
     if (!token_address_or_symbol.is_a_valid_address?)
       token = Token.find_by({ symbol: token_address_or_symbol.upcase })
