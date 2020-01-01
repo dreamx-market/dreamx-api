@@ -125,10 +125,9 @@ class Balance < ApplicationRecord
     self.closed_and_partially_filled_sell_orders.each do |o|
       total -= o.filled.to_i
     end
-    # FIX THIS: 
-    # can bigdecimals reliably reproduce the same result for both of these scenarios:
-    # adding up maker_receiving_amount_after_fee from each trade within the orders
-    # adding up filled_take_minus_fee driectly the orders
+    # DO NOT use order.filled to calculate maker_receiving_amount
+    # maker_receiving_amount must be calculated by adding up the individual trades
+    # to accurately take into account the truncation that occurs after each trade
     self.closed_and_partially_filled_buy_orders.includes(:trades).each do |o|
       o.trades.each do |t|
         total += t.maker_receiving_amount_after_fee.to_i
