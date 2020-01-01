@@ -15,7 +15,6 @@ class Market < ApplicationRecord
     def within_period(period=nil)
       @to ||= Time.current
       from = period ? @to - period : Time.at(0)
-      AppLogger.log("queried for trades from: #{from.to_i} to: #{@to.to_i}")
       where({ :created_at => from..@to })
     end
   end
