@@ -3,7 +3,7 @@ FactoryBot.define do
     transient do
       partially_filled { false }
     end
-
+    
     account_address { addresses[0] }
     give_token_address { token_addresses['ETH'] }
     give_amount { '1'.to_wei }

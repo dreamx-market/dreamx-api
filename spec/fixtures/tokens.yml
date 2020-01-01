@@ -1,6 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 eth:
+  id: 0
   name: Ethereum
   address: "<%= token_addresses['ETH'] %>"
   symbol: ETH
@@ -9,6 +10,7 @@ eth:
   withdraw_fee: <%= "0.01".to_wei %>
 
 one:
+  id: 1
   name: One
   address: "<%= token_addresses['ONE'] %>"
   symbol: ONE
@@ -17,6 +19,7 @@ one:
   withdraw_fee: <%= "0.01".to_wei %>
 
 two:
+  id: 2
   name: Two
   address: "<%= token_addresses['TWO'] %>"
   symbol: TWO

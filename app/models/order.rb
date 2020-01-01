@@ -2,7 +2,6 @@ class Order < ApplicationRecord
   include AccountNonEjectable
 
   has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
-  # FIX THIS: an order belongs to a token
   belongs_to :give_token, class_name: 'Token', foreign_key: 'give_token_address', primary_key: 'address'
   belongs_to :take_token, class_name: 'Token', foreign_key: 'take_token_address', primary_key: 'address'
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
@@ -20,7 +19,7 @@ class Order < ApplicationRecord
   validates :filled, numericality: { :equal_to => 0 }, on: :create
   validate :status_must_be_open_on_create, on: :create
 	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
-  validate :market_must_be_active, :balance_must_exist_and_is_sufficient, :volume_must_meet_maker_minimum, on: :create
+  validate :market_must_be_active, :balance_must_be_sufficient, :volume_must_meet_maker_minimum, on: :create
 
   before_validation :initialize_attributes, on: :create
   before_validation :remove_checksum
@@ -159,7 +158,7 @@ class Order < ApplicationRecord
 		end
 	end
 
-	def balance_must_exist_and_is_sufficient
+	def balance_must_be_sufficient
 		if !self.balance || self.balance.reload.balance.to_i < give_amount.to_i then
 			errors.add(:account, 'insufficient balance')
 		end

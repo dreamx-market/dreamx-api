@@ -1,11 +1,14 @@
 fee:
+  id: 9
   address: "<%= addresses[9] %>"
   ejected: false
 
 one:
+  id: 0
   address: "<%= addresses[0] %>"
   ejected: false
 
 two:
+  id: 1
   address: "<%= addresses[1] %>"
   ejected: false

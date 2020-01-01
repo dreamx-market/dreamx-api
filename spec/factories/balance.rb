@@ -8,8 +8,7 @@ FactoryBot.define do
     token_address { token_addresses['ETH'] }
 
     after(:build) do |balance|
-      # manually initalize an account because after_initialize doesn't work with factory_bot
-      balance.account = Account.new({ address: balance.account_address })
+      balance.valid?
     end
 
     after (:create) do |balance, evaluator|
