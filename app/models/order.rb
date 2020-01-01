@@ -2,8 +2,9 @@ class Order < ApplicationRecord
   include AccountNonEjectable
 
   has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
-  has_one :give_token, class_name: 'Token', foreign_key: 'address', primary_key: 'give_token_address'
-  has_one :take_token, class_name: 'Token', foreign_key: 'address', primary_key: 'take_token_address'
+  # FIX THIS: an order belongs to a token
+  belongs_to :give_token, class_name: 'Token', foreign_key: 'give_token_address', primary_key: 'address'
+  belongs_to :take_token, class_name: 'Token', foreign_key: 'take_token_address', primary_key: 'address'
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
   belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
   belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'

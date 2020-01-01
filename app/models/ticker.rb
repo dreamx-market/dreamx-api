@@ -1,6 +1,7 @@
 class Ticker < ApplicationRecord
-  validates :market_symbol, uniqueness: true
   belongs_to :market, class_name: 'Market', foreign_key: 'market_symbol', primary_key: 'symbol'
+
+  validates :market_symbol, uniqueness: true
 
   after_commit { MarketTickersRelayJob.perform_later(self) }
 
