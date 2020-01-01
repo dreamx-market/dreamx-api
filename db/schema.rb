@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_01_165306) do
+ActiveRecord::Schema.define(version: 2020_01_01_181851) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -57,7 +57,9 @@ ActiveRecord::Schema.define(version: 2020_01_01_165306) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "market_symbol"
+    t.bigint "market_id"
     t.index ["created_at"], name: "index_chart_data_on_created_at"
+    t.index ["market_id"], name: "index_chart_data_on_market_id"
   end
 
   create_table "deposits", force: :cascade do |t|
@@ -264,6 +266,7 @@ ActiveRecord::Schema.define(version: 2020_01_01_165306) do
 
   add_foreign_key "balances", "accounts"
   add_foreign_key "balances", "tokens"
+  add_foreign_key "chart_data", "markets"
   add_foreign_key "deposits", "accounts"
   add_foreign_key "deposits", "balances"
   add_foreign_key "deposits", "tokens"

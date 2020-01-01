@@ -10,6 +10,7 @@ class ChartDatum < ApplicationRecord
     markets.each do |market|
       open_price = market.chart_data.last ? market.chart_data.last.close : nil
       new_chart_datum = {
+        :market => market,
         :market_symbol => market.symbol,
         :high => market.high(period) || open_price,
         :low => market.low(period) || open_price,

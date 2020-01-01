@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :chart_datum do
+    market
     market_symbol { "ETH_ONE" }
     high { "0.03149999" }
     low { "0.031" }
