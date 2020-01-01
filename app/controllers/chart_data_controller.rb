@@ -1,7 +1,7 @@
 class ChartDataController < ApplicationController
   before_action :set_chart_datum, only: [:show, :update, :destroy]
 
-  # GET /chart_data/1
+  # GET /chart_data/ETH_ONE
   def show
   end
 

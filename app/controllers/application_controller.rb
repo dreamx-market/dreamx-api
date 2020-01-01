@@ -1,4 +1,9 @@
 class ApplicationController < ActionController::API
+  rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
+  rescue_from Error::ValidationError do |error|
+    @error = error
+    render '/errors/validation_error', status: :unprocessable_entity
+  end
   before_action :authorize_request, :validate_pagination_params
 
   def authorize_request
@@ -51,12 +56,11 @@ class ApplicationController < ActionController::API
     end
   end
 
-	rescue_from Error::ValidationError do |error|
-		@error = error
-		render '/errors/validation_error', status: :unprocessable_entity
-	end
-
 	private
+
+    def record_not_found(error)
+      render json: { error: error.message }, status: :not_found
+    end
 
 		def validate_pagination_params
 			unless !params[:per_page] || Integer(params[:per_page]) <= ENV['MAX_PER_PAGE'].to_i then
