@@ -12,7 +12,6 @@ class Market < ApplicationRecord
   has_many :open_buy_orders, -> { open_buy }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_many :open_sell_orders, -> { open_sell }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
   has_many :trades, foreign_key: 'market_symbol', primary_key: 'symbol' do
-    # TO BE TESTED: test cacheing
     def within_period(period=nil)
       @to ||= Time.current
       from = period ? @to - period : Time.at(0)
@@ -139,7 +138,6 @@ class Market < ApplicationRecord
     return ((last.to_d * 100) / previous_24h.to_d) - 100
   end
 
-  # TO BE TESTED
   def price_previous_24h
     hourly_candle_from_previous_24h = self.chart_data.by_period(1.hour).order(:created_at).last(24).first
     return hourly_candle_from_previous_24h ? hourly_candle_from_previous_24h.close : nil
