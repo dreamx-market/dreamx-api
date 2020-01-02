@@ -10,8 +10,10 @@ class Balance < ApplicationRecord
   has_many :buy_trades, class_name: 'Trade', foreign_key: 'give_balance_id'
   has_many :sell_trades, class_name: 'Trade', foreign_key: 'take_balance_id'
   alias_attribute :trades, :sell_trades
-  belongs_to :token
-  belongs_to :account
+  # belongs_to :token
+  # belongs_to :account
+  belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'  
+  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
 
 	validates_uniqueness_of :account_address, scope: [:token_address]
   validates :balance, :hold_balance, numericality: { :greater_than_or_equal_to => 0 }

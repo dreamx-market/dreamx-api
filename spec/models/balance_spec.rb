@@ -66,9 +66,8 @@ RSpec.describe Balance, type: :model do
     expect(balance.reload.authentic?).to be(true)
   end
 
-  it "calculates total_traded correctly with order filled by multiple trades", :focus do
+  it "calculates total_traded correctly with order filled by multiple trades" do
     order = build(:order, :sell, give_amount: '1804962086700662200', take_amount: '11512246507483280464')
-    order.save!
     trades = build_list(:trade, 3, order: order, amount: '25000000000000000')
     total_give_amount = 0
     total_maker_receiving_amount_after_fee = 0
@@ -85,20 +84,15 @@ RSpec.describe Balance, type: :model do
     balance_with_sell_trade = trades.first.taker_take_balance
     balance_with_buy_trade = trades.first.taker_give_balance
 
-    pp balance_with_sell_order
-    pp balance_with_buy_order
-    pp balance_with_sell_trade
-    pp balance_with_buy_trade
-
-    # expect {
-    # expect {
-    # expect {
-    # expect {
-    #   trades.each(&:save)
-    # }.to decrease {balance_with_sell_order.reload.total_traded}.by(total_give_amount)
-    # }.to increase {balance_with_buy_order.reload.total_traded}.by(total_maker_receiving_amount_after_fee)
-    # }.to increase {balance_with_buy_trade.reload.total_traded}.by(total_taker_receiving_amount_after_fee)
-    # }.to decrease {balance_with_sell_trade.reload.total_traded}.by(total_take_amount)
+    expect {
+    expect {
+    expect {
+    expect {
+      trades.each(&:save)
+    }.to decrease {balance_with_sell_order.reload.total_traded}.by(total_give_amount)
+    }.to increase {balance_with_buy_order.reload.total_traded}.by(total_maker_receiving_amount_after_fee)
+    }.to increase {balance_with_buy_trade.reload.total_traded}.by(total_taker_receiving_amount_after_fee)
+    }.to decrease {balance_with_sell_trade.reload.total_traded}.by(total_take_amount)
   end
 
   it 'marks balance fraud with lock' do
