@@ -4,7 +4,7 @@ class OrdersController < ApplicationController
   # GET /orders
   def index
     filters = extract_filters_from_query_params([:account_address])
-    @orders = Order.where(filters).paginate(:page => params[:page], :per_page => params[:per_page])
+    @orders = Order.where(filters).order(created_at: :desc).paginate(:page => params[:page], :per_page => params[:per_page])
   end
 
   # POST /orders
