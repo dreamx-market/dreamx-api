@@ -49,10 +49,6 @@ class Order < ApplicationRecord
     end
   end
 
-  def remaining_give_amount
-    self.give_amount.to_i - self.filled.to_i
-  end
-
   def v
     signature[-2..signature.length].hex
   end
