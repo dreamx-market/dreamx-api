@@ -1,7 +1,10 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
+  base_token_id: 0
   base_token_address: "<%= token_addresses['ETH'] %>"
+  quote_token_id: 1
   quote_token_address: "<%= token_addresses['ONE'] %>"
   status: "active"
   symbol: "ONE_ETH"

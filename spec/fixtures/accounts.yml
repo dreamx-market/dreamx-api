@@ -4,11 +4,11 @@ fee:
   ejected: false
 
 one:
-  id: 0
+  id: 1
   address: "<%= addresses[0] %>"
   ejected: false
 
 two:
-  id: 1
+  id: 2
   address: "<%= addresses[1] %>"
   ejected: false

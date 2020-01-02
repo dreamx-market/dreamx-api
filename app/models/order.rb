@@ -130,6 +130,7 @@ class Order < ApplicationRecord
     if self.account && 
       self.give_token_address.is_a_valid_address? && 
       self.take_token_address.is_a_valid_address? then
+      
       self.give_balance = self.account.balance(self.give_token_address)
       self.take_balance = self.account.balance(self.take_token_address)
       self.market = Market.find_by({ :base_token_address => self.take_token_address, :quote_token_address => self.give_token_address }) || Market.find_by({ :base_token_address => self.give_token_address, :quote_token_address => self.take_token_address })

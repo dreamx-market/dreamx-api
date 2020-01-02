@@ -1,4 +1,6 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
+  market_id: 1
   market_symbol: "ONE_ETH"

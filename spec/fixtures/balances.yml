@@ -1,30 +1,34 @@
 one_eth:
-  account_id: 0
-  token_id: 0
+  id: 10
+  account_id: 1
+  token_id: 1
   account_address: "<%= addresses[0] %>"
   token_address: "<%= token_addresses['ETH'] %>"
   balance: <%= "1000".to_wei %>
   hold_balance: "0"
 
 one_one:
-  account_id: 0
-  token_id: 0
+  id: 11
+  account_id: 1
+  token_id: 1
   account_address: "<%= addresses[0] %>"
   token_address: "<%= token_addresses['ONE'] %>"
   balance: <%= "1000".to_wei %>
   hold_balance: "0"
 
 one_two:
-  account_id: 0
-  token_id: 0
+  id: 12
+  account_id: 1
+  token_id: 1
   account_address: "<%= addresses[0] %>"
   token_address: "<%= token_addresses['TWO'] %>"
   balance: <%= "1000".to_wei %>
   hold_balance: "0"
 
 two_eth:
-  account_id: 1
-  token_id: 1
+  id: 20
+  account_id: 2
+  token_id: 2
   account_address: "<%= addresses[1] %>"
   token_address: "<%= token_addresses['ETH'] %>"
   balance: <%= "1000".to_wei %>
