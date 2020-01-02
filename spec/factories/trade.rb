@@ -1,14 +1,22 @@
 FactoryBot.define do
   factory :trade do
+    transient do
+      account { nil }
+    end
+
     account_address { addresses[1] }
     association :order, :sell
     order_hash { order.order_hash }
     amount { order.give_amount }
     nonce { get_action_nonce }
 
-    after(:build) do |trade|
+    after(:build) do |trade, evaluator|
       if !trade.order.persisted?
         trade.order.save
+      end
+
+      if evaluator.account
+        trade.account_address = evaluator.account.address
       end
 
       trade.valid?

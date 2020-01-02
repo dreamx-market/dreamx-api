@@ -1,10 +1,10 @@
 class Trade < ApplicationRecord
   include AccountNonEjectable
 
-  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
+  belongs_to :account
 	belongs_to :order
-  belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
-  belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
+  belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id'
+  belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id'
   belongs_to :market
   alias_attribute :balance, :take_balance
   has_one :tx, class_name: 'Transaction', as: :transactable
@@ -275,6 +275,7 @@ class Trade < ApplicationRecord
 
   def initialize_attributes
     self.order = Order.find_by(order_hash: self.order_hash)
+    self.account = Account.find_by(address: self.account_address)
 
     if self.account && self.order
       self.give_balance = self.account.balance(self.order.give_token.address)

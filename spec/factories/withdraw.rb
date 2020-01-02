@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :withdraw do
     transient do
       transaction_status { nil }
+      account { nil }
     end
 
     account_address { addresses[0] }
@@ -9,7 +10,11 @@ FactoryBot.define do
     amount { '1'.to_wei }
     nonce { get_action_nonce }
 
-    after(:build) do |withdraw|
+    after(:build) do |withdraw, evaluator|
+      if evaluator.account
+        withdraw.account_address = evaluator.account.address
+      end
+
       withdraw.valid?
       # withdraw_hash can be set manually at build time, don't reset it if already present
       withdraw.withdraw_hash = withdraw.withdraw_hash || Withdraw.calculate_hash(withdraw)

@@ -1,8 +1,8 @@
 class Withdraw < ApplicationRecord
   include AccountNonEjectable
   
-  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
-  belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
+  belongs_to :account
+  belongs_to :token
   belongs_to :balance
   has_one :tx, class_name: 'Transaction', as: :transactable
 
@@ -13,7 +13,7 @@ class Withdraw < ApplicationRecord
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balance_must_exist_and_is_sufficient, on: :create
 
-  before_validation :set_balance, :build_transaction, on: :create
+  before_validation :initialize_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
   before_create :set_fee, :debit_balance_with_lock
   before_save :remove_checksum
@@ -125,7 +125,10 @@ class Withdraw < ApplicationRecord
     return (self.amount.to_i * self.token.withdraw_fee.to_i) / "1".to_wei.to_i
   end
 
-  def set_balance
+  def initialize_attributes
+    self.account = Account.find_by(address: self.account_address)
+    self.token = Token.find_by(address: self.token_address)
+
     if self.account && self.token
       self.balance = self.account.balance(self.token.address)
     end
