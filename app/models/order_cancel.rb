@@ -1,8 +1,8 @@
 class OrderCancel < ApplicationRecord
   include AccountNonEjectable
   
-  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'  
-  belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
+  belongs_to :account
+  belongs_to :order
   belongs_to :balance
 
   validates :cancel_hash, :nonce, uniqueness: true
@@ -12,7 +12,7 @@ class OrderCancel < ApplicationRecord
   validate :order_must_be_open, :account_must_not_be_ejected, on: :create
   validate :account_address_must_be_owner, :cancel_hash_must_be_valid
 
-  before_validation :set_balance, on: :create
+  before_validation :initialize_attributes, on: :create
   before_validation :remove_checksum
   before_create :cancel_order_and_realease_balance_with_lock
   after_create :enqueue_update_ticker
@@ -75,7 +75,10 @@ class OrderCancel < ApplicationRecord
     end
   end
 
-  def set_balance
+  def initialize_attributes
+    self.account = Account.find_by(address: self.account_address)
+    self.order = Order.find_by(order_hash: self.order_hash)
+
     if self.order
       self.balance = self.order.balance
     end

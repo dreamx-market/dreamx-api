@@ -10,13 +10,16 @@ RSpec.describe OrderCancel, type: :model do
   end
 
   it 'must belong to an open order' do
-    order_cancel.order.status = 'closed'
+    order = order_cancel.order
+    order.update(status: 'closed')
     expect(order_cancel.valid?).to eq(false)
     expect(order_cancel.errors.messages[:order]).to include('must be open')
   end
 
   it 'must be the owner of the order' do
-    order_cancel.order.account_address = 'SOMEONE_ELSE'
+    order = order_cancel.order
+    order.account_address = 'invalid'
+    order.save(validate: false)
     expect(order_cancel.valid?).to eq(false)
     expect(order_cancel.errors.messages[:account]).to include('must be owner')
   end
