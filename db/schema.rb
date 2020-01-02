@@ -30,8 +30,8 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "fraud", default: false
-    t.bigint "token_id"
-    t.bigint "account_id"
+    t.bigint "token_id", null: false
+    t.bigint "account_id", null: false
     t.index ["account_address"], name: "index_balances_on_account_address"
     t.index ["account_id"], name: "index_balances_on_account_id"
     t.index ["token_id"], name: "index_balances_on_token_id"
@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "market_symbol"
-    t.bigint "market_id"
+    t.bigint "market_id", null: false
     t.index ["created_at"], name: "index_chart_data_on_created_at"
     t.index ["market_id"], name: "index_chart_data_on_market_id"
   end
@@ -71,9 +71,9 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.string "transaction_hash", null: false
     t.string "block_hash", null: false
     t.bigint "block_number", null: false
-    t.bigint "account_id"
-    t.bigint "token_id"
-    t.bigint "balance_id"
+    t.bigint "account_id", null: false
+    t.bigint "token_id", null: false
+    t.bigint "balance_id", null: false
     t.index ["account_id"], name: "index_deposits_on_account_id"
     t.index ["balance_id"], name: "index_deposits_on_balance_id"
     t.index ["created_at"], name: "index_deposits_on_created_at"
@@ -85,7 +85,7 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.string "account_address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "account_id"
+    t.bigint "account_id", null: false
     t.index ["account_address"], name: "index_ejections_on_account_address", unique: true
     t.index ["account_id"], name: "index_ejections_on_account_id"
   end
@@ -97,8 +97,8 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.datetime "updated_at", null: false
     t.string "symbol"
     t.string "status", default: "disabled"
-    t.bigint "base_token_id"
-    t.bigint "quote_token_id"
+    t.bigint "base_token_id", null: false
+    t.bigint "quote_token_id", null: false
     t.index ["base_token_address"], name: "index_markets_on_base_token_address"
     t.index ["base_token_id"], name: "index_markets_on_base_token_id"
     t.index ["quote_token_address"], name: "index_markets_on_quote_token_address"
@@ -113,9 +113,9 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.string "signature", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "account_id"
-    t.bigint "order_id"
-    t.bigint "balance_id"
+    t.bigint "account_id", null: false
+    t.bigint "order_id", null: false
+    t.bigint "balance_id", null: false
     t.index ["account_id"], name: "index_order_cancels_on_account_id"
     t.index ["balance_id"], name: "index_order_cancels_on_balance_id"
     t.index ["cancel_hash"], name: "index_order_cancels_on_cancel_hash", unique: true
@@ -141,12 +141,12 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.string "market_symbol", null: false
     t.boolean "sell"
     t.decimal "price", precision: 32, scale: 16
-    t.bigint "give_token_id"
-    t.bigint "take_token_id"
-    t.bigint "account_id"
-    t.bigint "give_balance_id"
-    t.bigint "take_balance_id"
-    t.bigint "market_id"
+    t.bigint "give_token_id", null: false
+    t.bigint "take_token_id", null: false
+    t.bigint "account_id", null: false
+    t.bigint "give_balance_id", null: false
+    t.bigint "take_balance_id", null: false
+    t.bigint "market_id", null: false
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["give_balance_id"], name: "index_orders_on_give_balance_id"
     t.index ["give_token_id"], name: "index_orders_on_give_token_id"
@@ -162,7 +162,7 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.decimal "amount", precision: 1000, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "balance_id"
+    t.bigint "balance_id", null: false
     t.index ["balance_id"], name: "index_refunds_on_balance_id"
   end
 
@@ -178,7 +178,7 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.decimal "percent_change", precision: 32, scale: 16, default: "0.0"
     t.decimal "base_volume", precision: 32, scale: 16, default: "0.0"
     t.decimal "quote_volume", precision: 32, scale: 16, default: "0.0"
-    t.bigint "market_id"
+    t.bigint "market_id", null: false
     t.index ["market_id"], name: "index_tickers_on_market_id"
   end
 
@@ -210,11 +210,11 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.boolean "sell", null: false
     t.decimal "price", precision: 32, scale: 16, null: false
     t.decimal "take_amount", precision: 1000, null: false
-    t.bigint "account_id"
-    t.bigint "order_id"
-    t.bigint "give_balance_id"
-    t.bigint "take_balance_id"
-    t.bigint "market_id"
+    t.bigint "account_id", null: false
+    t.bigint "order_id", null: false
+    t.bigint "give_balance_id", null: false
+    t.bigint "take_balance_id", null: false
+    t.bigint "market_id", null: false
     t.index ["account_id"], name: "index_trades_on_account_id"
     t.index ["created_at"], name: "index_trades_on_created_at"
     t.index ["give_balance_id"], name: "index_trades_on_give_balance_id"
@@ -240,8 +240,8 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.bigint "nonce", null: false
     t.datetime "broadcasted_at"
     t.text "hex"
-    t.string "transactable_type"
-    t.bigint "transactable_id"
+    t.string "transactable_type", null: false
+    t.bigint "transactable_id", null: false
     t.index ["transactable_type", "transactable_id"], name: "index_transactions_on_transactable_type_and_transactable_id"
     t.index ["transaction_hash"], name: "index_transactions_on_transaction_hash"
   end
@@ -256,9 +256,9 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "fee", precision: 1000, null: false
-    t.bigint "account_id"
-    t.bigint "token_id"
-    t.bigint "balance_id"
+    t.bigint "account_id", null: false
+    t.bigint "token_id", null: false
+    t.bigint "balance_id", null: false
     t.index ["account_id"], name: "index_withdraws_on_account_id"
     t.index ["balance_id"], name: "index_withdraws_on_balance_id"
     t.index ["created_at"], name: "index_withdraws_on_created_at"
