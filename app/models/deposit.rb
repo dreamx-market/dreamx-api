@@ -1,6 +1,6 @@
 class Deposit < ApplicationRecord
-  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
-  belongs_to :token, class_name: 'Token', foreign_key: 'token_address', primary_key: 'address'
+  belongs_to :account
+  belongs_to :token
   belongs_to :balance
 
   validates :transaction_hash, uniqueness: true
@@ -8,7 +8,7 @@ class Deposit < ApplicationRecord
   
   validates :amount, numericality: { greater_than: 0 }
 
-  before_validation :set_balance, on: :create
+  before_validation :initialize_attributes, on: :create
   before_validation :remove_checksum
   before_create :credit_balance_with_lock
   after_commit { AccountTransfersRelayJob.perform_later(self) }
@@ -25,7 +25,10 @@ class Deposit < ApplicationRecord
     end
   end
 
-  def set_balance
+  def initialize_attributes
+    self.account = Account.find_by(address: self.account_address)
+    self.token = Token.find_by(address: self.token_address)
+
     if self.account && self.token
       self.balance = self.account.balance(self.token.address)
     end

@@ -3,9 +3,9 @@ class AddForeignKeysAndIndexes < ActiveRecord::Migration[5.2]
     add_reference :balances, :token, foreign_key: true
     add_reference :balances, :account, foreign_key: true
 
+    remove_reference :deposits, :balance
     add_reference :deposits, :account, foreign_key: true
     add_reference :deposits, :token, foreign_key: true
-    remove_reference :deposits, :balance
     add_reference :deposits, :balance, foreign_key: true
 
     add_reference :ejections, :account, foreign_key: true
