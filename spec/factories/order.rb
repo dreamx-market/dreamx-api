@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :order do
     transient do
       partially_filled { false }
+      account { nil }
     end
     
     account_address { addresses[0] }
@@ -12,7 +13,11 @@ FactoryBot.define do
     nonce { get_action_nonce }
     expiry_timestamp_in_milliseconds { 1.week.from_now.to_i * 1000 }
 
-    after(:build) do |order|
+    after(:build) do |order, evaluator|
+      if evaluator.account
+        order.account_address = evaluator.account.address
+      end
+
       order.valid?
       order.order_hash = Order.calculate_hash(order)
       order.signature = sign_message(order.account_address, order.order_hash)

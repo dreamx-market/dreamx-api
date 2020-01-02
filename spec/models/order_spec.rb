@@ -83,7 +83,8 @@ RSpec.describe Order, type: :model do
   end
 
   it 'must belong to an existing market' do
-    order.take_token_address = generate_random_address
+    token = create(:token)
+    order.take_token_address = token.address
     expect(order.valid?).to eq(false)
     expect(order.errors.messages[:market]).to include('must exist')
   end

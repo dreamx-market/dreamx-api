@@ -221,6 +221,7 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.index ["market_id"], name: "index_trades_on_market_id"
     t.index ["market_symbol"], name: "index_trades_on_market_symbol"
     t.index ["nonce"], name: "index_trades_on_nonce", unique: true
+    t.index ["order_hash"], name: "index_trades_on_order_hash"
     t.index ["order_id"], name: "index_trades_on_order_id"
     t.index ["take_balance_id"], name: "index_trades_on_take_balance_id"
     t.index ["trade_hash"], name: "index_trades_on_trade_hash", unique: true

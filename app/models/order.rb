@@ -1,10 +1,10 @@
 class Order < ApplicationRecord
   include AccountNonEjectable
 
-  has_many :trades, foreign_key: 'order_hash', primary_key: 'order_hash'  
-  belongs_to :give_token, class_name: 'Token', foreign_key: 'give_token_address', primary_key: 'address'
-  belongs_to :take_token, class_name: 'Token', foreign_key: 'take_token_address', primary_key: 'address'
-	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
+  has_many :trades
+  belongs_to :give_token, class_name: 'Token', foreign_key: 'give_token_id'
+  belongs_to :take_token, class_name: 'Token', foreign_key: 'take_token_id'
+	belongs_to :account
   belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
   belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
   belongs_to :market
@@ -127,13 +127,17 @@ class Order < ApplicationRecord
   end
 
   def initialize_attributes
+    self.give_token = Token.find_by(address: self.give_token_address)
+    self.take_token = Token.find_by(address: self.take_token_address)
+    self.account = Account.find_by(address: self.account_address)
+
     if self.account && 
-      self.give_token_address.is_a_valid_address? && 
-      self.take_token_address.is_a_valid_address? then
+      self.give_token && 
+      self.take_token then
       
-      self.give_balance = self.account.balance(self.give_token_address)
-      self.take_balance = self.account.balance(self.take_token_address)
-      self.market = Market.find_by({ :base_token_address => self.take_token_address, :quote_token_address => self.give_token_address }) || Market.find_by({ :base_token_address => self.give_token_address, :quote_token_address => self.take_token_address })
+      self.give_balance = self.account.balance(self.give_token.address)
+      self.take_balance = self.account.balance(self.take_token.address)
+      self.market = Market.find_by({ :base_token_address => self.take_token.address, :quote_token_address => self.give_token.address }) || Market.find_by({ :base_token_address => self.give_token.address, :quote_token_address => self.take_token.address })
     end
 
     if self.market
