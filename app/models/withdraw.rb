@@ -50,11 +50,15 @@ class Withdraw < ApplicationRecord
   end
 
   def block_hash
-    tx.block_hash
+    if self.tx
+      self.tx.block_hash
+    end
   end
 
   def block_number
-    tx.block_number
+    if self.tx
+      self.tx.block_number
+    end
   end
 
   # to distinguish this model from deposits when being displayed a mixed collection of transfers
