@@ -5,7 +5,7 @@ class Trade < ApplicationRecord
 	belongs_to :order, class_name: 'Order', foreign_key: 'order_hash', primary_key: 'order_hash'
   belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
   belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
-  belongs_to :market, class_name: 'Market', foreign_key: 'market_symbol', primary_key: 'symbol'
+  belongs_to :market
   alias_attribute :balance, :take_balance
   has_one :tx, class_name: 'Transaction', as: :transactable
 
@@ -284,6 +284,10 @@ class Trade < ApplicationRecord
       self.fee = self.calculate_taker_fee
       self.maker_fee = self.calculate_maker_fee
       self.total = self.sell ? self.amount : self.take_amount
+    end
+
+    if self.market
+      self.market_symbol = self.market.symbol
     end
   end
 

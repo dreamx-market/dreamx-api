@@ -1,5 +1,8 @@
 class AddNullConstraintsForReferences < ActiveRecord::Migration[5.2]
   def change
+    add_index :trades, :market_symbol
+    add_index :orders, :market_symbol
+
     # change_column_null :balances, :token_id, false
     # change_column_null :balances, :account_id, false
     # change_column_null :deposits, :account_id, false

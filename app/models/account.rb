@@ -2,7 +2,7 @@ class Account < ApplicationRecord
 	has_many :balances, foreign_key: 'account_address', primary_key: 'address', dependent: :destroy
   has_many :deposits, foreign_key: 'account_address', primary_key: 'address'
   has_many :withdraws, foreign_key: 'account_address', primary_key: 'address'
-  has_one :ejection, foreign_key: 'account_address', primary_key: 'address'
+  has_one :ejection
 	validates :address, uniqueness: true
 
   before_create :remove_checksum

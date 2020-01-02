@@ -1,5 +1,5 @@
 class Ejection < ApplicationRecord
-  belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'
+  belongs_to :account
   has_one :tx, class_name: 'Transaction', as: :transactable
 
   validates :account_address, uniqueness: true

@@ -1,8 +1,9 @@
 class Ticker < ApplicationRecord
-  belongs_to :market, class_name: 'Market', foreign_key: 'market_symbol', primary_key: 'symbol'
+  belongs_to :market
 
   validates :market_symbol, uniqueness: true
 
+  before_validation :initialize_attributes, on: :create
   after_commit { MarketTickersRelayJob.perform_later(self) }
 
   class << self
@@ -26,7 +27,6 @@ class Ticker < ApplicationRecord
     lowest_ask = self.market.lowest_ask
 
     ticker = {
-      :market_symbol => self.market.symbol,
       :last => last_price ? last_price.to_s : nil,
       :high => high ? high.to_s : nil,
       :low => low ? low.to_s : nil,
@@ -40,4 +40,10 @@ class Ticker < ApplicationRecord
   end
 
   private
+
+  def initialize_attributes
+    if self.market
+      self.market_symbol = self.market.symbol
+    end
+  end
 end

@@ -3,24 +3,24 @@ class Market < ApplicationRecord
   include NonUpdatable
   non_updatable_attrs :symbol, :base_token_address, :quote_token_address
 
-  has_many :chart_data, class_name: 'ChartDatum', foreign_key: 'market_symbol', primary_key: 'symbol' do
+  has_many :chart_data do
     def by_period(period)
       where({ period: period })
     end
   end
-  has_many :open_orders, -> { open }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
-  has_many :open_buy_orders, -> { open_buy }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
-  has_many :open_sell_orders, -> { open_sell }, class_name: 'Order', foreign_key: 'market_symbol', primary_key: 'symbol'
-  has_many :trades, foreign_key: 'market_symbol', primary_key: 'symbol' do
+  has_many :open_orders, -> { open }, class_name: 'Order'
+  has_many :open_buy_orders, -> { open_buy }, class_name: 'Order'
+  has_many :open_sell_orders, -> { open_sell }, class_name: 'Order'
+  has_many :trades do
     def within_period(period=nil)
       @to ||= Time.current
       from = period ? @to - period : Time.at(0)
       where({ :created_at => from..@to })
     end
   end
-  has_one :ticker, foreign_key: 'market_symbol', primary_key: 'symbol'
-	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_address', primary_key: 'address'
-	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_address', primary_key: 'address'
+  has_one :ticker
+	belongs_to :base_token, class_name: 'Token', foreign_key: 'base_token_id'
+	belongs_to :quote_token, class_name: 'Token', foreign_key: 'quote_token_id'
 
   validates :status, inclusion: { in: ['active', 'disabled'] }
   validate :immutable_attributes_cannot_be_updated, on: :update
@@ -144,6 +144,8 @@ class Market < ApplicationRecord
 
   def initialize_attributes
     self.ticker ||= Ticker.new
+    self.base_token = Token.find_by(address: self.base_token_address)
+    self.quote_token = Token.find_by(address: self.quote_token_address)
   end
 
   private

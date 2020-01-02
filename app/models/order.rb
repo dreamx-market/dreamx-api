@@ -7,7 +7,7 @@ class Order < ApplicationRecord
 	belongs_to :account, class_name: 'Account', foreign_key: 'account_address', primary_key: 'address'	
   belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id', primary_key: 'id'
   belongs_to :take_balance, class_name: 'Balance', foreign_key: 'take_balance_id', primary_key: 'id'
-  belongs_to :market, class_name: 'Market', foreign_key: 'market_symbol', primary_key: 'symbol'
+  belongs_to :market
   alias_attribute :balance, :give_balance
   
   validates :order_hash, :nonce, uniqueness: true
@@ -137,6 +137,7 @@ class Order < ApplicationRecord
     end
 
     if self.market
+      self.market_symbol = self.market.symbol
       self.sell = self.give_token_address == self.market.base_token_address ? false : true
     end
 
