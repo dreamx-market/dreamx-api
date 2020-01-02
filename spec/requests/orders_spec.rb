@@ -2,10 +2,9 @@ require 'rails_helper'
 
 RSpec.describe "Orders", type: :request do
   describe "GET /orders" do
-    it "returns all orders", :focus do
+    it "returns all orders" do
       create(:order)
       get orders_url, as: :json
-      pp json
       expect(response).to be_successful
       expect(json[:total]).to eq(1)
     end
