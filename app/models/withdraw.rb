@@ -44,7 +44,9 @@ class Withdraw < ApplicationRecord
   end
 
   def transaction_hash
-    self.tx.transaction_hash
+    if self.tx
+      self.tx.transaction_hash
+    end
   end
 
   def block_hash

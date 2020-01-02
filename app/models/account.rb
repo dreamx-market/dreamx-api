@@ -17,7 +17,7 @@ class Account < ApplicationRecord
     from = from ? Time.at(from.to_i) : Time.at(0)
     to = to ? Time.at(to.to_i) : Time.current
     deposits = self.deposits.order(created_at: :desc).where(created_at: from..to).paginate(page: page, per_page: per_page)
-    withdraws = self.withdraws.order(created_at: :desc).where(created_at: from..to).paginate(page: page, per_page: per_page)
+    withdraws = self.withdraws.order(created_at: :desc).where(created_at: from..to).paginate(page: page, per_page: per_page).includes(:tx)
     return { deposits: deposits, withdraws: withdraws }
   end
 
