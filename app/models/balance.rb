@@ -54,6 +54,13 @@ class Balance < ApplicationRecord
       fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
       self.find_or_create_by({ :account_address => fee_address, :token_address => token_address })
     end
+
+    def sync_fee_balances
+      Token.all.each do |token|
+        balance = Balance.fee(token.symbol)
+        balance.update(balance: balance.onchain_balance)
+      end
+    end
   end
 
   def initialize_attributes
