@@ -69,7 +69,7 @@ RSpec.describe OrderCancel, type: :model do
       allow(order_cancel.order).to receive(:lock!).and_call_original
       allow(order_cancel.balance).to receive(:lock!).and_call_original
 
-      order_cancel.cancel_order_and_realease_balance_with_lock
+      order_cancel.cancel_order_and_release_balance_with_lock
       balance.reload
 
       expect(order_cancel.order).to have_received(:lock!).once

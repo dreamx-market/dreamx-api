@@ -85,6 +85,7 @@ class Order < ApplicationRecord
   end
 
   def cancel
+    self.filled = self.give_amount
     self.status = 'closed'
     self.save!
   end

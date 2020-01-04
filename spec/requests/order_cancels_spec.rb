@@ -3,9 +3,10 @@ require 'rails_helper'
 RSpec.describe "OrderCancels", type: :request do
   describe "POST /order_cancels" do
     it "cancels an order" do
-      order = build(:order)
+      order = create(:order)
       order_cancel = build(:order_cancel, order: order)
 
+      expect {
       expect {
       expect {
       expect {
@@ -13,6 +14,7 @@ RSpec.describe "OrderCancels", type: :request do
         order.reload
         expect(response).to be_successful
         expect(order.status).to eq('closed')
+      }.to increase { order.filled }.by(order.remaining_give_amount)
       }.to increase { order.balance.balance }.by(order.remaining_give_amount)
       }.to decrease { order.balance.hold_balance }.by(order.remaining_give_amount)
       }.to increase { OrderCancel.count }.by(1)

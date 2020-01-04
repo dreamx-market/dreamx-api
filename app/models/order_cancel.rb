@@ -14,7 +14,7 @@ class OrderCancel < ApplicationRecord
 
   before_validation :initialize_attributes, on: :create
   before_validation :remove_checksum
-  before_create :cancel_order_and_realease_balance_with_lock
+  before_create :cancel_order_and_release_balance_with_lock
   after_create :enqueue_update_ticker
 
   class << self
@@ -66,12 +66,12 @@ class OrderCancel < ApplicationRecord
     self.market.symbol
   end
 
-  def cancel_order_and_realease_balance_with_lock
+  def cancel_order_and_release_balance_with_lock
     ActiveRecord::Base.transaction do
       order = self.order.lock!
       balance = self.balance.lock!
-      order.cancel
       balance.release(order.remaining_give_amount)
+      order.cancel
     end
   end
 
