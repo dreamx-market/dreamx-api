@@ -9,12 +9,10 @@ RSpec.describe "OrderCancels", type: :request do
       expect {
       expect {
       expect {
-      expect {
         post order_cancels_url, params: [order_cancel], as: :json
         order.reload
         expect(response).to be_successful
         expect(order.status).to eq('closed')
-      }.to increase { order.filled }.by(order.remaining_give_amount)
       }.to increase { order.balance.balance }.by(order.remaining_give_amount)
       }.to decrease { order.balance.hold_balance }.by(order.remaining_give_amount)
       }.to increase { OrderCancel.count }.by(1)
