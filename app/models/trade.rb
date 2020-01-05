@@ -282,10 +282,7 @@ class Trade < ApplicationRecord
     end
 
     if self.order && self.account
-      self.maker_give_balance.lock!
-      self.maker_take_balance.lock!
-      self.taker_give_balance.lock!
-      self.taker_take_balance.lock!
+      Balance.lock.where({ id: [self.give_balance_id, self.take_balance_id, self.order.give_balance_id, self.order.take_balance_id] })
       self.order.lock!
     end
   end
