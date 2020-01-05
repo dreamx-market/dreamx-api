@@ -9,19 +9,21 @@ RSpec.describe OrderCancel, type: :model do
     expect(order_cancel.errors.messages[:order]).to include('must exist')
   end
 
-  it 'must belong to an open order' do
-    order = order_cancel.order
-    order.update(status: 'closed')
-    expect(order_cancel.valid?).to eq(false)
-    expect(order_cancel.errors.messages[:order]).to include('must be open')
-  end
+  describe 'when cancelling order' do
+    it 'can only cancel open orders' do
+      order = order_cancel.order
+      order.update(status: 'closed')
+      expect(order_cancel.valid?(:cancelling_order)).to eq(false)
+      expect(order_cancel.errors.messages[:order]).to include('must be open')
+    end
 
-  it 'must be the owner of the order' do
-    order = order_cancel.order
-    order.account_address = 'invalid'
-    order.save(validate: false)
-    expect(order_cancel.valid?).to eq(false)
-    expect(order_cancel.errors.messages[:account]).to include('must be owner')
+    it 'must be the owner of the order' do
+      order = order_cancel.order
+      order.account_address = 'invalid'
+      order.save(validate: false)
+      expect(order_cancel.valid?(:cancelling_order)).to eq(false)
+      expect(order_cancel.errors.messages[:account]).to include('must be owner')
+    end
   end
 
   it 'has a unique nonce' do
@@ -40,7 +42,7 @@ RSpec.describe OrderCancel, type: :model do
     new_order_cancel.cancel_hash = order_cancel.cancel_hash
     
     expect {
-      new_order_cancel.save(validate: false) # uniqueness validations must be tested at the database level
+      new_order_cancel.save_without_validations # uniqueness validations must be tested at the database level
     }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 

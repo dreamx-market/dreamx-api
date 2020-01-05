@@ -12,14 +12,8 @@ class OrderCancelsController < ApplicationController
         end
       end
       render :show, status: :created
-    rescue ActiveRecord::RecordInvalid
-      order_cancels_errors = []
-      order_cancels_params.each do |order_cancel_param|
-        order_cancel = OrderCancel.new(order_cancel_param)
-        order_cancel.valid?
-        order_cancels_errors.push(order_cancel.errors.messages)
-      end
-      serialize_active_record_validation_error order_cancels_errors
+    rescue ActiveRecord::RecordInvalid => invalid
+      serialize_active_record_validation_error invalid.record.errors.messages
     end
   end
 

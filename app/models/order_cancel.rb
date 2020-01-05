@@ -1,5 +1,6 @@
 class OrderCancel < ApplicationRecord
   include AccountNonEjectable
+  attr_accessor :run_validations
   
   belongs_to :account
   belongs_to :order
@@ -9,8 +10,12 @@ class OrderCancel < ApplicationRecord
   validates :order_hash, :account_address, :nonce, :cancel_hash, :signature, presence: true
 
   validates :cancel_hash, signature: true
-  validate :order_must_be_open, :account_must_not_be_ejected, on: :create
-  validate :account_address_must_be_owner, :cancel_hash_must_be_valid
+  validate :account_must_not_be_ejected, on: :create
+  validate :cancel_hash_must_be_valid
+
+  with_options on: :cancelling_order do
+    validate :order_must_be_open, :account_address_must_be_owner
+  end
 
   before_validation :initialize_attributes, on: :create
   before_validation :remove_checksum
@@ -24,15 +29,20 @@ class OrderCancel < ApplicationRecord
     end
   end
 
+  def save_without_validations
+    self.run_validations = false
+    self.save(validate: false)
+  end
+
   def order_must_be_open
-    if (!self.order)
+    if !self.order
       return
     end
     errors.add(:order, "must be open") unless self.order.status != 'closed'
   end
 
   def account_address_must_be_owner
-    if (!self.order)
+    if !self.order
       return
     end
     errors.add(:account, "must be owner") unless self.order.account_address == self.account_address
@@ -70,6 +80,11 @@ class OrderCancel < ApplicationRecord
     ActiveRecord::Base.transaction do
       order = self.order.lock!
       balance = self.balance.lock!
+
+      if self.run_validations && !self.valid?(:cancelling_order)
+        raise ActiveRecord::RecordInvalid.new(self)
+      end
+
       balance.release(order.remaining_give_amount)
       order.cancel
     end
@@ -94,13 +109,5 @@ class OrderCancel < ApplicationRecord
 
   def enqueue_update_ticker
     UpdateMarketTickerJob.perform_later(self.market)
-  end
-
-  def order_must_be_valid
-    if self.order && !self.order.valid?
-      self.order.errors.full_messages.each do |msg|
-        errors.add(:order, msg.downcase)
-      end
-    end
   end
 end
