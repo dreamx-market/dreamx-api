@@ -31,14 +31,8 @@ class TradesController < ApplicationController
         end
       end
       render :show, status: :created
-    rescue ActiveRecord::RecordInvalid
-      trades_errors = []
-      trades_params.each do |trade_param|
-        trade = Trade.new(trade_param)
-        trade.valid?
-        trades_errors.push(trade.errors.messages)
-      end
-      serialize_active_record_validation_error trades_errors
+    rescue ActiveRecord::RecordInvalid => invalid
+      serialize_active_record_validation_error invalid.record.errors.messages
     end
   end
 

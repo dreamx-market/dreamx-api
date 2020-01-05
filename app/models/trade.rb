@@ -11,14 +11,13 @@ class Trade < ApplicationRecord
 
   validates :trade_hash, :nonce, uniqueness: true
   validates :account_address, :order_hash, :amount, :nonce, :trade_hash, :signature, :fee, :total, :maker_fee, presence: true
-
   validates :trade_hash, signature: true
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum
 
   before_validation :initialize_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
-  before_create :trade_balances_and_fill_order_with_lock
+  before_create :trade_balances
   after_create :enqueue_update_ticker
 
   class << self
@@ -142,7 +141,7 @@ class Trade < ApplicationRecord
   end
 
 	def balance_must_exist_and_is_sufficient
-		if !self.balance || !self.order
+		if !self.balance
 			return
 		end
 
@@ -215,28 +214,6 @@ class Trade < ApplicationRecord
     self.account
   end
 
-  def trade_balances_and_fill_order_with_lock
-    ActiveRecord::Base.transaction do
-      maker_account.create_balance_if_not_exist(take_token_address)
-      taker_account.create_balance_if_not_exist(give_token_address)
-      locked_balances = Balance.lock.where({ account_address: [maker_address, taker_address], token_address: [give_token_address, take_token_address] }).includes([:token, :account])
-      maker_give_balance = locked_balances.find { |b| b.account_address == maker_address && b.token_address == give_token_address }
-      taker_give_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == give_token_address }
-      maker_take_balance = locked_balances.find { |b| b.account_address == maker_address && b.token_address == take_token_address }
-      taker_take_balance = locked_balances.find { |b| b.account_address == taker_address && b.token_address == take_token_address }
-      order = self.order.lock!
-      
-      maker_give_balance.spend(self.amount)
-      maker_take_balance.credit(self.maker_receiving_amount_after_fee)
-      taker_give_balance.credit(self.taker_receiving_amount_after_fee)
-      taker_take_balance.debit(self.take_amount)
-      order.fill(amount, self.maker_fee)
-      if order.status == 'closed'
-        maker_give_balance.release(order.remaining_give_amount)
-      end
-    end
-  end
-
   def order_must_be_open
     if self.order
       if self.order.status == 'closed'
@@ -273,6 +250,17 @@ class Trade < ApplicationRecord
     return self.amount.to_i - self.taker_fee.to_i
   end
 
+  def trade_balances
+    self.maker_give_balance.spend(self.amount)
+    self.maker_take_balance.credit(self.maker_receiving_amount_after_fee)
+    self.taker_give_balance.credit(self.taker_receiving_amount_after_fee)
+    self.taker_take_balance.debit(self.take_amount)
+    self.order.fill(amount, self.maker_fee)
+    if self.order.status == 'closed'
+      self.maker_give_balance.release(self.order.remaining_give_amount)
+    end
+  end
+
   def initialize_attributes
     self.order = Order.find_by(order_hash: self.order_hash)
     self.account = Account.find_by(address: self.account_address)
@@ -291,6 +279,14 @@ class Trade < ApplicationRecord
 
     if self.market
       self.market_symbol = self.market.symbol
+    end
+
+    if self.order && self.account
+      self.maker_give_balance.lock!
+      self.maker_take_balance.lock!
+      self.taker_give_balance.lock!
+      self.taker_take_balance.lock!
+      self.order.lock!
     end
   end
 

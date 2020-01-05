@@ -7,12 +7,11 @@ class OrderCancel < ApplicationRecord
 
   validates :cancel_hash, :nonce, uniqueness: true
   validates :order_hash, :account_address, :nonce, :cancel_hash, :signature, presence: true
-
   validates :cancel_hash, signature: true
   validate :order_must_be_open, :account_must_not_be_ejected, on: :create
   validate :account_address_must_be_owner, :cancel_hash_must_be_valid
 
-  before_validation :initialize_and_lock_attributes, on: :create
+  before_validation :initialize_attributes, on: :create
   before_validation :remove_checksum
   before_create :cancel_order
   after_create :enqueue_update_ticker
@@ -71,7 +70,7 @@ class OrderCancel < ApplicationRecord
     order.cancel
   end
 
-  def initialize_and_lock_attributes
+  def initialize_attributes
     self.account = Account.find_by(address: self.account_address)
     self.order = Order.find_by(order_hash: self.order_hash)
 

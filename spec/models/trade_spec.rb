@@ -66,17 +66,6 @@ RSpec.describe Trade, type: :model do
     expect(trade.errors.messages[:order]).to include('must have sufficient volume')
   end
 
-  it 'trades balances with locks' do
-    trade.order.save
-    allow(Balance).to receive(:lock).and_call_original
-    allow(trade.order).to receive(:lock!).and_call_original
-    
-    trade.trade_balances_and_fill_order_with_lock
-
-    expect(Balance).to have_received(:lock).once
-    expect(trade.order).to have_received(:lock!).once
-  end
-
   it 'refunds a partial trade with locks, should not refund the entire order' do
     trade = create(:trade, :partial)
     trade.reload
