@@ -62,11 +62,9 @@ class Trade < ApplicationRecord
     taker_refund_amount =  taker_delta > 0 ? taker_onchain_balance : taker_giving_amount
 
     ActiveRecord::Base.transaction do
-      locked_balances = Balance.lock.where({ id: [self.maker_balance.id, self.taker_balance.id] }).includes([:token, :account])
-      maker_balance = locked_balances.find { |b| b.account_address == self.maker_address && b.token_address == self.give_token_address }
-      taker_balance = locked_balances.find { |b| b.account_address == self.taker_address && b.token_address == self.take_token_address }
-      maker_balance.refund(maker_refund_amount)
-      taker_balance.refund(taker_refund_amount)
+      Balance.lock.where({ id: [self.maker_balance.id, self.taker_balance.id] })
+      self.maker_balance.refund(maker_refund_amount)
+      self.taker_balance.refund(taker_refund_amount)
     end
   end
 
@@ -282,7 +280,14 @@ class Trade < ApplicationRecord
     end
 
     if self.order && self.account
-      Balance.lock.where({ id: [self.give_balance_id, self.take_balance_id, self.order.give_balance_id, self.order.take_balance_id] })
+      Balance.lock.where({ 
+        id: [
+          self.maker_give_balance.id, 
+          self.maker_take_balance.id, 
+          self.taker_give_balance.id, 
+          self.taker_take_balance.id
+        ] 
+      })
       self.order.lock!
     end
   end
