@@ -2,6 +2,7 @@ class Order < ApplicationRecord
   include AccountNonEjectable
 
   has_many :trades
+  has_one :order_cancel
   belongs_to :give_token, class_name: 'Token', foreign_key: 'give_token_id'
   belongs_to :take_token, class_name: 'Token', foreign_key: 'take_token_id'
 	belongs_to :account
