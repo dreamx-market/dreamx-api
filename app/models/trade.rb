@@ -249,18 +249,13 @@ class Trade < ApplicationRecord
   end
 
   def trade_balances
-    maker_give_balance = @locked_balances.find { |b| b.account_address == maker_address && b.token_address == give_token_address }
-    taker_give_balance = @locked_balances.find { |b| b.account_address == taker_address && b.token_address == give_token_address }
-    maker_take_balance = @locked_balances.find { |b| b.account_address == maker_address && b.token_address == take_token_address }
-    taker_take_balance = @locked_balances.find { |b| b.account_address == taker_address && b.token_address == take_token_address }
-
-    maker_give_balance.spend(self.amount)
-    maker_take_balance.credit(self.maker_receiving_amount_after_fee) # WHY TF IS THIS NOT EXECUTING?
-    taker_give_balance.credit(self.taker_receiving_amount_after_fee)
-    taker_take_balance.debit(self.take_amount)
+    self.maker_give_balance.spend(self.amount)
+    self.maker_take_balance.credit(self.maker_receiving_amount_after_fee)
+    self.taker_give_balance.credit(self.taker_receiving_amount_after_fee)
+    self.taker_take_balance.debit(self.take_amount)
     self.order.fill(amount, self.maker_fee)
     if self.order.status == 'closed'
-      maker_give_balance.release(self.order.remaining_give_amount)
+      self.maker_give_balance.release(self.order.remaining_give_amount)
     end
   end
 
@@ -289,7 +284,7 @@ class Trade < ApplicationRecord
 
   def lock_attributes
     if self.order && self.account
-      @locked_balances = Balance.lock.where({ 
+      Balance.lock.where({ 
         id: [
           self.maker_give_balance.id, 
           self.maker_take_balance.id, 
