@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_01_193820) do
+ActiveRecord::Schema.define(version: 2020_01_06_110551) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 2020_01_01_193820) do
     t.bigint "token_id", null: false
     t.bigint "account_id", null: false
     t.index ["account_address"], name: "index_balances_on_account_address"
+    t.index ["account_id", "token_id"], name: "index_balances_on_account_id_and_token_id", unique: true
     t.index ["account_id"], name: "index_balances_on_account_id"
     t.index ["token_id"], name: "index_balances_on_token_id"
   end

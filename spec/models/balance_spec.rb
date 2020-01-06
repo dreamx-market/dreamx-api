@@ -3,6 +3,17 @@ require 'rails_helper'
 RSpec.describe Balance, type: :model do
   let (:balance) { build(:balance) }
 
+  it 'must have a unique account_id & token_id combination' do
+    balance1 = create(:balance)
+    balance2 = build(:balance)
+    balance2.account = balance1.account
+    balance2.token = balance1.token
+
+    expect {
+      balance2.save(validate: false)
+    }.to raise_error(ActiveRecord::RecordNotUnique)
+  end
+
   it "cannot have negative balance" do
     balance.balance = -1
     expect(balance).to_not be_valid

@@ -1,7 +1,7 @@
 one_eth:
   id: 10
   account_id: 1
-  token_id: 1
+  token_id: 0
   account_address: "<%= addresses[0] %>"
   token_address: "<%= token_addresses['ETH'] %>"
   balance: <%= "1000".to_wei %>
@@ -19,7 +19,7 @@ one_one:
 one_two:
   id: 12
   account_id: 1
-  token_id: 1
+  token_id: 2
   account_address: "<%= addresses[0] %>"
   token_address: "<%= token_addresses['TWO'] %>"
   balance: <%= "1000".to_wei %>
