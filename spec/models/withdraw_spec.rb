@@ -102,12 +102,8 @@ RSpec.describe Withdraw, type: :model do
     }.to increase { withdraw.balance.reload.balance }.by(onchain_balance)
   end
 
-  it 'debits balance after created with lock' do
+  it 'debits balance after created' do
     balance = withdraw.balance
-
-    expect_any_instance_of(Balance).to receive(:with_lock).once do |&block|
-      block.call
-    end
 
     expect {
       withdraw.save

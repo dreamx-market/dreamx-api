@@ -192,7 +192,9 @@ ActiveRecord::Schema.define(version: 2020_01_06_110551) do
     t.datetime "updated_at", null: false
     t.decimal "withdraw_minimum", precision: 1000
     t.decimal "withdraw_fee", precision: 1000
-    t.index ["address"], name: "index_tokens_on_address"
+    t.index ["address"], name: "index_tokens_on_address", unique: true
+    t.index ["name"], name: "index_tokens_on_name", unique: true
+    t.index ["symbol"], name: "index_tokens_on_symbol", unique: true
   end
 
   create_table "trades", force: :cascade do |t|

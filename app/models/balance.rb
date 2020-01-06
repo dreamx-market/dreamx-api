@@ -192,8 +192,6 @@ class Balance < ApplicationRecord
     self.token.symbol
   end
 
-  # balance altering operations
-
   def credit(amount)
     self.balance += amount.to_i
     self.save!

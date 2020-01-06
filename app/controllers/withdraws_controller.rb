@@ -5,9 +5,12 @@ class WithdrawsController < ApplicationController
   def create
     @withdraw = Withdraw.new(withdraw_params)
 
-    if @withdraw.save
+    begin
+      ActiveRecord::Base.transaction do
+        @withdraw.save!
+      end
       render :show, status: :created
-    else
+    rescue ActiveRecord::RecordInvalid
       serialize_active_record_validation_error @withdraw.errors.messages
     end
   end

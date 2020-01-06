@@ -15,7 +15,7 @@ class Withdraw < ApplicationRecord
 
   before_validation :initialize_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
-  before_create :set_fee, :debit_balance_with_lock
+  before_create :set_fee, :debit_balance
   before_save :remove_checksum
 
   class << self
@@ -117,12 +117,11 @@ class Withdraw < ApplicationRecord
   end
 
   def balance_must_exist_and_is_sufficient
-    if (!self.account)
+    if (!self.balance)
       return
     end
 
-    balance = self.account.balances.find_by(token_address: self.token_address)
-    if !balance || balance.balance.to_i < self.amount.to_i then
+    if self.balance.balance.to_i < self.amount.to_i then
       errors.add(:account, 'has insufficient balance')
     end
   end
@@ -142,15 +141,18 @@ class Withdraw < ApplicationRecord
 
   private
 
+  def lock_attributes
+    if (self.balance)
+      self.balance.lock!
+    end
+  end
+
   def set_fee
     self.fee = self.calculate_fee
   end
 
-  def debit_balance_with_lock
-    balance = self.balance
-    balance.with_lock do
-      self.balance.debit(self.amount)
-    end
+  def debit_balance
+    self.balance.debit(self.amount)
   end
 
   def remove_checksum

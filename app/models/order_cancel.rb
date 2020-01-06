@@ -11,7 +11,7 @@ class OrderCancel < ApplicationRecord
   validate :order_must_be_open, :account_must_not_be_ejected, on: :create
   validate :account_address_must_be_owner, :cancel_hash_must_be_valid
 
-  before_validation :initialize_attributes, on: :create
+  before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum
   before_create :cancel_order
   after_create :enqueue_update_ticker
@@ -77,14 +77,16 @@ class OrderCancel < ApplicationRecord
     if self.order
       self.balance = self.order.balance
     end
+  end
 
+  private
+
+  def lock_attributes
     if self.order && self.balance
       self.order.lock!
       self.balance.lock!
     end
   end
-
-  private
 
   def remove_checksum
     if self.account

@@ -15,7 +15,7 @@ class Trade < ApplicationRecord
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum
 
-  before_validation :initialize_attributes, :build_transaction, on: :create
+  before_validation :initialize_attributes, :lock_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
   before_create :trade_balances
   after_create :enqueue_update_ticker
@@ -278,7 +278,11 @@ class Trade < ApplicationRecord
     if self.market
       self.market_symbol = self.market.symbol
     end
+  end
 
+  private
+
+  def lock_attributes
     if self.order && self.account
       Balance.lock.where({ 
         id: [
@@ -291,8 +295,6 @@ class Trade < ApplicationRecord
       self.order.lock!
     end
   end
-
-  private
 
   def remove_checksum
     if self.account_address.is_a_valid_address?

@@ -23,7 +23,7 @@ class Order < ApplicationRecord
 
   before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum
-	before_create :hold_balance_with_lock
+	before_create :hold_balance
   after_create :enqueue_update_ticker
   after_commit { 
     MarketOrdersRelayJob.perform_later(self)
@@ -64,8 +64,6 @@ class Order < ApplicationRecord
   def calculate_take_amount(give_amount)
     return give_amount.to_i * self.take_amount.to_i / self.give_amount.to_i
   end
-
-  # order altering operations
 
   def fill(amount, fee=0)
     self.filled += amount.to_i
@@ -115,11 +113,8 @@ class Order < ApplicationRecord
     return self.remaining_volume >= minimum_volume
   end
 
-  def hold_balance_with_lock
-    balance = self.balance
-    balance.with_lock do
-      balance.hold(give_amount)
-    end
+  def hold_balance
+    self.balance.hold(give_amount)
   end
 
   def initialize_attributes
