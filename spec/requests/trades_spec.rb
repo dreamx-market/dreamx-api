@@ -65,6 +65,22 @@ RSpec.describe "Trades", type: :request do
       }.to decrease { taker_take.balance }.by(trade.take_amount)
     end
 
+    it "can trade with yourself" do
+      order = create(:order)
+      trade = build(:trade, account: order.account)
+      maker_give = trade.maker_give_balance
+      maker_take = trade.maker_take_balance
+
+      expect {
+      expect {
+      expect {
+        post trades_url, params: [trade], as: :json
+        maker_give.reload; maker_take.reload
+      }.to decrease { maker_give.hold_balance }.by(trade.amount)
+      }.to increase { maker_give.balance }.by(trade.taker_receiving_amount_after_fee)
+      }.to decrease { maker_take.balance }.by(trade.maker_fee)
+    end
+
     it "batch-creates an array of trades" do
       trades = build_list(:trade, 3)
 

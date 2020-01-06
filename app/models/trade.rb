@@ -118,6 +118,14 @@ class Trade < ApplicationRecord
     return self.fee
   end
 
+  def give_token_id
+    return self.order.give_token_id
+  end
+
+  def take_token_id
+    return self.order.take_token_id
+  end
+
   def give_token_address
     return self.order.give_token_address
   end
@@ -128,6 +136,14 @@ class Trade < ApplicationRecord
 
   def give_amount
     return self.amount
+  end
+
+  def maker_id
+    return self.order.account_id
+  end
+
+  def taker_id
+    return self.account_id
   end
 
   def maker_address
@@ -249,13 +265,17 @@ class Trade < ApplicationRecord
   end
 
   def trade_balances
-    self.maker_give_balance.spend(self.amount)
-    self.maker_take_balance.credit(self.maker_receiving_amount_after_fee)
-    self.taker_give_balance.credit(self.taker_receiving_amount_after_fee)
-    self.taker_take_balance.debit(self.take_amount)
+    maker_give_balance = @locked_balances.find { |b| b.id == self.maker_give_balance.id }
+    taker_give_balance = @locked_balances.find { |b| b.id == self.taker_give_balance.id }
+    maker_take_balance = @locked_balances.find { |b| b.id == self.maker_take_balance.id }
+    taker_take_balance = @locked_balances.find { |b| b.id == self.taker_take_balance.id }
+    maker_give_balance.spend(self.amount)
+    maker_take_balance.credit(self.maker_receiving_amount_after_fee)
+    taker_give_balance.credit(self.taker_receiving_amount_after_fee)
+    taker_take_balance.debit(self.take_amount)
     self.order.fill(amount, self.maker_fee)
     if self.order.status == 'closed'
-      self.maker_give_balance.release(self.order.remaining_give_amount)
+      maker_give_balance.release(self.order.remaining_give_amount)
     end
   end
 
@@ -284,11 +304,11 @@ class Trade < ApplicationRecord
 
   def lock_attributes
     if self.order && self.account
-      Balance.lock.where({ 
+      @locked_balances = Balance.lock.where({ 
         id: [
           self.maker_give_balance.id, 
-          self.maker_take_balance.id, 
           self.taker_give_balance.id, 
+          self.maker_take_balance.id, 
           self.taker_take_balance.id
         ] 
       })
