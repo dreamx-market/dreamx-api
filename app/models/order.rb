@@ -154,18 +154,18 @@ class Order < ApplicationRecord
   def addresses_must_be_valid
     [:account_address, :give_token_address, :take_token_address].each do |key|
       if !self[key].is_a_valid_address?
-        self.self.errors.add(key, 'is invalid')
+        self.errors.add(key, 'is invalid')
       end
     end
   end
 
   def filled_must_not_exceed_give_amount
-    self.self.errors.add(:filled, 'must not exceed give_amount') unless self.filled.to_i <= self.give_amount.to_i
+    self.errors.add(:filled, 'must not exceed give_amount') unless self.filled.to_i <= self.give_amount.to_i
   end
 
 	def expiry_timestamp_must_be_in_the_future
 		if self.expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i
-			self.self.errors.add(:expiry_timestamp_in_milliseconds, 'must be in the future')
+			self.errors.add(:expiry_timestamp_in_milliseconds, 'must be in the future')
 		end
 	end
 
@@ -216,7 +216,7 @@ class Order < ApplicationRecord
     end
 
     if self.market.disabled?
-      self.self.errors.add(:market, 'has been disabled')
+      self.errors.add(:market, 'has been disabled')
     end
   end
 end
