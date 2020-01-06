@@ -11,10 +11,13 @@ class OrdersController < ApplicationController
   def create
     @order = Order.new(order_params)
 
-    if @order.save
+    begin
+      ActiveRecord::Base.transaction do
+        @order.save!
+      end
       render :show, status: :created
-    else
-    	serialize_active_record_validation_error @order.errors.messages
+    rescue ActiveRecord::RecordInvalid
+      serialize_active_record_validation_error @order.errors.messages
     end
   end
 

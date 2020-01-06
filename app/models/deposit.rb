@@ -5,7 +5,6 @@ class Deposit < ApplicationRecord
 
   validates :transaction_hash, uniqueness: true
   validates :transaction_hash, :account_address, :token_address, :amount, :block_hash, :block_number, presence: true
-  
   validates :amount, numericality: { greater_than: 0 }
 
   before_validation :initialize_attributes, on: :create

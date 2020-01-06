@@ -16,12 +16,12 @@ class Order < ApplicationRecord
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
   validates :order_hash, signature: true
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }
+	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
   validates :filled, numericality: { :equal_to => 0 }, on: :create
   validate :status_must_be_open_on_create, on: :create
-	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
   validate :market_must_be_active, :balance_must_be_sufficient, :volume_must_meet_maker_minimum, on: :create
 
-  before_validation :initialize_attributes, on: :create
+  before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum
 	before_create :hold_balance_with_lock
   after_create :enqueue_update_ticker
@@ -141,7 +141,7 @@ class Order < ApplicationRecord
       self.sell = self.give_token_address == self.market.base_token_address ? false : true
     end
 
-    if (self.sell)
+    if self.sell
       self.price = self.take_amount.to_d / self.give_amount.to_d
     else
       self.price = self.give_amount.to_d / self.take_amount.to_d
@@ -150,12 +150,26 @@ class Order < ApplicationRecord
 
 	private
 
+  def lock_attributes
+    if self.balance
+      self.balance.lock!
+    end
+  end
+
+  def addresses_must_be_valid
+    [:account_address, :give_token_address, :take_token_address].each do |key|
+      if !self[key].is_a_valid_address?
+        errors.add(key, 'is invalid')
+      end
+    end
+  end
+
   def filled_must_not_exceed_give_amount
     errors.add(:filled, 'must not exceed give_amount') unless filled.to_i <= give_amount.to_i
   end
 
 	def expiry_timestamp_must_be_in_the_future
-		if expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i then
+		if expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i
 			errors.add(:expiry_timestamp_in_milliseconds, 'must be in the future')
 		end
 	end
@@ -188,14 +202,6 @@ class Order < ApplicationRecord
     end
     return result
   end
-
-	def addresses_must_be_valid
-		[:account_address, :give_token_address, :take_token_address].each do |key|
-			if !Eth::Address.new(eval(key.to_s)).valid? then
-				errors.add(key, 'is invalid')
-			end
-		end
-	end
 
   def remove_checksum
     if self.account_address.is_a_valid_address? && self.give_token_address.is_a_valid_address? && self.take_token_address.is_a_valid_address?
