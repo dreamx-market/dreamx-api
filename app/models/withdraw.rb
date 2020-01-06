@@ -8,7 +8,6 @@ class Withdraw < ApplicationRecord
 
   validates :nonce, :withdraw_hash, uniqueness: true
   validates :account_address, :amount, :token_address, :nonce, :withdraw_hash, :signature, presence: true
-
   validates :withdraw_hash, signature: true
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balance_must_exist_and_is_sufficient, on: :create
@@ -87,8 +86,8 @@ class Withdraw < ApplicationRecord
 
   def withdraw_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
-    if (!calculated_hash or calculated_hash != withdraw_hash) then
-      errors.add(:withdraw_hash, "is invalid")
+    if (!calculated_hash or calculated_hash != self.withdraw_hash) then
+      self.errors.add(:withdraw_hash, "is invalid")
     end
   end
 
@@ -112,7 +111,7 @@ class Withdraw < ApplicationRecord
     end
 
     if (self.amount.to_i < self.token.withdraw_minimum.to_i)
-      errors.add(:amount, "must be greater than #{self.token.withdraw_minimum}")
+      self.errors.add(:amount, "must be greater than #{self.token.withdraw_minimum}")
     end
   end
 
@@ -122,7 +121,7 @@ class Withdraw < ApplicationRecord
     end
 
     if self.balance.balance.to_i < self.amount.to_i then
-      errors.add(:account, 'has insufficient balance')
+      self.errors.add(:account, 'has insufficient balance')
     end
   end
 

@@ -170,15 +170,15 @@ class Trade < ApplicationRecord
   end
 
   def volume
-    if (order.sell) then
-      return order.take_amount.to_i * amount.to_i / order.give_amount.to_i
+    if (!self.sell)
+      return self.take_amount.to_i
     else
-      return amount.to_i
+      return self.amount.to_i
     end
   end
 
   def volume_must_meet_taker_minimum
-    if (!order) then
+    if (!self.order)
       return
     end
 

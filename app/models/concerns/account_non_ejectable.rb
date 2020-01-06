@@ -3,7 +3,7 @@ module AccountNonEjectable
 
   def account_must_not_be_ejected
     if self.account && self.account.ejected
-      errors.add(:account, 'has been ejected')
+      self.errors.add(:account, 'has been ejected')
     end
   end
 end

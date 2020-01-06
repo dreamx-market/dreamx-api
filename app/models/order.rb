@@ -45,7 +45,7 @@ class Order < ApplicationRecord
 
   def status_must_be_open_on_create
     if self.status != 'open'
-      errors.add(:status, 'must be open')
+      self.errors.add(:status, 'must be open')
     end
   end
 
@@ -103,8 +103,8 @@ class Order < ApplicationRecord
     end
 
     minimum_volume = ENV['MAKER_MINIMUM_ETH_IN_WEI'].to_i
-    if self.remaining_volume < minimum_volume
-      errors.add(attribute, "must be greater than #{minimum_volume}")
+    if self.remaining_volume.to_i < minimum_volume
+      self.errors.add(attribute, "must be greater than #{minimum_volume}")
     end
   end
 
@@ -154,31 +154,31 @@ class Order < ApplicationRecord
   def addresses_must_be_valid
     [:account_address, :give_token_address, :take_token_address].each do |key|
       if !self[key].is_a_valid_address?
-        errors.add(key, 'is invalid')
+        self.self.errors.add(key, 'is invalid')
       end
     end
   end
 
   def filled_must_not_exceed_give_amount
-    errors.add(:filled, 'must not exceed give_amount') unless filled.to_i <= give_amount.to_i
+    self.self.errors.add(:filled, 'must not exceed give_amount') unless self.filled.to_i <= self.give_amount.to_i
   end
 
 	def expiry_timestamp_must_be_in_the_future
-		if expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i
-			errors.add(:expiry_timestamp_in_milliseconds, 'must be in the future')
+		if self.expiry_timestamp_in_milliseconds.to_i <= Time.now.to_i
+			self.self.errors.add(:expiry_timestamp_in_milliseconds, 'must be in the future')
 		end
 	end
 
 	def balance_must_be_sufficient
-		if !self.balance || self.balance.reload.balance.to_i < give_amount.to_i then
-			errors.add(:account, 'insufficient balance')
+		if !self.balance || self.balance.balance.to_i < self.give_amount.to_i then
+			self.errors.add(:account, 'insufficient balance')
 		end
 	end
 
 	def order_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
 		if (!calculated_hash or calculated_hash != order_hash) then
-			errors.add(:order_hash, 'is invalid')
+			self.errors.add(:order_hash, 'is invalid')
 		end
 	end
 
@@ -216,7 +216,7 @@ class Order < ApplicationRecord
     end
 
     if self.market.disabled?
-      self.errors.add(:market, 'has been disabled')
+      self.self.errors.add(:market, 'has been disabled')
     end
   end
 end

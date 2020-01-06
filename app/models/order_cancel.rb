@@ -27,20 +27,20 @@ class OrderCancel < ApplicationRecord
     if !self.order
       return
     end
-    errors.add(:order, "must be open") unless self.order.status != 'closed'
+    self.errors.add(:order, "must be open") unless self.order.status != 'closed'
   end
 
   def account_address_must_be_owner
     if !self.order
       return
     end
-    errors.add(:account, "must be owner") unless self.order.account_address == self.account_address
+    self.errors.add(:account, "must be owner") unless self.order.account_address == self.account_address
   end
 
   def cancel_hash_must_be_valid
     calculated_hash = self.class.calculate_hash(self)
-    if (!calculated_hash or calculated_hash != cancel_hash) then
-      errors.add(:cancel_hash, 'is invalid')
+    if (!calculated_hash or calculated_hash != self.cancel_hash) then
+      self.errors.add(:cancel_hash, 'is invalid')
     end
   end
 
