@@ -1,7 +1,7 @@
 class Transaction < ApplicationRecord
   belongs_to :transactable, :polymorphic => true
 
-  validates :status, inclusion: { in: ['confirmed', 'unconfirmed', 'pending', 'replaced', 'failed', 'out_of_gas'] }
+  validates :status, inclusion: { in: ['pending', 'unconfirmed', 'confirmed', 'replaced', 'failed', 'out_of_gas'] }
 
   before_create :assign_nonce, :sign
   after_create_commit :broadcast
@@ -66,7 +66,7 @@ class Transaction < ApplicationRecord
         if transaction.status == 'failed'
           transaction.mark_failed
 
-          if transaction.gas_limit == transaction_receipt['gasUsed'].hex
+          if transaction.gas_limit == transaction.gas
             transaction.mark_out_of_gas
           end
         end
