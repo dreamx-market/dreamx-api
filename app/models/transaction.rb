@@ -36,7 +36,7 @@ class Transaction < ApplicationRecord
     client = Ethereum::Singleton.instance
     key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
     last_onchain_nonce = client.get_nonce(key.address) - 1
-    last_block_number = client.eth_get_block_by_number('latest', false)['result']['number'].hex
+    last_block_number = client.eth_block_number["result"].hex
     mined_transactions = self.where({ :status => ["unconfirmed", "pending"] }).where({ :nonce => 0..last_onchain_nonce })
     mined_transactions.each do |transaction|
       transaction.with_lock do
