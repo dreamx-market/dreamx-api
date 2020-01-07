@@ -66,13 +66,41 @@ class Transaction < ApplicationRecord
         if transaction.status == 'failed'
           transaction.mark_failed
 
-          if transaction.raw.gas_limit == transaction_receipt['gasUsed'].hex
+          if transaction.gas_limit == transaction_receipt['gasUsed'].hex
             transaction.mark_out_of_gas
           end
         end
         transaction.save!
       end
     end
+  end
+
+  def self.broadcast_expired_transactions
+    # TEMPORARY: disable automatic replaced transaction handling
+    # uncomment later when the work-flow becomes more stable
+    # if (self.has_replaced_transactions?)
+    #   self.regenerate_replaced_transactions
+    # end
+
+    unconfirmed_transactions = self.unconfirmed_and_pending.order(:nonce)
+    unconfirmed_transactions.each do |transaction|
+      if !transaction.expired?
+        next
+      end
+
+      begin
+        BroadcastTransactionJob.perform_later(transaction)
+      rescue
+      end
+    end
+  end
+
+  def expired?
+    if (!self.broadcasted_at)
+      return true
+    end
+
+    return self.broadcasted_at <= 5.minutes.ago && self.status != 'confirmed'
   end
 
   def mark_replaced(last_onchain_nonce)
@@ -141,26 +169,6 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.broadcast_expired_transactions
-    # TEMPORARY: disable automatic replaced transaction handling
-    # uncomment later when the work-flow becomes more stable
-    # if (self.has_replaced_transactions?)
-    #   self.regenerate_replaced_transactions
-    # end
-
-    unconfirmed_transactions = self.unconfirmed_and_pending.order(:nonce)
-    unconfirmed_transactions.each do |transaction|
-      if !transaction.expired?
-        next
-      end
-
-      begin
-        BroadcastTransactionJob.perform_later(transaction)
-      rescue
-      end
-    end
-  end
-
   def self.regenerate_replaced_transactions
     if (self.has_unconfirmed_and_pending_transactions?)
       return
@@ -223,22 +231,6 @@ class Transaction < ApplicationRecord
         end
       end
     end
-  end
-
-  def expired?
-    if (self.status == 'confirmed')
-      return false
-    end
-
-    if (!self.broadcasted_at)
-      return true
-    end
-
-    client = Ethereum::Singleton.instance
-    key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
-    last_confirmed_nonce = client.get_nonce(key.address) - 1
-    # only unconfirmed transactions can expire
-    return self.nonce.to_i > last_confirmed_nonce && self.broadcasted_at <= 5.minutes.ago
   end
 
   def sign

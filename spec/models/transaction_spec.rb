@@ -5,7 +5,7 @@ RSpec.describe Transaction, type: :model do
 
   it 'expires', :onchain do
     transaction = create(:withdraw).tx
-    transaction.update({ broadcasted_at: 10.minutes.ago })
+    transaction.broadcasted_at = 10.minutes.ago
     expect(transaction.reload.expired?).to eq(true)
   end
 
