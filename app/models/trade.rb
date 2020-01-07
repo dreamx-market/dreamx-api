@@ -266,8 +266,8 @@ class Trade < ApplicationRecord
 
   def trade_balances
     maker_give_balance = @locked_balances.find { |b| b.id == self.maker_give_balance.id }
-    taker_give_balance = @locked_balances.find { |b| b.id == self.taker_give_balance.id }
     maker_take_balance = @locked_balances.find { |b| b.id == self.maker_take_balance.id }
+    taker_give_balance = @locked_balances.find { |b| b.id == self.taker_give_balance.id }
     taker_take_balance = @locked_balances.find { |b| b.id == self.taker_take_balance.id }
     maker_give_balance.spend(self.amount)
     maker_take_balance.credit(self.maker_receiving_amount_after_fee)
@@ -307,8 +307,8 @@ class Trade < ApplicationRecord
       @locked_balances = Balance.lock.where({ 
         id: [
           self.maker_give_balance.id, 
-          self.taker_give_balance.id, 
           self.maker_take_balance.id, 
+          self.taker_give_balance.id, 
           self.taker_take_balance.id
         ] 
       })
