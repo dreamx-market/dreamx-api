@@ -40,7 +40,7 @@ class Deposit < ApplicationRecord
     deposits = exchange.deposits(block_number)
     deposits.each do |deposit|
       deposit['account'], deposit['token'] = deposit['account'].without_checksum, deposit['token'].without_checksum
-      Balance.find_or_create_by({ account_address: deposit['account'], token_address: deposit['token'] })
+      balance = Balance.find_or_create_by({ account_address: deposit['account'], token_address: deposit['token'] })
       new_deposit = {
         :account_address => deposit['account'],
         :token_address => deposit['token'],

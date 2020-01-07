@@ -65,11 +65,7 @@ class Balance < ApplicationRecord
 
   def initialize_attributes
     self.token = Token.find_by(address: self.token_address)
-    self.account = Account.find_by(address: self.account_address)
-
-    if !self.account
-      self.account = Account.new({ address: self.account_address })
-    end
+    self.account = Account.find_or_create_by(address: self.account_address)
   end
 
   def onchain_balance
