@@ -21,10 +21,6 @@ class Trade < ApplicationRecord
   after_create :enqueue_update_ticker
 
   class << self
-    # TEMPORARY
-    def duplicates
-      self.select(:nonce).group(:nonce).having("count(*) > 1").size
-    end
   end
 
   def maker_balance

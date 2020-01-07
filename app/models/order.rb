@@ -38,10 +38,6 @@ class Order < ApplicationRecord
   scope :closed_and_partially_filled, -> { where.not({ status: 'open' }) }
 
   class << self
-    # TEMPORARY
-    def duplicates
-      self.select(:nonce).group(:nonce).having("count(*) > 1").size
-    end
   end
 
   def status_must_be_open_on_create
