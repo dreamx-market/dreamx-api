@@ -12,7 +12,7 @@ class Withdraw < ApplicationRecord
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
   validate :balance_must_exist_and_is_sufficient, on: :create
 
-  before_validation :initialize_attributes, :build_transaction, on: :create
+  before_validation :initialize_attributes, :lock_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
   before_create :set_fee, :debit_balance
   before_save :remove_checksum

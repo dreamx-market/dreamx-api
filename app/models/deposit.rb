@@ -7,9 +7,9 @@ class Deposit < ApplicationRecord
   validates :transaction_hash, :account_address, :token_address, :amount, :block_hash, :block_number, presence: true
   validates :amount, numericality: { greater_than: 0 }
 
-  before_validation :initialize_attributes, on: :create
+  before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum
-  before_create :credit_balance_with_lock
+  before_create :credit_balance
   after_commit { AccountTransfersRelayJob.perform_later(self) }
 
   # to distinguish this model from withdraws when being displayed a mixed collection of transfers
@@ -17,11 +17,8 @@ class Deposit < ApplicationRecord
     'deposit'
   end
 
-  def credit_balance_with_lock
-    balance = self.balance
-    balance.with_lock do
-      balance.credit(self.amount)
-    end
+  def credit_balance
+    self.balance.credit(self.amount)
   end
 
   def initialize_attributes
@@ -34,6 +31,10 @@ class Deposit < ApplicationRecord
   end
 
   private
+
+  def lock_attributes
+    self.balance.lock!
+  end
 
   def self.aggregate(block_number)
     exchange = Contract::Exchange.singleton

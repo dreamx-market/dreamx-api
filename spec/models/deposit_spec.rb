@@ -51,12 +51,4 @@ RSpec.describe Deposit, type: :model do
   it 'belongs to a balance' do
     expect(deposit.balance).to_not be_nil
   end
-
-  it 'credits balance after created with lock' do
-    allow(deposit.balance).to receive(:with_lock).and_call_original
-
-    deposit.credit_balance_with_lock
-
-    expect(deposit.balance).to have_received(:with_lock).once
-  end
 end
