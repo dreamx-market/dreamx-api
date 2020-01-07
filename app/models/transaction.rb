@@ -8,10 +8,13 @@ class Transaction < ApplicationRecord
   after_commit :relay_account_transactable, on: :create
   after_commit :relay_market_transactable, on: :create
 
-  scope :replaced, -> { where(status: 'replaced') }
-  scope :unconfirmed_and_pending, -> { where(status: ['unconfirmed', 'pending']) }
+  scope :confirmed, -> { where(status: 'confirmed') }
   scope :unconfirmed, -> { where(status: 'unconfirmed') }
   scope :pending, -> { where(status: 'pending') }
+  scope :unconfirmed_and_pending, -> { where(status: ['unconfirmed', 'pending']) }
+  scope :replaced, -> { where(status: 'replaced') }
+  scope :failed, -> { where(status: 'failed') }
+  scope :out_of_gas, -> { where(status: 'out_of_gas') }
 
   class << self
     def next_nonce
