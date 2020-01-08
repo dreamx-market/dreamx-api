@@ -40,8 +40,6 @@ class Balance < ApplicationRecord
 
       return false
     end
-      
-    end
 
     def unauthentic_balances
       result = []
