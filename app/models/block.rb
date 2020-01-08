@@ -35,7 +35,7 @@ class Block < ApplicationRecord
   end
 
   def self.process(current_block)
-    Transaction.confirm_mined_transactions(current_block)
+    # Transaction.confirm_mined_transactions(current_block)
     # Transaction.broadcast_expired_transactions
   end
 
