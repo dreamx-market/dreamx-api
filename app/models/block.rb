@@ -16,17 +16,17 @@ class Block < ApplicationRecord
 
       self.before_processing
 
-      # (@last_processed_block_number..@last_confirmed_block_number).step(1) do |i|
-      #   current_block = client.eth_get_block_by_number(i, false).convert_keys_to_underscore_symbols![:result]
+      (@last_processed_block_number..@last_confirmed_block_number).step(1) do |i|
+        current_block = client.eth_get_block_by_number(i, false).convert_keys_to_underscore_symbols![:result]
 
-      #   self.process(current_block)
+        self.process(current_block)
 
-      #   last_block.assign_attributes({
-      #     block_number: current_block[:number].hex,
-      #     block_hash: current_block[:hash],
-      #     parent_hash: current_block[:parent_hash]
-      #   })
-      # end
+        last_block.assign_attributes({
+          block_number: current_block[:number].hex,
+          block_hash: current_block[:hash],
+          parent_hash: current_block[:parent_hash]
+        })
+      end
 
       self.after_processing
 
