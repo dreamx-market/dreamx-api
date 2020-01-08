@@ -17,7 +17,6 @@ RSpec.describe Deposit, type: :model do
   end
 
   it 'aggregates a new deposit and initializes account', :onchain do
-    client = Ethereum::Singleton.instance
     token_address = token_addresses['ETH']
     amount = '1'.to_wei
     account_address = addresses[2]

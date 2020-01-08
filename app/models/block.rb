@@ -17,7 +17,7 @@ class Block < ApplicationRecord
       self.before_processing
 
       (@last_processed_block_number..@last_confirmed_block_number).step(1) do |i|
-        current_block = client.eth_get_block_by_number(i, true).convert_keys_to_underscore_symbols!
+        current_block = client.eth_get_block_by_number(i, true).convert_keys_to_underscore_symbols![:result]
 
         self.process(current_block)
 
@@ -35,6 +35,7 @@ class Block < ApplicationRecord
   end
 
   def self.process(current_block)
+    Transaction.confirm_mined_transactions(current_block)
   end
 
   def self.before_processing

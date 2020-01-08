@@ -39,31 +39,6 @@ class Trade < ApplicationRecord
     Balance.fee(self.order.take_token_address)
   end
 
-  # used by transaction.mark_failed
-  def refund
-    if !self.persisted?
-      raise 'cannot refund unpersisted trades'
-    end
-
-    maker_onchain_balance = self.maker_balance.onchain_balance
-    maker_giving_amount = self.give_amount
-    maker_delta = maker_giving_amount.to_i - maker_onchain_balance.to_i
-    # fake coins removal: if maker is giving more than he has, refund only what he has
-    maker_refund_amount = maker_delta > 0 ? maker_onchain_balance : maker_giving_amount
-
-    taker_onchain_balance = self.taker_balance.onchain_balance
-    taker_giving_amount = self.take_amount
-    taker_delta = taker_giving_amount.to_i - taker_onchain_balance.to_i
-    # fake coins removal: if taker is giving more than he has, refund only what he has
-    taker_refund_amount =  taker_delta > 0 ? taker_onchain_balance : taker_giving_amount
-
-    ActiveRecord::Base.transaction do
-      Balance.lock.where({ id: [self.maker_balance.id, self.taker_balance.id] })
-      self.maker_balance.refund(maker_refund_amount)
-      self.taker_balance.refund(taker_refund_amount)
-    end
-  end
-
   def transaction_hash
     self.tx ? self.tx.transaction_hash : nil
   end

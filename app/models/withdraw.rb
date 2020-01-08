@@ -20,24 +20,6 @@ class Withdraw < ApplicationRecord
   class << self
   end
 
-  # used by transaction.mark_failed
-  def refund
-    if !self.persisted?
-      raise 'cannot refund unpersisted withdrawals'
-    end
-
-    onchain_balance = self.balance.onchain_balance.to_i
-    withdraw_amount = self.amount.to_i
-    delta = withdraw_amount - onchain_balance
-    # fake coins removal: if user is withdrawing more than he has, refund only what he has
-    refund_amount = delta > 0 ? onchain_balance : withdraw_amount
-
-    balance = self.balance
-    balance.with_lock do
-      balance.refund(refund_amount)
-    end
-  end
-
   def transaction_hash
     if self.tx
       self.tx.transaction_hash
