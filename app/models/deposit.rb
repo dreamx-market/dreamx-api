@@ -4,7 +4,7 @@ class Deposit < ApplicationRecord
   belongs_to :balance
 
   validates :transaction_hash, uniqueness: true
-  validates :transaction_hash, :account_address, :token_address, :amount, :block_hash, :block_number, presence: true
+  validates :transaction_hash, :account_address, :token_address, :amount, :block_number, presence: true
   validates :amount, numericality: { greater_than: 0 }
 
   before_validation :initialize_attributes, :lock_attributes, on: :create
@@ -48,7 +48,6 @@ class Deposit < ApplicationRecord
         token_address: deposit[:token],
         amount: deposit[:amount],
         transaction_hash: deposit[:transaction_hash],
-        block_hash: deposit[:block_hash],
         block_number: deposit[:block_number],
       }
       begin

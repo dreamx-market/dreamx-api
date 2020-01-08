@@ -16,19 +16,6 @@ RSpec.describe Deposit, type: :model do
     expect(deposit.errors.messages[:transaction_hash]).to include("can't be blank")
   end
 
-  it 'aggregates a new deposit and initializes account', :onchain do
-    token_address = token_addresses['ETH']
-    amount = '1'.to_wei
-    account_address = addresses[2]
-    tx = create_onchain_deposit(token_address, amount, account_address)
-
-    expect {
-    expect {
-      Deposit.aggregate(tx[:block_number].hex)
-    }.to increase { Deposit.count }.by(1)
-    }.to increase { Account.count }.by(1)
-  end
-
   it 'must belong to an existing account' do
     deposit.account_address = 'INVALID'
     expect(deposit).to_not be_valid

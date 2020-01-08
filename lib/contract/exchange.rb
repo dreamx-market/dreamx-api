@@ -25,23 +25,13 @@ module Contract
       deposit_event_indexed_inputs = deposit_event_inputs.select(&:indexed)
       deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
 
-      filter_id = @contract.new_filter.deposit(
-        {
-          from_block: from.to_hex_string,
-          to_block: to.to_hex_string,
-          address: @contract.address,
-          topics: []
-        }
-      )
-      events = @contract.get_filter_logs.deposit(filter_id)
-
       deposit_logs = []
-      events.each do |event|
-        transaction_id = event[:transactionHash]
-        transaction = client.eth_get_transaction_receipt(transaction_id).convert_keys_to_underscore_symbols!
-        transaction[:result][:logs].each do |log|
-          deposit_logs << log if log[:topics][0] == deposit_event_signature
-        end
+      uri = URI.parse("#{ENV['ETHERSCAN_HTTP']}?module=logs&action=getLogs&fromBlock=#{from}&toBlock=#{to}&address=#{@contract.address}&topic0=#{deposit_event_signature}&apikey=#{ENV['ETHERSCAN_API_KEY']}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      response = JSON.parse(http.get(uri.request_uri).body).convert_keys_to_underscore_symbols!
+      response[:result].each do |e|
+        deposit_logs << e
       end
 
       decoded_deposits = []
@@ -54,7 +44,6 @@ module Contract
 
         decoded_deposit = {}
         decoded_deposit[:transaction_hash] = deposit_log[:transaction_hash]
-        decoded_deposit[:block_hash] = deposit_log[:block_hash]
         decoded_deposit[:block_number] = deposit_log[:block_number].hex
         args.each_with_index do |arg, i|
           decoded_deposit[deposit_event_inputs[i].name.to_sym] = arg
@@ -68,7 +57,7 @@ module Contract
         decoded_deposits << decoded_deposit
       end
 
-      # [ { :transaction_hash, :block_hash, :block_number, :token, :account, :amount, :balance }, ... ]
+      # [ { :transaction_hash, :block_number, :token, :account, :amount, :balance }, ... ]
       return decoded_deposits
     end
 
