@@ -15,6 +15,7 @@ module Contract
     end
 
     def deposits(block)
+      block.convert_keys_to_underscore_symbols!
       decoder = Ethereum::Decoder.new
       encoder = Ethereum::Encoder.new
       client = Ethereum::Singleton.instance
@@ -33,46 +34,46 @@ module Contract
       #     topics: []
       #   }
       # )
-      pp block
+      # pp block['']
 
       incoming_transactions = []
-      block['result']['transactions'].each do |t|
-        if t['to'].nil? or !t['to'].is_a_valid_address?
+      block[:result][:transactions].each do |t|
+        if t[:to].nil? or !t[:to].is_a_valid_address?
           next
         end
 
-        if t['to'].without_checksum == @contract.address.without_checksum
+        if t[:to].without_checksum == @contract.address.without_checksum
           incoming_transactions << t
         end
       end
 
       deposit_logs = []
       incoming_transactions.each do |t|
-        transaction = client.eth_get_transaction_receipt(t['hash'])
-        transaction['result']['logs'].each do |log|
-          deposit_logs << log if log['topics'][0] == deposit_event_signature
+        transaction = client.eth_get_transaction_receipt(t[:hash]).convert_keys_to_underscore_symbols!
+        transaction[:result][:logs].each do |log|
+          deposit_logs << log if log[:topics][0] == deposit_event_signature
         end
       end
 
       decoded_deposits = []
       deposit_logs.each do |deposit_log|
-        indexed_data = '0x' + deposit_log['topics'][1..-1].join.gsub('0x', '')
+        indexed_data = '0x' + deposit_log[:topics][1..-1].join.gsub('0x', '')
         indexed_args = decoder.decode_arguments(deposit_event_indexed_inputs, indexed_data)
-        unindexed_data = deposit_log['data']
+        unindexed_data = deposit_log[:data]
         unindexed_args = decoder.decode_arguments(deposit_event_unindexed_inputs, unindexed_data)
         args = indexed_args.concat unindexed_args
 
         decoded_deposit = {}
-        decoded_deposit['transaction_hash'] = deposit_log['transactionHash']
-        decoded_deposit['block_hash'] = deposit_log['blockHash']
-        decoded_deposit['block_number'] = deposit_log['blockNumber'].hex
+        decoded_deposit[:transaction_hash] = deposit_log[:transaction_hash]
+        decoded_deposit[:block_hash] = deposit_log[:block_hash]
+        decoded_deposit[:block_number] = deposit_log[:block_number].hex
         args.each_with_index do |arg, i|
-          decoded_deposit[deposit_event_inputs[i].name] = arg
+          decoded_deposit[deposit_event_inputs[i].name.to_sym] = arg
         end
 
         decoded_deposit_prefixed_attr = [:token, :account]
         decoded_deposit_prefixed_attr.each do |attr|
-          decoded_deposit["#{attr}"] = encoder.ensure_prefix(decoded_deposit["#{attr}"])
+          decoded_deposit[attr] = encoder.ensure_prefix(decoded_deposit[attr])
         end
 
         decoded_deposits << decoded_deposit
