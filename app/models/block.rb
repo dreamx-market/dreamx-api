@@ -22,9 +22,9 @@ class Block < ApplicationRecord
         self.process(current_block)
 
         last_block.assign_attributes({
-          block_number: current_block[:result][:number].hex,
-          block_hash: current_block[:result][:hash],
-          parent_hash: current_block[:result][:parent_hash]
+          block_number: current_block[:number].hex,
+          block_hash: current_block[:hash],
+          parent_hash: current_block[:parent_hash]
         })
       end
 
