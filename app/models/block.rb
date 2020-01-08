@@ -40,7 +40,7 @@ class Block < ApplicationRecord
   end
 
   def self.before_processing
-    Deposit.aggregate(@last_confirmed_block_number, @last_processed_block_number)
+    Deposit.aggregate(@last_processed_block_number, @last_confirmed_block_number)
   end
 
   def self.after_processing
