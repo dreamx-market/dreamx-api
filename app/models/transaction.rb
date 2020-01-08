@@ -30,7 +30,11 @@ class Transaction < ApplicationRecord
   end
 
   def self.confirm_mined_transactions(confirmed_block)
-    self.where(transaction_hash: confirmed_block[:transactions]).update_all(status: 'confirmed')
+    self.where(transaction_hash: confirmed_block[:transactions]).update_all({
+      status: 'confirmed', 
+      block_hash: confirmed_block[:hash],
+      block_number: confirmed_block[:number].hex,
+    })
   end
 
   def self.broadcast_expired_transactions
