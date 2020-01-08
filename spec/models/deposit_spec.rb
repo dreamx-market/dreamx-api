@@ -22,11 +22,10 @@ RSpec.describe Deposit, type: :model do
     amount = '1'.to_wei
     account_address = addresses[2]
     tx = create_onchain_deposit(token_address, amount, account_address)
-    block = client.eth_get_block_by_number(tx[:block_number], true)
 
     expect {
     expect {
-      Deposit.aggregate(block)
+      Deposit.aggregate(tx[:block_number].hex)
     }.to increase { Deposit.count }.by(1)
     }.to increase { Account.count }.by(1)
   end

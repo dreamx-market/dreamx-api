@@ -14,8 +14,7 @@ module Contract
       @contract.key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
     end
 
-    def deposits(block)
-      block.convert_keys_to_underscore_symbols!
+    def deposits(from, to)
       decoder = Ethereum::Decoder.new
       encoder = Ethereum::Encoder.new
       client = Ethereum::Singleton.instance
@@ -26,30 +25,20 @@ module Contract
       deposit_event_indexed_inputs = deposit_event_inputs.select(&:indexed)
       deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
 
-      # filter_id = contract.new_filter.log_register(
-      #   {
-      #     from_block: '0x0',
-      #     to_block: 'latest',
-      #     address: '0x....',
-      #     topics: []
-      #   }
-      # )
-      # pp block['']
-
-      incoming_transactions = []
-      block[:result][:transactions].each do |t|
-        if t[:to].nil? or !t[:to].is_a_valid_address?
-          next
-        end
-
-        if t[:to].without_checksum == @contract.address.without_checksum
-          incoming_transactions << t
-        end
-      end
+      filter_id = @contract.new_filter.deposit(
+        {
+          from_block: from.to_hex_string,
+          to_block: to.to_hex_string,
+          address: @contract.address,
+          topics: []
+        }
+      )
+      events = @contract.get_filter_logs.deposit(filter_id)
 
       deposit_logs = []
-      incoming_transactions.each do |t|
-        transaction = client.eth_get_transaction_receipt(t[:hash]).convert_keys_to_underscore_symbols!
+      events.each do |event|
+        transaction_id = event[:transactionHash]
+        transaction = client.eth_get_transaction_receipt(transaction_id).convert_keys_to_underscore_symbols!
         transaction[:result][:logs].each do |log|
           deposit_logs << log if log[:topics][0] == deposit_event_signature
         end
