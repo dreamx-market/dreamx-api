@@ -25,6 +25,16 @@ module Contract
       deposit_event_indexed_inputs = deposit_event_inputs.select(&:indexed)
       deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
 
+      # filter_id = contract.new_filter.log_register(
+      #   {
+      #     from_block: '0x0',
+      #     to_block: 'latest',
+      #     address: '0x....',
+      #     topics: []
+      #   }
+      # )
+      pp block
+
       incoming_transactions = []
       block['result']['transactions'].each do |t|
         if t['to'].nil? or !t['to'].is_a_valid_address?
