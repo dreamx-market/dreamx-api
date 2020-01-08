@@ -1,11 +1,3 @@
-GIT
-  remote: https://github.com/hieudoan2609/ethereum.rb.git
-  revision: d1726bbbeb8bb9aa3eb615713bde7e156edbe16e
-  specs:
-    ethereum.rb (2.2)
-      activesupport (>= 4.0)
-      digest-sha3 (~> 1.1)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -91,6 +83,9 @@ GEM
       money-tree (~> 0.10.0)
       rlp (~> 0.7.3)
       scrypt (~> 3.0.6)
+    ethereum.rb (2.2)
+      activesupport (>= 4.0)
+      digest-sha3 (~> 1.1)
     factory_bot (5.1.1)
       activesupport (>= 4.2.0)
     factory_bot_rails (5.1.1)
@@ -235,7 +230,7 @@ DEPENDENCIES
   climate_control
   database_cleaner
   eth
-  ethereum.rb!
+  ethereum.rb
   factory_bot_rails
   figaro
   jbuilder (~> 2.5)
