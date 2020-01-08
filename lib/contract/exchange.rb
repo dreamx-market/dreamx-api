@@ -14,7 +14,7 @@ module Contract
       @contract.key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
     end
 
-    def deposits(from=1, to=from)
+    def deposits(block)
       decoder = Ethereum::Decoder.new
       encoder = Ethereum::Encoder.new
       client = Ethereum::Singleton.instance
@@ -26,18 +26,13 @@ module Contract
       deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
 
       incoming_transactions = []
-      (from..to).step(1) do |i|
-        block = client.eth_get_block_by_number(i, true)['result']
-        if block
-          block['transactions'].each do |t|
-            if t['to'].nil? or !Eth::Utils.valid_address?(t['to'])
-              next
-            end
+      block['result']['transactions'].each do |t|
+        if t['to'].nil? or !t['to'].is_a_valid_address?
+          next
+        end
 
-            if t['to'].without_checksum == @contract.address.without_checksum
-              incoming_transactions << t
-            end
-          end
+        if t['to'].without_checksum == @contract.address.without_checksum
+          incoming_transactions << t
         end
       end
 

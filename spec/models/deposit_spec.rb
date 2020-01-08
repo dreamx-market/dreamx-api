@@ -17,15 +17,16 @@ RSpec.describe Deposit, type: :model do
   end
 
   it 'aggregates a new deposit and initializes account', :onchain do
+    client = Ethereum::Singleton.instance
     token_address = token_addresses['ETH']
     amount = '1'.to_wei
     account_address = addresses[2]
     tx = create_onchain_deposit(token_address, amount, account_address)
-    block_number = tx[:block_number].hex
+    block = client.eth_get_block_by_number(tx[:block_number], true)
 
     expect {
     expect {
-      Deposit.aggregate(block_number)
+      Deposit.aggregate(block)
     }.to increase { Deposit.count }.by(1)
     }.to increase { Account.count }.by(1)
   end

@@ -7,25 +7,21 @@ class Block < ApplicationRecord
 
     last_confirmed_block_number = current_block - required_confirmations
     last_processed_block_number = saved_block ? saved_block.block_number : last_confirmed_block_number
-    last_block_number = last_processed_block_number
 
     if (current_block < required_confirmations || saved_block.block_number == last_confirmed_block_number)
       return
     end
 
     (last_processed_block_number..last_confirmed_block_number).step(1) do |i|
-      self.process_block(i)
-      last_block_number = i
+      block = client.eth_get_block_by_number(i, true)
+      self.process_block(block)
+      last_block = block
     end
 
-    last_block = client.eth_get_block_by_number(last_block_number, false)
     saved_block.update!(:block_number => last_block["result"]["number"].hex, :block_hash => last_block["result"]["hash"], :parent_hash => last_block["result"]["parentHash"])
   end
 
-  def self.process_block(block_number)
-    # the following methods should be able to be called multiple times 
-    # with the same arguments without causing errors for scenarios where block_number is reverted
-    # to an earlier version
-    Deposit.aggregate(block_number)
+  def self.process_block(block)
+    Deposit.aggregate(block)
   end
 end
