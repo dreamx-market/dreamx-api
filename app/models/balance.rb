@@ -23,7 +23,7 @@ class Balance < ApplicationRecord
   class << self
     def has_unauthentic_balances?
       self.all.each do |b|
-        if !b.authentic?
+        if !b.authentic? || !b.onchain_authentic
           return true
         end
       end
@@ -35,7 +35,7 @@ class Balance < ApplicationRecord
       result = []
 
       self.all.each do |b|
-        if !b.authentic?
+        if !b.authentic? || !b.onchain_authentic
           result << b
         end
       end
@@ -99,15 +99,16 @@ class Balance < ApplicationRecord
       return true
     end
 
-    return (balance_authentic? and hold_balance_authentic?)
+    return self.real_delta == 0 && self.real_hold_delta == 0
   end
 
-  def balance_authentic?
-    self.real_delta == 0
-  end
+  def onchain_authentic?
+    fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
+    if (fee_address == self.account_address)
+      return true
+    end
 
-  def hold_balance_authentic?
-    self.real_hold_delta == 0
+    return self.onchain_delta == 0
   end
 
   def real_total_balance
