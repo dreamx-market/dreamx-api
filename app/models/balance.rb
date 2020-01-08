@@ -23,7 +23,7 @@ class Balance < ApplicationRecord
   class << self
     def has_unauthentic_balances?
       self.all.each do |b|
-        if !b.authentic? || !b.onchain_authentic
+        if !b.authentic? || !b.onchain_authentic?
           return true
         end
       end
@@ -35,7 +35,7 @@ class Balance < ApplicationRecord
       result = []
 
       self.all.each do |b|
-        if !b.authentic? || !b.onchain_authentic
+        if !b.authentic? || !b.onchain_authentic?
           result << b
         end
       end
