@@ -3,9 +3,9 @@ job_type :rake_with_lock, 'export PATH="$HOME/.rbenv/bin:$PATH"; eval "$(rbenv i
 env :PATH, ENV['PATH'] 
 set :output, "#{path}/log/cron.log"
 
-# every 1.minutes do
-#   rake_with_lock "block:process_new_confirmed_blocks"
-# end
+every 1.minutes do
+  rake_with_lock "block:process_new_confirmed_blocks"
+end
 
 every 5.minutes do
   rake_with_lock "chart:aggregate_5m"
