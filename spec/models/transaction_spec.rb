@@ -16,7 +16,7 @@ RSpec.describe Transaction, type: :model do
     expect(transaction.reload.expired?).to eq(false)
   end
 
-  it 'confirms successful transactions' do
+  it 'confirms successful transactions', :perform_enqueued do
     from_block_number = 7090218
     ropsten_server_private_key = '0x667808D292681DA47E70DF33EF276264DF39A056DE95427CFB9437106A08FAF3'
     ropsten_transaction_hash = '0x7eb384a190f305b8f08c80bb1d90667e338f206b42415274ad9a013a172fad74'
