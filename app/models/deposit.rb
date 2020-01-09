@@ -12,9 +12,13 @@ class Deposit < ApplicationRecord
   before_create :credit_balance
   after_commit { AccountTransfersRelayJob.perform_later(self) }
 
-  # to distinguish this model from withdraws when being displayed a mixed collection of transfers
+  # static attributes used for rendering _transfer.json.jbuilder
   def type
     'deposit'
+  end
+
+  def status
+    'confirmed'
   end
 
   def credit_balance

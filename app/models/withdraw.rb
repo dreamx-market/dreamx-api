@@ -26,21 +26,17 @@ class Withdraw < ApplicationRecord
     end
   end
 
-  def block_hash
-    if self.tx
-      self.tx.block_hash
-    end
-  end
-
-  def block_number
-    if self.tx
-      self.tx.block_number
-    end
-  end
-
-  # to distinguish this model from deposits when being displayed a mixed collection of transfers
+  # static attributes used for rendering _transfer.json.jbuilder
   def type
     'withdraw'
+  end
+
+  def status
+    if self.tx && self.tx.status == 'confirmed'
+      return 'confirmed'
+    else
+      return 'unconfirmed'
+    end
   end
 
   def payload

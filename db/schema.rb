@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_08_202155) do
+ActiveRecord::Schema.define(version: 2020_01_09_175320) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -233,8 +233,6 @@ ActiveRecord::Schema.define(version: 2020_01_08_202155) do
     t.decimal "gas_limit", precision: 1000, null: false
     t.decimal "gas_price", precision: 1000, null: false
     t.string "transaction_hash"
-    t.string "block_hash"
-    t.bigint "block_number"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
