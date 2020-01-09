@@ -55,7 +55,6 @@ class Deposit < ApplicationRecord
       begin
         self.create!(new_deposit)
       rescue => err
-        byebug
         AppLogger.log("Failed to create deposit, received following error: #{err}")
       end
     end

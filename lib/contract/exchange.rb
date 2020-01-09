@@ -19,21 +19,12 @@ module Contract
       encoder = Ethereum::Encoder.new
       client = Ethereum::Singleton.instance
 
-      deposit_event_signature = encoder.ensure_prefix(@contract.events.find { |event| event.name == 'Deposit' }.signature)
       deposit_event_abi = @abi.find { |a| a['name'] == 'Deposit' }
       deposit_event_inputs = deposit_event_abi['inputs'].map { |i| OpenStruct.new(i) }
       deposit_event_indexed_inputs = deposit_event_inputs.select(&:indexed)
       deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
 
-      deposit_logs = []
-      uri = URI.parse("#{ENV['ETHERSCAN_HTTP']}?module=logs&action=getLogs&fromBlock=#{from}&toBlock=#{to}&address=#{@contract.address}&topic0=#{deposit_event_signature}&apikey=#{ENV['ETHERSCAN_API_KEY']}")
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      response = JSON.parse(http.get(uri.request_uri).body).convert_keys_to_underscore_symbols!
-      response[:result].each do |e|
-        deposit_logs << e
-      end
-
+      deposit_logs = Etherscan.get_deposit_logs(from, to)
       decoded_deposits = []
       deposit_logs.each do |deposit_log|
         indexed_data = '0x' + deposit_log[:topics][1..-1].join.gsub('0x', '')

@@ -23,6 +23,7 @@ module DreamxApi
     require 'ext/integer'
     require 'ext/hash'
     require 'config'
+    require 'ether_scan'
 
     def environment_variables
       return {

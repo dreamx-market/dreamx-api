@@ -16,7 +16,7 @@ RSpec.describe Transaction, type: :model do
     expect(transaction.reload.expired?).to eq(false)
   end
 
-  it 'confirms successful transactions', :focus do
+  skip 'confirms successful transactions' do
     from_block_number = 7095527
     ropsten_contract_address = '0x7f6a01dcebe266779e00a4cf15e9432cb1423203'
     ropsten_transaction_hash = '0x624c55566e2e3f88e73cb351e6a0f93d0c12bb2ace175a8e073b342c3887ff85'
