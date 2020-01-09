@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe AccountTransfersChannel, type: :channel, perform_enqueued: true do
-  it "broadcast a message when a new deposit is created" do
+  it "broadcast message when deposit is created" do
     deposit = build(:deposit)
 
     expect {
@@ -9,11 +9,11 @@ RSpec.describe AccountTransfersChannel, type: :channel, perform_enqueued: true d
     }.to have_broadcasted_to("account_transfers:#{deposit.account_address}")
   end
 
-  it "broadcast a message when a new withdraw is created and when its transaction is updated", :onchain do
+  it "broadcast message when withdrawal is created or updated", :onchain do
     withdraw = build(:withdraw)
 
     expect {
       withdraw.save
-    }.to have_broadcasted_to("account_transfers:#{withdraw.account_address}")
+    }.to have_broadcasted_to("account_transfers:#{withdraw.account_address}").twice
   end
 end

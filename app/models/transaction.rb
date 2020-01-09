@@ -5,7 +5,7 @@ class Transaction < ApplicationRecord
 
   before_create :assign_nonce, :sign
   after_create_commit :broadcast
-  after_commit :relay_account_transactable, on: :create
+  after_commit :relay_account_transactable, on: [:create, :update]
   after_commit :relay_market_transactable, on: :create
 
   scope :confirmed, -> { where(status: 'confirmed') }
