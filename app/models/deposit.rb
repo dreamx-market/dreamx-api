@@ -33,7 +33,9 @@ class Deposit < ApplicationRecord
   private
 
   def lock_attributes
-    self.balance.lock!
+    if self.balance
+      self.balance.lock!
+    end
   end
 
   def self.aggregate(from, to=from)
@@ -53,6 +55,7 @@ class Deposit < ApplicationRecord
       begin
         self.create!(new_deposit)
       rescue => err
+        byebug
         AppLogger.log("Failed to create deposit, received following error: #{err}")
       end
     end

@@ -83,7 +83,8 @@ class Transaction < ApplicationRecord
   def broadcast
     begin
       BroadcastTransactionJob.perform_later(self)
-    rescue
+    rescue => err
+      AppLogger.log("Failed to broadcast transaction, received following error: #{err}")
     end
   end
 
