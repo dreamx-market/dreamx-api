@@ -30,11 +30,8 @@ class Transaction < ApplicationRecord
   end
 
   def self.confirm_mined_transactions(from, to=from)
-    self.where(transaction_hash: confirmed_block[:transactions]).update_all({
-      status: 'confirmed', 
-      block_hash: confirmed_block[:hash],
-      block_number: confirmed_block[:number].hex,
-    })
+    confirmed_hashes = Etherscan.get_transactions(from, to)
+    self.where(transaction_hash: confirmed_hashes).update_all(status: 'confirmed')
   end
 
   def self.broadcast_expired_transactions

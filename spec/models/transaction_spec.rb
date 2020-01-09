@@ -16,15 +16,15 @@ RSpec.describe Transaction, type: :model do
     expect(transaction.reload.expired?).to eq(false)
   end
 
-  skip 'confirms successful transactions' do
-    from_block_number = 7095527
-    ropsten_contract_address = '0x7f6a01dcebe266779e00a4cf15e9432cb1423203'
-    ropsten_transaction_hash = '0x624c55566e2e3f88e73cb351e6a0f93d0c12bb2ace175a8e073b342c3887ff85'
+  it 'confirms successful transactions' do
+    from_block_number = 7090218
+    ropsten_server_private_key = '0x667808D292681DA47E70DF33EF276264DF39A056DE95427CFB9437106A08FAF3'
+    ropsten_transaction_hash = '0x7eb384a190f305b8f08c80bb1d90667e338f206b42415274ad9a013a172fad74'
 
     transaction = create(:withdraw).tx
     transaction.update(transaction_hash: ropsten_transaction_hash)
 
-    with_modified_env CONTRACT_ADDRESS: ropsten_contract_address do
+    with_modified_env SERVER_PRIVATE_KEY: ropsten_server_private_key do
       expect {
         Transaction.confirm_mined_transactions(from_block_number)
       }.to change { transaction.reload.status }.to('confirmed')
