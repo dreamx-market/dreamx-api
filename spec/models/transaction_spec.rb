@@ -16,14 +16,19 @@ RSpec.describe Transaction, type: :model do
     expect(transaction.reload.expired?).to eq(false)
   end
 
-  it 'confirms successful transactions', :onchain do
-    transaction = create(:withdraw).tx
-    BroadcastTransactionJob.perform_now(transaction)
-    block = client.eth_get_block_by_number('latest', false).convert_keys_to_underscore_symbols![:result]
+  it 'confirms successful transactions', :focus do
+    from_block_number = 7095527
+    ropsten_contract_address = '0x7f6a01dcebe266779e00a4cf15e9432cb1423203'
+    ropsten_transaction_hash = '0x624c55566e2e3f88e73cb351e6a0f93d0c12bb2ace175a8e073b342c3887ff85'
 
-    expect {
-      Transaction.confirm_mined_transactions(block)
-    }.to change { transaction.reload.status }.to('confirmed')
+    transaction = create(:withdraw).tx
+    transaction.update(transaction_hash: ropsten_transaction_hash)
+
+    with_modified_env CONTRACT_ADDRESS: ropsten_contract_address do
+      expect {
+        Transaction.confirm_mined_transactions(from_block_number)
+      }.to change { transaction.reload.status }.to('confirmed')
+    end
   end
 
   it 'has a hash prior to broadcasting' do

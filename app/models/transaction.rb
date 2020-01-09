@@ -29,7 +29,7 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.confirm_mined_transactions(confirmed_block)
+  def self.confirm_mined_transactions(from, to=from)
     self.where(transaction_hash: confirmed_block[:transactions]).update_all({
       status: 'confirmed', 
       block_hash: confirmed_block[:hash],

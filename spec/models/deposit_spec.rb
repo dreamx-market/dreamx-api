@@ -38,7 +38,7 @@ RSpec.describe Deposit, type: :model do
     expect(deposit.balance).to_not be_nil
   end
 
-  it 'aggregates new deposits and initializes new accounts', :focus do
+  it 'aggregates new deposits and initializes new accounts' do
     from_block_number = 7095527
     ropsten_contract_address = '0x7f6a01dcebe266779e00a4cf15e9432cb1423203'
 
