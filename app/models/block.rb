@@ -14,7 +14,7 @@ class Block < ApplicationRecord
       return
     end
 
-    self.process(last_processed_block_number, last_confirmed_block_number)
+    self.process(last_processed_block_number + 1, last_confirmed_block_number)
 
     last_block.update!(block_number: last_confirmed_block_number)
   end
