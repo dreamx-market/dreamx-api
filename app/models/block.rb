@@ -19,7 +19,7 @@ class Block < ApplicationRecord
     last_block.update!(block_number: last_confirmed_block_number)
   end
 
-  def self.process(from, to)
+  def self.process(from, to=from)
     Deposit.aggregate(from, to)
     Transaction.confirm_mined_transactions(from, to)
   end
