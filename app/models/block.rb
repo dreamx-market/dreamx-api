@@ -21,7 +21,8 @@ class Block < ApplicationRecord
 
   def self.process(from, to=from)
     # AppLogger.log("Processing new blocks from #{from} to #{to} ...")
-    AppLogger.log("#{ENV['TRANSACTION_CONFIRMATIONS']}")
+    AppLogger.log("#{Contract::Exchange.singleton}")
+    AppLogger.log("#{Contract::Exchange.singleton.contract.address}")
     Deposit.aggregate(from, to)
     Transaction.confirm_mined_transactions(from, to)
   end
