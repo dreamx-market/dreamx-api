@@ -4,30 +4,30 @@ env :PATH, ENV['PATH']
 set :output, "#{path}/log/cron.log"
 
 every 1.minutes do
-  rake "block:process_new_confirmed_blocks"
+  rake_with_lock "block:process_new_confirmed_blocks"
 end
 
 every 5.minutes do
-  rake "chart:aggregate_5m"
+  rake_with_lock "chart:aggregate_5m"
 end
 
 every 15.minutes do
-  rake "chart:aggregate_15m"
+  rake_with_lock "chart:aggregate_15m"
 end
 
 every 1.hour do
-  rake "chart:aggregate_hourly"
+  rake_with_lock "chart:aggregate_hourly"
 end
 
 every 1.day do
-  rake "chart:aggregate_daily"
+  rake_with_lock "chart:aggregate_daily"
 end
 
 every 7.days do
-  rake "chart:remove_expired"
+  rake_with_lock "chart:remove_expired"
 end
 
 # TEMPORARY
 every 2.hour do
-  rake "faucet:request_ether"
+  rake_with_lock "faucet:request_ether"
 end
