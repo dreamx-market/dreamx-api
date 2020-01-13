@@ -42,6 +42,19 @@ class Deposit < ApplicationRecord
     end
   end
 
+  def self.missing(from, to=from)
+    exchange = Contract::Exchange.singleton
+    deposits = exchange.deposits(from, to)
+
+    missing = []
+    deposits.each do |deposit|
+      offchain_deposit = self.find_by(transaction_hash: deposit[:transaction_hash])
+      missing << deposit if !offchain_deposit
+    end
+
+    return missing
+  end
+
   def self.aggregate(from, to=from)
     exchange = Contract::Exchange.singleton
     deposits = exchange.deposits(from, to)
