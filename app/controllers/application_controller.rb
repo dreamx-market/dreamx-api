@@ -10,22 +10,14 @@ class ApplicationController < ActionController::API
     @limit = ENV['RATE_LIMIT'].to_i
     duration = ENV['RATE_LIMIT_DURATION'].to_i
     @ip = request.remote_ip
-    @current_requests = Redis.current.get(@ip)
+    @current_requests = Redis.current.incr(@ip)
+    set_response_headers
 
-    if !@current_requests
-      @current_requests = 0
-      Redis.current.set(@ip, @current_requests)
+    if @current_requests == 1
       Redis.current.expire(@ip, duration)
-    else
-      @current_requests = @current_requests.to_i
     end
 
-    if @current_requests < @limit
-      Redis.current.incr(@ip)
-      @current_requests += 1
-      set_response_headers
-    else
-      set_response_headers
+    if @current_requests > @limit
       render json: "too many requests", status: :too_many_requests
       return
     end
