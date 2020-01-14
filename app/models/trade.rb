@@ -312,9 +312,16 @@ class Trade < ApplicationRecord
   end
 
   def amount_precision_is_valid
-    fraction = self.amount.from_wei.split('.')[1]
-    if fraction && fraction.length > 2
-      AppLogger.log("invalid amount precision, trade##{self.id}")
+    if self.sell
+      fraction = self.take_amount.from_wei.split('.')[1]
+      if fraction && fraction.length > 2
+        AppLogger.log("invalid amount precision, trade##{self.id}")
+      end
+    else
+      fraction = self.amount.from_wei.split('.')[1]
+      if fraction && fraction.length > 2
+        AppLogger.log("invalid amount precision, trade##{self.id}")
+      end
     end
   end
 end
