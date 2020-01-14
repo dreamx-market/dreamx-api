@@ -20,7 +20,7 @@ class Trade < ApplicationRecord
   before_create :trade_balances
   after_create :enqueue_update_ticker
   # TEMPORARY
-  after_commit :price_precision_is_valid, :amount_precision_is_valid
+  after_commit :price_precision_is_valid, :amount_precision_is_valid, on: :create
 
   class << self
   end

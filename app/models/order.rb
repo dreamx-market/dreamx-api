@@ -31,7 +31,7 @@ class Order < ApplicationRecord
     AccountOrdersRelayJob.perform_later(self)
   }
   # TEMPORARY
-  after_commit :price_precision_is_valid, :amount_precision_is_valid
+  after_commit :price_precision_is_valid, :amount_precision_is_valid, on: :create
 
   scope :open, -> { where.not({ status: 'closed' }) }
   scope :open_buy, -> { where({ sell: false }).where.not({ status: 'closed' }) }
