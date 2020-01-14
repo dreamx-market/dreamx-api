@@ -14,6 +14,8 @@ class Trade < ApplicationRecord
   validates :trade_hash, signature: true
   validate :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum
+  # TEMPORARY
+  validate :price_precision_is_valid, :amount_precision_is_valid
 
   before_validation :initialize_attributes, :lock_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
@@ -299,5 +301,20 @@ class Trade < ApplicationRecord
 
   def build_transaction
     self.tx ||= Transaction.new({ status: 'pending' })
+  end
+
+  # TEMPORARY
+  def price_precision_is_valid
+    fraction = self.price.to_s.split('.')[1]
+    if fraction && fraction.length > 6
+      AppLogger.log("invalid price precision, trade##{self.id}")
+    end
+  end
+
+  def amount_precision_is_valid
+    fraction = self.amount.to_s.split('.')[1]
+    if fraction && fraction.length > 2
+      AppLogger.log("invalid amount precision, trade##{self.id}")
+    end
   end
 end

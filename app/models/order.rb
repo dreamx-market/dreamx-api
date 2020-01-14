@@ -21,6 +21,8 @@ class Order < ApplicationRecord
   validates :filled, numericality: { :equal_to => 0 }, on: :create
   validate :status_must_be_open_on_create, on: :create
   validate :market_must_be_active, :balance_must_be_sufficient, :volume_must_meet_maker_minimum, on: :create
+  # TEMPORARY
+  validate :price_precision_is_valid, :amount_precision_is_valid
 
   before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum
@@ -214,6 +216,28 @@ class Order < ApplicationRecord
 
     if self.market.disabled?
       self.errors.add(:market, 'has been disabled')
+    end
+  end
+
+  # TEMPORARY
+  def price_precision_is_valid
+    fraction = self.price.to_s.split('.')[1]
+    if fraction && fraction.length > 6
+      AppLogger.log("invalid price precision, trade##{self.id}")
+    end
+  end
+
+  def amount_precision_is_valid
+    if self.sell
+      fraction = self.take_amount.to_s.split('.')[1]
+      if fraction && fraction.length > 2
+        AppLogger.log("invalid take_amount precision, order##{self.id}")
+      end
+    else
+      fraction = self.give_amount.to_s.split('.')[1]
+      if fraction && fraction.length > 2
+        AppLogger.log("invalid give_amount precision, order##{self.id}")
+      end
     end
   end
 end
