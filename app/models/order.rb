@@ -229,12 +229,12 @@ class Order < ApplicationRecord
 
   def amount_precision_is_valid
     if self.sell
-      fraction = self.take_amount.from_wei.split('.')[1]
+      fraction = self.give_amount.from_wei.split('.')[1]
       if fraction && fraction.length > 2
         AppLogger.log("invalid take_amount precision, order##{self.id}")
       end
     else
-      fraction = self.give_amount.from_wei.split('.')[1]
+      fraction = self.take_amount.from_wei.split('.')[1]
       if fraction && fraction.length > 2
         AppLogger.log("invalid give_amount precision, order##{self.id}")
       end
