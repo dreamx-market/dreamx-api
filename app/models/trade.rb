@@ -12,7 +12,7 @@ class Trade < ApplicationRecord
   validates :trade_hash, :nonce, uniqueness: true
   validates :account_address, :order_hash, :amount, :nonce, :trade_hash, :signature, :fee, :total, :maker_fee, presence: true
   validates :trade_hash, signature: true
-  validate :price_precision_is_valid, :amount_precision_is_valid, :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
+  validate :amount_precision_is_valid, :order_must_be_open, :order_must_have_sufficient_volume, :balance_must_exist_and_is_sufficient, :account_must_not_be_ejected, on: :create
   validate :trade_hash_must_be_valid, :volume_must_meet_taker_minimum
 
   before_validation :initialize_attributes, :lock_attributes, :build_transaction, on: :create
@@ -301,26 +301,19 @@ class Trade < ApplicationRecord
     self.tx ||= Transaction.new({ status: 'pending' })
   end
 
-  # TEMPORARY
-  def price_precision_is_valid
-    fraction = self.price.to_s.split('.')[1]
-    if fraction && fraction.length > 6
-      self.errors.add(:price, 'invalid precision')
-      AppLogger.log("invalid price precision, trade_hash: #{self.trade_hash}")
-    end
-  end
-
   def amount_precision_is_valid
     if self.sell
       fraction = self.take_amount.from_wei.split('.')[1]
       if fraction && fraction.length > 2
         self.errors.add(:take_amount, 'invalid precision')
+        # TEMPORARY
         AppLogger.log("invalid amount precision, trade_hash: #{self.trade_hash}")
       end
     else
       fraction = self.amount.from_wei.split('.')[1]
       if fraction && fraction.length > 2
         self.errors.add(:give_amount, 'invalid precision')
+        # TEMPORARY
         AppLogger.log("invalid amount precision, trade_hash: #{self.trade_hash}")
       end
     end
