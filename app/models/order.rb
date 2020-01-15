@@ -19,8 +19,7 @@ class Order < ApplicationRecord
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }
 	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
   validates :filled, numericality: { :equal_to => 0 }, on: :create
-  validate :status_must_be_open_on_create, on: :create
-  validate :market_must_be_active, :balance_must_be_sufficient, :volume_must_meet_maker_minimum, on: :create
+  validate :price_precision_is_valid, :amount_precision_is_valid, :status_must_be_open_on_create, :market_must_be_active, :balance_must_be_sufficient, :volume_must_meet_maker_minimum, on: :create
 
   before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum
@@ -30,8 +29,6 @@ class Order < ApplicationRecord
     MarketOrdersRelayJob.perform_later(self)
     AccountOrdersRelayJob.perform_later(self)
   }
-  # TEMPORARY
-  after_commit :price_precision_is_valid, :amount_precision_is_valid, on: :create
 
   scope :open, -> { where.not({ status: 'closed' }) }
   scope :open_buy, -> { where({ sell: false }).where.not({ status: 'closed' }) }
@@ -219,11 +216,12 @@ class Order < ApplicationRecord
     end
   end
 
-  # TEMPORARY
   def price_precision_is_valid
     fraction = self.price.to_s.split('.')[1]
     if fraction && fraction.length > 6
-      AppLogger.log("invalid price precision, trade##{self.id}")
+      self.errors.add(:price, 'invalid precision')
+      # TEMPORARY
+      AppLogger.log("invalid price precision, order_hash: #{self.order_hash}")
     end
   end
 
@@ -231,12 +229,16 @@ class Order < ApplicationRecord
     if self.sell
       fraction = self.give_amount.from_wei.split('.')[1]
       if fraction && fraction.length > 2
-        AppLogger.log("invalid take_amount precision, order##{self.id}")
+        self.errors.add(:give_amount, 'invalid precision')
+        # TEMPORARY
+        AppLogger.log("invalid take_amount precision, order_hash: #{self.order_hash}")
       end
     else
       fraction = self.take_amount.from_wei.split('.')[1]
       if fraction && fraction.length > 2
-        AppLogger.log("invalid give_amount precision, order##{self.id}")
+        self.errors.add(:take_amount, 'invalid precision')
+        # TEMPORARY
+        AppLogger.log("invalid give_amount precision, order_hash: #{self.order_hash}")
       end
     end
   end
