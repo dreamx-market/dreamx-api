@@ -7,6 +7,8 @@ FactoryBot.define do
 
     base_token_address { token_addresses['ETH'] }
     quote_token_address { token_addresses['TWO'] }
+    price_precision { 6 }
+    amount_precision { 2 }
 
     trait :reversed do
       base_token_address { token_addresses['TWO'] }
