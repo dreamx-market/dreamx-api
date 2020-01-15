@@ -107,7 +107,7 @@ RSpec.describe Market, type: :model do
     market = markets(:one)
     order1 = create(:order, :sell, give_amount: '1'.to_wei, take_amount: '1'.to_wei, created_at: 1.days.ago)
     order2 = create(:order, :sell, give_amount: '1'.to_wei, take_amount: '1'.to_wei, created_at: 2.days.ago)
-    order3 = create(:order, :sell, give_amount: '1.5'.to_wei, take_amount: '1'.to_wei)
+    order3 = create(:order, :sell, give_amount: '1.5'.to_wei, take_amount: '0.9'.to_wei)
     order4 = create(:order, :sell, give_amount: '2'.to_wei, take_amount: '1'.to_wei)
     sell_book = market.order_book[:sell_book]
 

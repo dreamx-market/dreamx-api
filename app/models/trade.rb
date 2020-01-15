@@ -302,19 +302,19 @@ class Trade < ApplicationRecord
   end
 
   def amount_precision_is_valid
+    if !self.market
+      return
+    end
+
     if self.sell
       fraction = self.take_amount.from_wei.split('.')[1]
-      if fraction && fraction.length > 2
-        # TEMPORARY
-        AppLogger.log("invalid amount precision, trade_hash: #{self.trade_hash}")
-        # self.errors.add(:take_amount, 'invalid precision')
+      if fraction && fraction.length > self.market.amount_precision
+        self.errors.add(:take_amount, 'invalid precision')
       end
     else
       fraction = self.amount.from_wei.split('.')[1]
-      if fraction && fraction.length > 2
-        # TEMPORARY
-        AppLogger.log("invalid amount precision, trade_hash: #{self.trade_hash}")
-        # self.errors.add(:give_amount, 'invalid precision')
+      if fraction && fraction.length > self.market.amount_precision
+        self.errors.add(:give_amount, 'invalid precision')
       end
     end
   end

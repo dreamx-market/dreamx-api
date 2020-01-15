@@ -217,28 +217,30 @@ class Order < ApplicationRecord
   end
 
   def price_precision_is_valid
+    if !self.market
+      return
+    end
+    
     fraction = self.price.to_s.split('.')[1]
-    if fraction && fraction.length > 6
-      # TEMPORARY
-      AppLogger.log("invalid price precision, order_hash: #{self.order_hash}")
-      # self.errors.add(:price, 'invalid precision')
+    if fraction && fraction.length > self.market.price_precision
+      self.errors.add(:price, 'invalid precision')
     end
   end
 
   def amount_precision_is_valid
+    if !self.market
+      return
+    end
+
     if self.sell
       fraction = self.give_amount.from_wei.split('.')[1]
-      if fraction && fraction.length > 2
-        # TEMPORARY
-        AppLogger.log("invalid take_amount precision, order_hash: #{self.order_hash}")
-        # self.errors.add(:give_amount, 'invalid precision')
+      if fraction && fraction.length > self.market.amount_precision
+        self.errors.add(:give_amount, 'invalid precision')
       end
     else
       fraction = self.take_amount.from_wei.split('.')[1]
-      if fraction && fraction.length > 2
-        # TEMPORARY
-        AppLogger.log("invalid give_amount precision, order_hash: #{self.order_hash}")
-        # self.errors.add(:take_amount, 'invalid precision')
+      if fraction && fraction.length > self.market.amount_precision
+        self.errors.add(:take_amount, 'invalid precision')
       end
     end
   end

@@ -78,8 +78,8 @@ RSpec.describe Balance, type: :model do
   end
 
   it "calculates total_traded correctly with order filled by multiple trades" do
-    order = build(:order, :sell, give_amount: '1804962086700662200', take_amount: '11512246507483280464')
-    trades = build_list(:trade, 3, order: order, amount: '25000000000000000')
+    order = build(:order, :sell, give_amount: '1.5'.to_wei, take_amount: '0.9'.to_wei)
+    trades = build_list(:trade, 3, order: order, amount: '0.25'.to_wei)
     total_give_amount = 0
     total_maker_receiving_amount_after_fee = 0
     total_take_amount = 0

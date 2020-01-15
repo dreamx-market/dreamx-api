@@ -5,7 +5,7 @@ RSpec.describe "Markets", type: :request do
     @market = markets(:one)
   end
 
-  it "GET /markets", :focus do
+  it "GET /markets" do
     get markets_url, as: :json
     expect(response).to be_successful
   end
