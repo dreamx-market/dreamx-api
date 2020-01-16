@@ -239,14 +239,14 @@ class Order < ApplicationRecord
       if fraction && fraction.length > self.market.amount_precision
         self.errors.add(:give_amount, 'invalid precision')
         # TEMPORARY
-        AppLogger.log("invalid order give_amount precision, give_amount: #{self.give_amount}, allowed precision: #{self.market.amount_precision}")
+        AppLogger.log("invalid order give_amount precision, give_amount: #{self.give_amount.from_wei}, allowed precision: #{self.market.amount_precision}")
       end
     else
       fraction = self.take_amount.from_wei.split('.')[1]
       if fraction && fraction.length > self.market.amount_precision
         self.errors.add(:take_amount, 'invalid precision')
         # TEMPORARY
-        AppLogger.log("invalid order take_amount precision, take_amount: #{self.take_amount}, allowed precision: #{self.market.amount_precision}")
+        AppLogger.log("invalid order take_amount precision, take_amount: #{self.take_amount.from_wei}, allowed precision: #{self.market.amount_precision}")
       end
     end
   end
