@@ -87,4 +87,10 @@ RSpec.describe Withdraw, type: :model do
   it 'belongs to a balance' do
     expect(withdraw.balance).to_not be_nil
   end
+
+  it 'must have a valid precision' do
+    withdraw.amount = "1.23456".to_wei
+    expect(withdraw.valid?).to eq(false)
+    expect(withdraw.errors.messages[:amount]).to include('invalid precision')
+  end
 end

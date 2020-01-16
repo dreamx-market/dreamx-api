@@ -10,7 +10,7 @@ class Withdraw < ApplicationRecord
   validates :account_address, :amount, :token_address, :nonce, :withdraw_hash, :signature, presence: true
   validates :withdraw_hash, signature: true
   validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
-  validate :balance_must_exist_and_is_sufficient, on: :create
+  validate :amount_precision_is_valid, :balance_must_exist_and_is_sufficient, on: :create
 
   before_validation :initialize_attributes, :lock_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
@@ -137,5 +137,18 @@ class Withdraw < ApplicationRecord
 
   def build_transaction
     self.tx ||= Transaction.new({ status: 'pending' })
+  end
+
+  def amount_precision_is_valid
+    if !self.token
+      return
+    end
+
+    fraction = self.amount.from_wei.split('.')[1]
+    if fraction && fraction.length > self.token.amount_precision
+      self.errors.add(:amount, 'invalid precision')
+      # TEMPORARY
+      AppLogger.log("invalid withdraw amount precision, amount: #{self.amount.from_wei}, allowed precision: #{self.token.amount_precision}")
+    end
   end
 end
