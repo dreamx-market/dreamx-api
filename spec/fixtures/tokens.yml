@@ -6,6 +6,7 @@ eth:
   address: "<%= token_addresses['ETH'] %>"
   symbol: ETH
   decimals: 18
+  amount_precision: 4
   withdraw_minimum: <%= "0.02".to_wei %>
   withdraw_fee: <%= "0.01".to_wei %>
 
@@ -15,6 +16,7 @@ one:
   address: "<%= token_addresses['ONE'] %>"
   symbol: ONE
   decimals: 18
+  amount_precision: 2
   withdraw_minimum: <%= "0.02".to_wei %>
   withdraw_fee: <%= "0.01".to_wei %>
 
@@ -24,5 +26,6 @@ two:
   address: "<%= token_addresses['TWO'] %>"
   symbol: TWO
   decimals: 18
+  amount_precision: 5
   withdraw_minimum: <%= "0.02".to_wei %>
   withdraw_fee: <%= "0.01".to_wei %>

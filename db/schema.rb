@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_15_103422) do
+ActiveRecord::Schema.define(version: 2020_01_16_112202) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -97,7 +97,6 @@ ActiveRecord::Schema.define(version: 2020_01_15_103422) do
     t.string "status", default: "disabled"
     t.bigint "base_token_id", null: false
     t.bigint "quote_token_id", null: false
-    t.integer "amount_precision"
     t.integer "price_precision"
     t.index ["base_token_address"], name: "index_markets_on_base_token_address"
     t.index ["base_token_id"], name: "index_markets_on_base_token_id"
@@ -191,6 +190,7 @@ ActiveRecord::Schema.define(version: 2020_01_15_103422) do
     t.datetime "updated_at", null: false
     t.decimal "withdraw_minimum", precision: 1000
     t.decimal "withdraw_fee", precision: 1000
+    t.integer "amount_precision"
     t.index ["address"], name: "index_tokens_on_address", unique: true
     t.index ["name"], name: "index_tokens_on_name", unique: true
     t.index ["symbol"], name: "index_tokens_on_symbol", unique: true
@@ -217,15 +217,19 @@ ActiveRecord::Schema.define(version: 2020_01_15_103422) do
     t.bigint "give_balance_id", null: false
     t.bigint "take_balance_id", null: false
     t.bigint "market_id", null: false
+    t.bigint "give_token_id"
+    t.bigint "take_token_id"
     t.index ["account_id"], name: "index_trades_on_account_id"
     t.index ["created_at"], name: "index_trades_on_created_at"
     t.index ["give_balance_id"], name: "index_trades_on_give_balance_id"
+    t.index ["give_token_id"], name: "index_trades_on_give_token_id"
     t.index ["market_id"], name: "index_trades_on_market_id"
     t.index ["market_symbol"], name: "index_trades_on_market_symbol"
     t.index ["nonce"], name: "index_trades_on_nonce", unique: true
     t.index ["order_hash"], name: "index_trades_on_order_hash"
     t.index ["order_id"], name: "index_trades_on_order_id"
     t.index ["take_balance_id"], name: "index_trades_on_take_balance_id"
+    t.index ["take_token_id"], name: "index_trades_on_take_token_id"
     t.index ["trade_hash"], name: "index_trades_on_trade_hash", unique: true
   end
 
@@ -292,6 +296,8 @@ ActiveRecord::Schema.define(version: 2020_01_15_103422) do
   add_foreign_key "trades", "balances", column: "take_balance_id"
   add_foreign_key "trades", "markets"
   add_foreign_key "trades", "orders"
+  add_foreign_key "trades", "tokens", column: "give_token_id"
+  add_foreign_key "trades", "tokens", column: "take_token_id"
   add_foreign_key "withdraws", "accounts"
   add_foreign_key "withdraws", "balances"
   add_foreign_key "withdraws", "tokens"

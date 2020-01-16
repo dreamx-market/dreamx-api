@@ -1,6 +1,8 @@
 class Trade < ApplicationRecord
   include AccountNonEjectable
 
+  belongs_to :give_token, class_name: 'Token', foreign_key: 'give_token_id'
+  belongs_to :take_token, class_name: 'Token', foreign_key: 'take_token_id'
   belongs_to :account
 	belongs_to :order
   belongs_to :give_balance, class_name: 'Balance', foreign_key: 'give_balance_id'
@@ -255,6 +257,8 @@ class Trade < ApplicationRecord
     self.account = Account.find_by(address: self.account_address)
 
     if self.account && self.order
+      self.give_token = self.order.give_token
+      self.take_token = self.order.take_token
       self.give_balance = self.account.balance(self.order.give_token.address)
       self.take_balance = self.account.balance(self.order.take_token.address)
       self.market = self.order.market
@@ -269,6 +273,10 @@ class Trade < ApplicationRecord
     if self.market
       self.market_symbol = self.market.symbol
     end
+  end
+
+  def give_amount
+    self.amount
   end
 
   private
@@ -302,23 +310,23 @@ class Trade < ApplicationRecord
   end
 
   def amount_precision_is_valid
-    if !self.market
+    if !self.give_token || !self.take_token
       return
     end
 
     if self.sell
       fraction = self.take_amount.from_wei.split('.')[1]
-      if fraction && fraction.length > self.market.amount_precision
+      if fraction && fraction.length > self.take_token.amount_precision
         self.errors.add(:take_amount, 'invalid precision')
         # TEMPORARY
-        AppLogger.log("invalid trade take_amount precision, take_amount: #{self.take_amount.from_wei}, allowed precision: #{self.market.amount_precision}")
+        AppLogger.log("invalid trade take_amount precision, take_amount: #{self.take_amount.from_wei}, allowed precision: #{self.take_token.amount_precision}")
       end
     else
-      fraction = self.amount.from_wei.split('.')[1]
-      if fraction && fraction.length > self.market.amount_precision
+      fraction = self.give_amount.from_wei.split('.')[1]
+      if fraction && fraction.length > self.give_token.amount_precision
         self.errors.add(:give_amount, 'invalid precision')
         # TEMPORARY
-        AppLogger.log("invalid trade give_amount precision, give_amount: #{self.give_amount.from_wei}, allowed precision: #{self.market.amount_precision}")
+        AppLogger.log("invalid trade give_amount precision, give_amount: #{self.give_amount.from_wei}, allowed precision: #{self.give_token.amount_precision}")
       end
     end
   end
