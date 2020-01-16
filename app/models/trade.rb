@@ -310,11 +310,15 @@ class Trade < ApplicationRecord
       fraction = self.take_amount.from_wei.split('.')[1]
       if fraction && fraction.length > self.market.amount_precision
         self.errors.add(:take_amount, 'invalid precision')
+        # TEMPORARY
+        AppLogger.log("invalid take_amount precision, trade_hash: #{self.trade_hash}")
       end
     else
       fraction = self.amount.from_wei.split('.')[1]
       if fraction && fraction.length > self.market.amount_precision
         self.errors.add(:give_amount, 'invalid precision')
+        # TEMPORARY
+        AppLogger.log("invalid give_amount precision, trade_hash: #{self.trade_hash}")
       end
     end
   end
