@@ -1,22 +1,34 @@
 class Block < ApplicationRecord
-  def self.process_new_confirmed_blocks
-    client = Ethereum::Singleton.instance
-    required_confirmations = ENV['TRANSACTION_CONFIRMATIONS'].to_i
+  def self.process_new_confirmed_blocks(from, to=from)
+    begin
+      ActiveRecord::Base.transaction do
+        last_block = Block.find_or_create_by({ id: 1 })
 
-    current_block = client.eth_get_block_by_number('latest', false).convert_keys_to_underscore_symbols![:result]
-    current_block_number = current_block[:number].hex
-    last_block = Block.find_or_create_by({ id: 1 })
-    last_block_number = last_block.block_number
-    last_confirmed_block_number = current_block_number - required_confirmations
-    last_processed_block_number = last_block ? last_block.block_number : last_confirmed_block_number
+        if (from && to)
+          last_confirmed_block_number = to
+          self.process(from, to)
+        else
+          client = Ethereum::Singleton.instance
+          required_confirmations = ENV['TRANSACTION_CONFIRMATIONS'].to_i
 
-    if (current_block_number < required_confirmations || last_block.block_number == last_confirmed_block_number)
-      return
+          current_block = client.eth_get_block_by_number('latest', false).convert_keys_to_underscore_symbols![:result]
+          current_block_number = current_block[:number].hex
+          last_block_number = last_block.block_number
+          last_confirmed_block_number = current_block_number - required_confirmations
+          last_processed_block_number = last_block ? last_block.block_number : last_confirmed_block_number
+
+          if (current_block_number < required_confirmations || last_block.block_number == last_confirmed_block_number)
+            return
+          end
+
+          self.process(last_processed_block_number + 1, last_confirmed_block_number)
+        end
+
+        last_block.update!(block_number: last_confirmed_block_number)
+      end
+    rescue => err
+      AppLogger.log("Failed to process new blocks, received following error: #{err}")
     end
-
-    self.process(last_processed_block_number + 1, last_confirmed_block_number)
-
-    last_block.update!(block_number: last_confirmed_block_number)
   end
 
   def self.process(from, to=from)

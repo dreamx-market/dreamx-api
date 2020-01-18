@@ -56,26 +56,20 @@ class Deposit < ApplicationRecord
   end
 
   def self.aggregate(from, to=from)
-    begin
-      ActiveRecord::Base.transaction do
-        exchange = Contract::Exchange.singleton
-        deposits = exchange.deposits(from, to)
-        deposits.each do |deposit|
-          deposit[:account] = deposit[:account].without_checksum
-          deposit[:token] = deposit[:token].without_checksum
-          balance = Balance.find_or_create_by({ account_address: deposit[:account], token_address: deposit[:token] })
-          new_deposit = {
-            account_address: deposit[:account],
-            token_address: deposit[:token],
-            amount: deposit[:amount],
-            transaction_hash: deposit[:transaction_hash],
-            block_number: deposit[:block_number],
-          }
-          self.create!(new_deposit)
-        end
-      end
-    rescue => err
-      AppLogger.log("Failed to aggregate deposits, received following error: #{err}")
+    exchange = Contract::Exchange.singleton
+    deposits = exchange.deposits(from, to)
+    deposits.each do |deposit|
+      deposit[:account] = deposit[:account].without_checksum
+      deposit[:token] = deposit[:token].without_checksum
+      balance = Balance.find_or_create_by({ account_address: deposit[:account], token_address: deposit[:token] })
+      new_deposit = {
+        account_address: deposit[:account],
+        token_address: deposit[:token],
+        amount: deposit[:amount],
+        transaction_hash: deposit[:transaction_hash],
+        block_number: deposit[:block_number],
+      }
+      self.create!(new_deposit)
     end
   end
 

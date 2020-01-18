@@ -37,17 +37,4 @@ RSpec.describe Deposit, type: :model do
   it 'belongs to a balance' do
     expect(deposit.balance).to_not be_nil
   end
-
-  it 'aggregates new deposits and initializes new accounts' do
-    from_block_number = 7095527
-    ropsten_contract_address = '0x7f6a01dcebe266779e00a4cf15e9432cb1423203'
-
-    with_modified_env CONTRACT_ADDRESS: ropsten_contract_address do
-      expect {
-      expect {
-        Deposit.aggregate(from_block_number)
-      }.to increase { Deposit.count }.by(2)
-      }.to increase { Account.count }.by(1)
-    end
-  end
 end
