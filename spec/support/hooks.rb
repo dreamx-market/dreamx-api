@@ -41,4 +41,13 @@ RSpec.configure do |config|
 
     ActiveJob::Base.queue_adapter = old_queue_adapter
   end
+
+  config.around(:each, :enqueued) do |example|
+    old_queue_adapter = ActiveJob::Base.queue_adapter
+    ActiveJob::Base.queue_adapter = :test
+
+    example.run
+
+    ActiveJob::Base.queue_adapter = old_queue_adapter
+  end
 end

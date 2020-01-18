@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_18_124623) do
+ActiveRecord::Schema.define(version: 2020_01_18_170345) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -20,6 +20,25 @@ ActiveRecord::Schema.define(version: 2020_01_18_124623) do
     t.string "address"
     t.boolean "ejected", default: false
     t.index ["address"], name: "index_accounts_on_address"
+  end
+
+  create_table "approvals", force: :cascade do |t|
+    t.bigint "account_id"
+    t.bigint "balance_id"
+    t.bigint "token_id"
+    t.string "account_address"
+    t.string "token_address"
+    t.string "transaction_hash"
+    t.bigint "block_number"
+    t.decimal "amount", precision: 1000, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_address"], name: "index_approvals_on_account_address"
+    t.index ["account_id"], name: "index_approvals_on_account_id"
+    t.index ["balance_id"], name: "index_approvals_on_balance_id"
+    t.index ["token_address"], name: "index_approvals_on_token_address"
+    t.index ["token_id"], name: "index_approvals_on_token_id"
+    t.index ["transaction_hash"], name: "index_approvals_on_transaction_hash", unique: true
   end
 
   create_table "balances", force: :cascade do |t|
@@ -274,6 +293,9 @@ ActiveRecord::Schema.define(version: 2020_01_18_124623) do
     t.index ["withdraw_hash"], name: "index_withdraws_on_withdraw_hash", unique: true
   end
 
+  add_foreign_key "approvals", "accounts"
+  add_foreign_key "approvals", "balances"
+  add_foreign_key "approvals", "tokens"
   add_foreign_key "balances", "accounts"
   add_foreign_key "balances", "tokens"
   add_foreign_key "chart_data", "markets"

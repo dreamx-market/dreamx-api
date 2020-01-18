@@ -37,4 +37,15 @@ RSpec.describe Deposit, type: :model do
   it 'belongs to a balance' do
     expect(deposit.balance).to_not be_nil
   end
+
+  it "aggregates new deposits" do
+    allow(Etherscan).to receive(:send_request).and_return(etherscan_deposits)
+
+    expect {
+    expect {
+      from = 7095527
+      Deposit.aggregate(from)
+    }.to increase { Deposit.count }.by(2)
+    }.to increase { Account.count }.by(1)
+  end
 end
