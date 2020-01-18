@@ -8,8 +8,24 @@ class Ejection < ApplicationRecord
   before_create :eject_account
 
   class << self
-    # def aggregate
-    # end
+    def aggregate(from, to=from)
+      exchange = Contract::Exchange.singleton
+      ejections = exchange.ejections(from, to)
+      ejections.each do |ejection|
+        ejection[:account] = ejection[:account].without_checksum
+        ejection[:token] = ejection[:token].without_checksum
+        account = Account.find_by(address: ejection[:account])
+        if !account
+          next
+        end
+        new_ejection = { 
+          account_address: ejection[:account], 
+          transaction_hash: ejection[:transaction_hash],
+          block_number: ejection[:block_number]
+        }
+        self.create!(new_ejection)
+      end
+    end
   end
 
   def eject_account

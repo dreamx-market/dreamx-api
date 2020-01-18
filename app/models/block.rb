@@ -33,6 +33,7 @@ class Block < ApplicationRecord
 
   def self.process(from, to=from)
     Deposit.aggregate(from, to)
-    Transaction.confirm_mined_transactions(from, to)
+    Ejection.aggregate(from, to)
+    Transaction.confirm_transactions(from, to)
   end
 end

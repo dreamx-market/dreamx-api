@@ -14,42 +14,51 @@ module Contract
       @contract.key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
     end
 
-    def deposits(from, to)
+    def get_events(name, from, to=from)
       decoder = Ethereum::Decoder.new
       encoder = Ethereum::Encoder.new
       client = Ethereum::Singleton.instance
+      name = name.capitalize
 
-      deposit_event_abi = @abi.find { |a| a['name'] == 'Deposit' }
-      deposit_event_inputs = deposit_event_abi['inputs'].map { |i| OpenStruct.new(i) }
-      deposit_event_indexed_inputs = deposit_event_inputs.select(&:indexed)
-      deposit_event_unindexed_inputs = deposit_event_inputs.reject(&:indexed)
+      event_abi = @abi.find { |a| a['name'] == name }
+      event_inputs = event_abi['inputs'].map { |i| OpenStruct.new(i) }
+      event_indexed_input = event_inputs.select(&:indexed)
+      event_unindexed_input = event_inputs.reject(&:indexed)
 
-      deposit_logs = Etherscan.get_deposit_logs(from, to)
-      decoded_deposits = []
-      deposit_logs.each do |deposit_log|
-        indexed_data = '0x' + deposit_log[:topics][1..-1].join.gsub('0x', '')
-        indexed_args = decoder.decode_arguments(deposit_event_indexed_inputs, indexed_data)
-        unindexed_data = deposit_log[:data]
-        unindexed_args = decoder.decode_arguments(deposit_event_unindexed_inputs, unindexed_data)
-        args = indexed_args.concat unindexed_args
+      event_logs = Etherscan.get_event_logs(name, from, to)
+      decoded_events = []
+      event_logs.each do |event_log|
+        indexed_data = '0x' + event_log[:topics][1..-1].join.gsub('0x', '')
+        indexed_args = decoder.decode_arguments(event_indexed_input, indexed_data)
+        unindexed_data = event_log[:data]
+        unindexed_args = decoder.decode_arguments(event_unindexed_input, unindexed_data)
+        args = indexed_args.concat(unindexed_args)
 
-        decoded_deposit = {}
-        decoded_deposit[:transaction_hash] = deposit_log[:transaction_hash]
-        decoded_deposit[:block_number] = deposit_log[:block_number].hex
+        decoded_event = {}
+        decoded_event[:transaction_hash] = event_log[:transaction_hash]
+        decoded_event[:block_number] = event_log[:block_number].hex
         args.each_with_index do |arg, i|
-          decoded_deposit[deposit_event_inputs[i].name.to_sym] = arg
+          decoded_event[event_inputs[i].name.to_sym] = arg
         end
 
-        decoded_deposit_prefixed_attr = [:token, :account]
-        decoded_deposit_prefixed_attr.each do |attr|
-          decoded_deposit[attr] = encoder.ensure_prefix(decoded_deposit[attr])
+        prefixed_attrs = [:token, :account]
+        prefixed_attrs.each do |attr|
+          if decoded_event[attr]
+            decoded_event[attr] = encoder.ensure_prefix(decoded_event[attr])
+          end
         end
 
-        decoded_deposits << decoded_deposit
+        decoded_events << decoded_event
       end
+      return decoded_events
+    end
 
-      # [ { :transaction_hash, :block_number, :token, :account, :amount, :balance }, ... ]
-      return decoded_deposits
+    def deposits(from, to=from)
+      self.get_events('deposit', from, to)
+    end
+
+    def ejections(from, to=from)
+      self.get_events('ejection', from, to)
     end
 
     def balances(token_address, account_address)

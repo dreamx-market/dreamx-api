@@ -29,7 +29,7 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.confirm_mined_transactions(from, to=from)
+  def self.confirm_transactions(from, to=from)
     confirmed_hashes = Etherscan.get_transactions(from, to)
     self.where(transaction_hash: confirmed_hashes).update_all(status: 'confirmed')
   end

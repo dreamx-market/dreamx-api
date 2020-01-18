@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Block, type: :model do
-  it "processes new blocks" do
+  it "aggregates new deposits" do
     from_block_number = 7095527
     ropsten_contract_address = '0x7f6a01dcebe266779e00a4cf15e9432cb1423203'
 
@@ -14,4 +14,7 @@ RSpec.describe Block, type: :model do
       }.to increase { Account.count }.by(1)
     end
   end
+
+  # it "aggregates new ejections" do
+  # end
 end

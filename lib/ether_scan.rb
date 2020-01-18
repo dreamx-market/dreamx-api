@@ -6,21 +6,21 @@ class Etherscan
     response = JSON.parse(http.get(uri.request_uri).body).convert_keys_to_underscore_symbols!
   end
 
-  def self.get_deposit_logs(from, to=from)
+  def self.get_event_logs(name, from, to=from)
     encoder = Ethereum::Encoder.new
     contract = Contract::Exchange.singleton.contract
-    deposit_event_signature = encoder.ensure_prefix(contract.events.find { |event| event.name == 'Deposit' }.signature)
+    event_signature = encoder.ensure_prefix(contract.events.find { |event| event.name == name }.signature)
     api_root = ENV['ETHERSCAN_HTTP']
     api_key = ENV['ETHERSCAN_API_KEY']
     contract_address = ENV['CONTRACT_ADDRESS']
 
-    deposit_logs_response = self.send_request("#{api_root}?module=logs&action=getLogs&fromBlock=#{from}&toBlock=#{to}&address=#{contract_address}&topic0=#{deposit_event_signature}&apikey=#{api_key}")
+    event_logs_response = self.send_request("#{api_root}?module=logs&action=getLogs&fromBlock=#{from}&toBlock=#{to}&address=#{contract_address}&topic0=#{event_signature}&apikey=#{api_key}")
 
-    deposit_logs = []
-    deposit_logs_response[:result].each do |e|
-      deposit_logs << e
+    event_logs = []
+    event_logs_response[:result].each do |e|
+      event_logs << e
     end
-    return deposit_logs
+    return event_logs
   end
 
   def self.get_transactions(from, to=from)

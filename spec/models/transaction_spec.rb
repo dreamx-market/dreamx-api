@@ -26,7 +26,7 @@ RSpec.describe Transaction, type: :model do
 
     with_modified_env SERVER_PRIVATE_KEY: ropsten_server_private_key do
       expect {
-        Transaction.confirm_mined_transactions(from_block_number)
+        Transaction.confirm_transactions(from_block_number)
       }.to change { transaction.reload.status }.to('confirmed')
     end
   end
