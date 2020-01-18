@@ -2,6 +2,8 @@ class Account < ApplicationRecord
 	has_many :balances, foreign_key: 'account_address', primary_key: 'address', dependent: :destroy
   has_many :deposits, foreign_key: 'account_address', primary_key: 'address'
   has_many :withdraws, foreign_key: 'account_address', primary_key: 'address'
+  has_many :orders
+  has_many :open_orders, -> { open }, class_name: 'Order'
   has_one :ejection
   
 	validates :address, uniqueness: true
@@ -38,20 +40,8 @@ class Account < ApplicationRecord
   end
 
   def eject
-    self.with_lock do
-      self.close_all_open_orders
-      self.ejection = Ejection.new
-      self.ejected = true
-      self.save!
-    end
-  end
-
-  def close_all_open_orders
-    self.balances.each do |balance|
-      balance.open_orders.each do |order|
-        order.cancel
-      end
-    end
+    self.ejected = true
+    self.save!
   end
 
   private

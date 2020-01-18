@@ -67,9 +67,5 @@ module Contract
     def call_payload(fun, args)
       @contract.parent.call_payload(fun, args)
     end
-
-    def account_manual_withdraws(account_address)
-      @contract.call.account_manual_withdraws(account_address)
-    end
   end
 end

@@ -1,21 +1,42 @@
 class Ejection < ApplicationRecord
   belongs_to :account
-  has_one :tx, class_name: 'Transaction', as: :transactable
 
   validates :account_address, uniqueness: true
 
-  before_validation :build_transaction, on: :create
+  before_validation :initialize_attributes, :lock_attributes, on: :create
+  before_validation :remove_checksum
+  before_create :eject_account
 
-  def payload
-    exchange = Contract::Exchange.singleton
-    fun = exchange.functions('setAccountManualWithdraws')
-    args = [self.account.address, true]
-    exchange.call_payload(fun, args)
+  class << self
+    # def aggregate
+    # end
+  end
+
+  def eject_account
+    self.account.open_orders.each do |order|
+      order.balance.release(order.remaining_give_amount)
+      order.cancel
+    end
+    self.account.eject
+  end
+
+  def initialize_attributes
+    self.account = Account.find_by(address: self.account_address)
   end
 
   private
 
-    def build_transaction
-      self.tx = Transaction.new({ status: 'pending' })
+  def lock_attributes
+    if self.account
+      self.account.lock!
+      self.account.balances.lock!
+      self.account.open_orders.lock!
     end
+  end
+
+  def remove_checksum
+    if self.account_address.is_a_valid_address?
+      self.account_address = self.account_address.without_checksum
+    end
+  end
 end
