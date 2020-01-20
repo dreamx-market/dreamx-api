@@ -59,12 +59,12 @@ class Deposit < ApplicationRecord
     exchange = Contract::Exchange.singleton
     deposits = exchange.deposits(from, to)
     deposits.each do |deposit|
-      deposit[:account] = deposit[:account].without_checksum
-      deposit[:token] = deposit[:token].without_checksum
-      balance = Balance.find_or_create_by({ account_address: deposit[:account], token_address: deposit[:token] })
+      balance = Balance.find_or_create_by({ account_address: deposit[:account].without_checksum, token_address: deposit[:token].without_checksum })
+      account = balance.account
+      token = balance.token
       new_deposit = {
-        account_address: deposit[:account],
-        token_address: deposit[:token],
+        account_address: account.address,
+        token_address: token.address,
         amount: deposit[:amount],
         transaction_hash: deposit[:transaction_hash],
         block_number: deposit[:block_number],

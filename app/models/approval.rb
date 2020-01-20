@@ -14,7 +14,7 @@ class Approval < ApplicationRecord
       Token.all.each do |token|
         approvals = token.approvals(from, to)
         approvals.each do |approval|
-          balance = Balance.find_or_create_by({ account_address: approval[:owner], token_address: token.address })
+          balance = Balance.find_or_create_by({ account_address: approval[:owner].without_checksum, token_address: token.address })
           account = balance.account
           new_approval = self.new({
             account_id: account.id,
