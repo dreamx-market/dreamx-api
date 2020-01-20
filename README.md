@@ -45,24 +45,6 @@
 * automated daily backup: https://github.com/hieudoan2609/dreamx-api-backup
 * log rotation: https://gorails.com/guides/rotating-rails-production-logs-with-logrotate
 
-## Errors
-
-### Error during cap production deploy:
-
-#### Cannot load such file — bundler/setup
-
-1. Make sure `capistrano-rails` is installed
-
-2. Add to Capfile `require 'capistrano/bundler'`
-
-```
-require "capistrano/bundler" # Rails needs bundler
-require "capistrano/rails/migrations"
-require "capistrano/passenger"
-require "capistrano/rbenv"
-require "whenever/capistrano"
-```
-
 # Running the test suite
 
 * clone this repo
