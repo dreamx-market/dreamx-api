@@ -85,11 +85,11 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def self.regenerate_unconfirmed_transactions
+  def self.regenerate_transactions
     Config.set('read_only', 'true')
     self.sync_nonce
-    unconfirmed_transactions = self.unconfirmed.order(:nonce)
-    unconfirmed_transactions.each do |transaction|
+    transactions = self.unconfirmed_and_pending.order(:nonce)
+    transactions.each do |transaction|
       transaction.with_lock do
         transaction.assign_nonce
         transaction.assign_attributes({ :status => "pending", :transaction_hash => nil, :hex => nil })
