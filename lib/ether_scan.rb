@@ -28,32 +28,6 @@ class Etherscan
     return event_logs
   end
 
-  def self.get_approval_event_logs(token_contract, from, to)
-    encoder = Ethereum::Encoder.new
-    event_signature = encoder.ensure_prefix(token_contract.events.find { |event| event.name == 'Approval' }.signature)
-    api_root = ENV['ETHERSCAN_HTTP']
-    api_key = ENV['ETHERSCAN_API_KEY']
-    contract_address = token_contract.address
-    exchange_address = Contract::Exchange.singleton.contract.address
-    padded_exchange_address = Eth::Utils.bin_to_prefixed_hex(Eth::Utils.zpad(Eth::Utils.hex_to_bin(exchange_address), 32))
-
-    url = "#{api_root}?module=logs&action=getLogs"\
-          "&fromBlock=#{from}"\
-          "&toBlock=#{to}"\
-          "&address=#{contract_address}"\
-          "&topic0=#{event_signature}"\
-          "&topic0_2_opr=and"\
-          "&topic2=#{padded_exchange_address}"\
-          "&apikey=#{api_key}"
-    event_logs_response = self.send_request(url)
-
-    event_logs = []
-    event_logs_response[:result].each do |e|
-      event_logs << e
-    end
-    return event_logs
-  end
-
   def self.get_transactions(from, to=from)
     transactions = []
     api_root = ENV['ETHERSCAN_HTTP']
