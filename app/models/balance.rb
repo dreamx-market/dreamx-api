@@ -126,7 +126,7 @@ class Balance < ApplicationRecord
 
   def onchain_authentic?
     fee_address = ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
-    if (fee_address == self.account_address)
+    if (fee_address == self.account_address || self.account.ejected)
       return true
     end
 
