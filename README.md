@@ -65,4 +65,6 @@
 
 # Disaster handling
 
-* 
+* shut down nginx: `sudo service nginx start`
+* pause block processing: `Config.set('processing_new_blocks', 'false')`
+* investigate
