@@ -64,6 +64,9 @@ class Deposit < ApplicationRecord
     deposits.each do |deposit|
       balance = Balance.find_or_create_by({ account_address: deposit[:account].without_checksum, token_address: deposit[:token].without_checksum })
       account = balance.account
+      if account.ejected
+        next
+      end
       token = balance.token
       new_deposit = {
         account_address: account.address,
