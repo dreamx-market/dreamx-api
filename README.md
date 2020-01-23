@@ -62,3 +62,7 @@
 * shut down the server
 * terminate the contract
 * put up the withdrawal-only frontend to call directWithdraw
+
+# Disaster handling
+
+* 

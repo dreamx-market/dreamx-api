@@ -71,7 +71,8 @@ module DreamxApi
 
     def redis_config_variables
       return {
-        read_only: 'false'
+        read_only: 'false',
+        processing_new_blocks: 'true'
       }
     end
 

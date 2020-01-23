@@ -1,5 +1,9 @@
 class Block < ApplicationRecord
   def self.process_new_confirmed_blocks
+    if Config.get('processing_new_blocks') == 'false'
+      return
+    end
+
     begin
       ActiveRecord::Base.transaction do
         last_block = Block.find_or_create_by({ id: 1 })
