@@ -17,9 +17,9 @@ class Order < ApplicationRecord
 	validates :give_amount, :take_amount, numericality: { greater_than: 0 }
   validates :order_hash, signature: true
   validates :filled, numericality: { :greater_than_or_equal_to => 0 }
-	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount, :account_must_not_be_ejected
+	validate :addresses_must_be_valid, :expiry_timestamp_must_be_in_the_future, :order_hash_must_be_valid, :filled_must_not_exceed_give_amount
   validates :filled, numericality: { :equal_to => 0 }, on: :create
-  validate :price_precision_is_valid, :amount_precision_is_valid, :status_must_be_open_on_create, :market_must_be_active, :balance_must_be_sufficient, :volume_must_meet_maker_minimum, on: :create
+  validate :account_must_not_be_ejected, :price_precision_is_valid, :amount_precision_is_valid, :status_must_be_open_on_create, :market_must_be_active, :balance_must_be_sufficient, :volume_must_meet_maker_minimum, on: :create
 
   before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum

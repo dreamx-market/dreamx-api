@@ -48,4 +48,10 @@ RSpec.describe Deposit, type: :model do
     }.to increase { Deposit.count }.by(2)
     }.to increase { Account.count }.by(1)
   end
+
+  it "cannot belong to an ejected account" do
+    deposit.account.eject
+    expect(deposit.valid?).to eq(false)
+    expect(deposit.errors.messages[:account]).to include('has been ejected')
+  end
 end

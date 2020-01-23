@@ -1,4 +1,6 @@
 class Deposit < ApplicationRecord
+  include AccountNonEjectable
+
   belongs_to :account
   belongs_to :token
   belongs_to :balance
@@ -6,6 +8,7 @@ class Deposit < ApplicationRecord
   validates :transaction_hash, uniqueness: true
   validates :transaction_hash, :account_address, :token_address, :amount, :block_number, presence: true
   validates :amount, numericality: { greater_than: 0 }
+  validate :account_must_not_be_ejected, on: :create
 
   before_validation :initialize_attributes, :lock_attributes, on: :create
   before_validation :remove_checksum

@@ -9,8 +9,8 @@ class Withdraw < ApplicationRecord
   validates :nonce, :withdraw_hash, uniqueness: true
   validates :account_address, :amount, :token_address, :nonce, :withdraw_hash, :signature, presence: true
   validates :withdraw_hash, signature: true
-  validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum, :account_must_not_be_ejected
-  validate :amount_precision_is_valid, :balance_must_exist_and_is_sufficient, on: :create
+  validate :withdraw_hash_must_be_valid, :amount_must_be_above_minimum
+  validate :account_must_not_be_ejected, :amount_precision_is_valid, :balance_must_exist_and_is_sufficient, on: :create
 
   before_validation :initialize_attributes, :lock_attributes, :build_transaction, on: :create
   before_validation :remove_checksum
