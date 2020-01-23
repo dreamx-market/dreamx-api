@@ -12,18 +12,16 @@ class Ejection < ApplicationRecord
       exchange = Contract::Exchange.singleton
       ejections = exchange.ejections(from, to)
       ejections.each do |ejection|
-        ejection[:account] = ejection[:account].without_checksum
-        ejection[:token] = ejection[:token].without_checksum
-        account = Account.find_by(address: ejection[:account])
+        account = Account.find_by(address: ejection[:account].without_checksum)
         if !account
           next
         end
-        new_ejection = { 
-          account_address: ejection[:account], 
+        new_ejection = Ejection.new({ 
+          account_address: account.address, 
           transaction_hash: ejection[:transaction_hash],
           block_number: ejection[:block_number]
-        }
-        self.create!(new_ejection)
+        })
+        new_ejection.save!
       end
     end
   end

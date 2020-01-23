@@ -44,3 +44,27 @@ def etherscan_deposits
   }
   api_response.convert_keys_to_underscore_symbols!
 end
+
+def etherscan_ejections
+  api_response = {
+    "status": "1",
+    "message": "OK",
+    "result": [
+      {
+        "address": "0x285bde58565fb40b6f0f0db857014c0a97697613",
+        "topics": [
+          "0xf65646537c435bb790f1113af8940702459843459f94029c00b7877a99b7e4e4"
+        ],
+        "data": "0x0000000000000000000000008e434a440b666646bdf8261239cdcd1f01189259",
+        "blockNumber": "0x6d8de6",
+        "timeStamp": "0x5e297fbe",
+        "gasPrice": "0xb2de3e40",
+        "gasUsed": "0xa9ba",
+        "logIndex": "0x7",
+        "transactionHash": "0xe892dfbe0b8283b042a2edf46a2ee354fc9873a2240bf4d8be2a5d570aaac92c",
+        "transactionIndex": "0x22"
+      }
+    ]
+  }
+  api_response.convert_keys_to_underscore_symbols!
+end

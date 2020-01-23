@@ -14,4 +14,15 @@ RSpec.describe Ejection, type: :model do
     create(:ejection, account: account)
     expect(account.open_orders.count).to eq(0)
   end
+
+  it "aggregates new ejections" do
+    create(:account, address: "0x8e434a440b666646bdf8261239cdcd1f01189259") # account must exist for the ejection to be aggregated
+    allow(Etherscan).to receive(:send_request).and_return(etherscan_ejections)
+
+    expect {
+      from = 7179750
+      to = 7179750
+      Ejection.aggregate(from, to)
+    }.to increase { Ejection.count }.by(1)
+  end
 end
