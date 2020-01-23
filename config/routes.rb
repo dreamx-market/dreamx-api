@@ -12,5 +12,6 @@ Rails.application.routes.draw do
   resources :orders, defaults: { format: :json }, param: :order_hash, only: [:index, :create]
   resources :markets, defaults: { format: :json }, only: [:index]
   resources :tokens, defaults: { format: :json }, only: [:index]
+  resources :accounts, defaults: { format: :json }, param: :address, only: [:show]
   mount ActionCable.server => '/cable'
 end
