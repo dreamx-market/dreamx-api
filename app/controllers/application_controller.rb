@@ -13,7 +13,7 @@ class ApplicationController < ActionController::API
     @current_requests = Redis.current.incr(@ip)
     set_response_headers
 
-    if @current_requests == 1
+    if Redis.current.ttl(@ip) < 0
       Redis.current.expire(@ip, duration)
     end
 
