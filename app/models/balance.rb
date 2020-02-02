@@ -65,6 +65,26 @@ class Balance < ApplicationRecord
       return result
     end
 
+    def sync_unauthentic_balances
+      self.unauthentic_onchain_balances do |b|
+        delta = b.onchain_delta
+
+        if delta > 0
+          deposit = b.deposits.last
+          deposit.amount += delta
+          deposit.save!
+          b.balance += delta
+          b.save!
+        else
+          withdraw = b.withdraws.last
+          withdraw.amount += delta
+          withdraw.save!(validate: false)
+          b.balance -= delta
+          b.save!
+        end
+      end
+    end
+
     def fee(token_address_or_symbol)
       if (!token_address_or_symbol.is_a_valid_address?)
         token = Token.find_by({ symbol: token_address_or_symbol.upcase })
