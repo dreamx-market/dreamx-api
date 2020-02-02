@@ -77,9 +77,9 @@ class Balance < ApplicationRecord
           b.save!
         else
           withdraw = b.withdraws.last
-          withdraw.amount += delta
+          withdraw.amount -= delta
           withdraw.save!(validate: false)
-          b.balance -= delta
+          b.balance += delta
           b.save!
         end
       end
