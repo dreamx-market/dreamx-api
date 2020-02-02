@@ -67,21 +67,7 @@ class Balance < ApplicationRecord
 
     def sync_unauthentic_balances
       self.unauthentic_onchain_balances do |b|
-        delta = b.onchain_delta
-
-        if delta > 0
-          deposit = b.deposits.last
-          deposit.amount += delta
-          deposit.save!
-          b.balance += delta
-          b.save!
-        else
-          withdraw = b.withdraws.last
-          withdraw.amount -= delta
-          withdraw.save!(validate: false)
-          b.balance += delta
-          b.save!
-        end
+        b.sync_with_onchain
       end
     end
 
@@ -102,6 +88,24 @@ class Balance < ApplicationRecord
         balance = Balance.fee(token.symbol)
         balance.update(balance: balance.onchain_balance)
       end
+    end
+  end
+
+  def sync_with_onchain
+    delta = b.onchain_delta
+
+    if delta > 0
+      deposit = b.deposits.last
+      deposit.amount += delta
+      deposit.save!
+      b.balance += delta
+      b.save!
+    else
+      withdraw = b.withdraws.last
+      withdraw.amount -= delta
+      withdraw.save!(validate: false)
+      b.balance += delta
+      b.save!
     end
   end
 
