@@ -92,20 +92,20 @@ class Balance < ApplicationRecord
   end
 
   def sync_with_onchain
-    delta = b.onchain_delta
+    delta = self.onchain_delta
 
     if delta > 0
-      deposit = b.deposits.last
+      deposit = self.deposits.last
       deposit.amount += delta
       deposit.save!
-      b.balance += delta
-      b.save!
+      self.balance += delta
+      self.save!
     else
-      withdraw = b.withdraws.last
+      withdraw = self.withdraws.last
       withdraw.amount -= delta
       withdraw.save!(validate: false)
-      b.balance += delta
-      b.save!
+      self.balance += delta
+      self.save!
     end
   end
 
