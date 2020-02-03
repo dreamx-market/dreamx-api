@@ -142,7 +142,8 @@ class Order < ApplicationRecord
 	private
 
   def lock_attributes
-    if self.balance
+    if self.balance && self.account
+      self.account.lock!
       self.balance.lock!
     end
   end

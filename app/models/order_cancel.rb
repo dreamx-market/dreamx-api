@@ -78,7 +78,8 @@ class OrderCancel < ApplicationRecord
   private
 
   def lock_attributes
-    if self.order && self.balance
+    if self.order && self.balance && self.account
+      self.account.lock!
       self.order.lock!
       self.balance.lock!
     end

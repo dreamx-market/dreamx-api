@@ -283,6 +283,7 @@ class Trade < ApplicationRecord
 
   def lock_attributes
     if self.order && self.account
+      self.account.lock!
       @locked_balances = Balance.lock.where({ 
         id: [
           self.maker_give_balance.id, 
