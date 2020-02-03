@@ -44,6 +44,21 @@ class Account < ApplicationRecord
     self.save!
   end
 
+  # TEMPORARY
+  def direct_eject
+    begin
+      ActiveRecord::Base.transaction do
+        Ejection.create!({ 
+          account_address: self.address, 
+          transaction_hash: Transaction.generate_random_hash, 
+          block_number: 1 
+        })
+      end
+    rescue => err
+      AppLogger.log(err)
+    end
+  end
+
   private
 
   def remove_checksum
