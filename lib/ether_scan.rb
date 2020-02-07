@@ -3,7 +3,11 @@ class Etherscan
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    response = JSON.parse(http.get(uri.request_uri).body).convert_keys_to_underscore_symbols!
+    raw_response = http.get(uri.request_uri)
+    if (raw_response.code != "200")
+      AppLogger.log(response)
+    end
+    response = JSON.parse(raw_response.body).convert_keys_to_underscore_symbols!
   end
 
   def self.get_event_logs(contract, event_name, from, to=from)

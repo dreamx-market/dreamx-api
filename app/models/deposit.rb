@@ -74,7 +74,7 @@ class Deposit < ApplicationRecord
         token_address: token.address,
         amount: deposit[:amount],
         transaction_hash: deposit[:transaction_hash],
-        block_number: deposit[:block_number],
+        block_number: deposit[:block_number]
       }
       self.create!(new_deposit)
     end
