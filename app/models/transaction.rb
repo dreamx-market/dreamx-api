@@ -58,7 +58,13 @@ class Transaction < ApplicationRecord
 
   def raw
     key = Eth::Key.new(priv: ENV['SERVER_PRIVATE_KEY'].hex)
-    gas_price = Redis.current.get('gas_price').to_i || Etherscan.gas_price.to_i
+
+    gas_price = Redis.current.get('gas_price').to_i
+    if gas_price == 0
+      gas_price = Etherscan.gas_price.to_i
+      Redis.current.set('gas_price', gas_price)
+    end
+
     gas_limit = ENV['GAS_LIMIT'].to_i
     contract_address = ENV['CONTRACT_ADDRESS'].without_checksum
     payload = self.transactable.payload
