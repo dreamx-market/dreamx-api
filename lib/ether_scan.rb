@@ -5,8 +5,9 @@ class Etherscan
     http.use_ssl = true
     raw_response = http.get(uri.request_uri)
     response = JSON.parse(raw_response.body).convert_keys_to_underscore_symbols!
+    # TEMPORARY
     if (raw_response.code != "200")
-      AppLogger.log("Failed to fetch #{url}, received status code #{raw_response.code} and following response: #{response}")
+      AppLogger.log("Failed to fetch #{url}, status code: #{raw_response.code}, response: #{response}")
     end
     return response
   end
@@ -44,5 +45,26 @@ class Etherscan
 
     transactions = transactions_response[:result].map { |transaction| transaction[:hash] }
     return transactions
+  end
+
+  def self.gas_price
+    one_gwei = 1000000000
+
+    if self.current_network == "private"
+      return one_gwei
+    end
+
+    api_root = ENV['ETHERSCAN_HTTP']
+    api_key = ENV['ETHERSCAN_API_KEY']
+    url = "#{api_root}?module=gastracker&action=gasoracle&apikey=#{api_key}"
+    gas_price_response = self.send_request(url)
+    price_in_gwei = gas_price_response[:result][:safe_gas_price].to_i
+    price = price_in_gwei * one_gwei
+    return price
+  end
+
+  def self.current_network
+    networks = { "1" => "mainnet", "42" => "kovan", "3" => "ropsten", "4" => "rinkeby" }
+    return networks[Eth.chain_id.to_s] || "private"
   end
 end
