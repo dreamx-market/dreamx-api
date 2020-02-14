@@ -4,11 +4,12 @@ class Etherscan
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     raw_response = http.get(uri.request_uri)
-    response = JSON.parse(raw_response.body).convert_keys_to_underscore_symbols!
-    # TEMPORARY
-    if (raw_response.code != "200")
-      AppLogger.log("Failed to fetch #{url}, status code: #{raw_response.code}, response: #{response}")
+    begin
+      parsed_response = JSON.parse(raw_response.body)
+    rescue JSON::ParserError
+      raise 'invalid json'
     end
+    response = parsed_response.convert_keys_to_underscore_symbols!
     return response
   end
 
