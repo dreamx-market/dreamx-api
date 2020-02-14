@@ -12,8 +12,16 @@
 # Deployment:
 
 * follow https://gorails.com/deploy/ubuntu/18.04
+  * generate a new ssh key for the vps and add it to github with `ssh-keygen`
   * set `server_name` in `/etc/nginx/sites-enabled/dreamx-api` to your specific domain for the certbot
   * when you run `createdb`, the database name must match with the one specified in database.yml
+  * environment variables that must be set before `cap production deploy`:
+    * POSTGRES_USERNAME
+    * POSTGRES_PASSWORD
+    * SERVER_PRIVATE_KEY
+    * CONTRACT_ADDRESS
+    * FEE_COLLECTOR_ADDRESS
+    * ETHEREUM_HOST (if deploying to main net)
   * you will need to temporarily make your database user a superuser to avoid PG::InsufficientPrivilege on the first deployment:
     * Connect to PostgreSQL as the superuser (not your database user):
       ```
@@ -24,13 +32,6 @@
     * Run `cap production deploy` from your local machine
     * Remove superuser from your database user: `$ alter role your_user nosuperuser;`
     * Leave PostgreSQL shell: `$ \q`
-  * environment variables that must be set before `cap production deploy`:
-    * POSTGRES_USERNAME
-    * POSTGRES_PASSWORD
-    * SERVER_PRIVATE_KEY
-    * CONTRACT_ADDRESS
-    * FEE_COLLECTOR_ADDRESS
-    * ETHEREUM_HOST (if deploying to main net)
 * start redis at boot `sudo systemctl enable redis-server.service`
 * double-check, make sure CONTRACT_ADDRESS is not checksummed and is deployed, SERVER_PRIVATE_KEY is funded, FEE_COLLECTOR_ADDRESS is not checksummed and is the right address, ETHEREUM_HOST is pointing to the right network
 * add domain
