@@ -50,7 +50,7 @@ class Etherscan
   def self.gas_price
     one_gwei = 1000000000
 
-    if self.current_network == "private"
+    if self.current_network == "private" or self.current_network == "ropsten"
       return one_gwei
     end
 
