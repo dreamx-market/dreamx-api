@@ -28,6 +28,6 @@ every 7.days do
 end
 
 # TEMPORARY
-every 2.hour do
+every 2.hours do
   rake_with_lock "faucet:request_ether"
 end
