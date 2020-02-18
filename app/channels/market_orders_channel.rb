@@ -1,7 +1,11 @@
 class MarketOrdersChannel < ApplicationCable::Channel
   def subscribed
     stop_all_streams
-    stream_from "market_orders:#{params[:market_symbol]}"
+    if params[:market_symbol]
+      stream_from "market_orders:#{params[:market_symbol]}"
+    else
+      stream_from "market_orders"
+    end
   end
 
   def unsubscribed
