@@ -14,6 +14,10 @@ class Account < ApplicationRecord
     def generate_random_address
       "0x#{SecureRandom.hex(20)}"
     end
+
+    def fee_collector
+        ENV['FEE_COLLECTOR_ADDRESS'].without_checksum
+    end
   end
 
   def transfers_within_period(from=nil, to=nil, page=nil, per_page=nil)

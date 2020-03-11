@@ -69,3 +69,9 @@
 * shut down nginx: `sudo service nginx start`
 * pause block processing: `Config.set('processing_new_blocks', 'false')`
 * investigate
+
+# Fee schedule
+
+* order minimum: 0.1 ETH
+* taker: 0.1%
+* maker: 0.1%

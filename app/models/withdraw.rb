@@ -122,7 +122,11 @@ class Withdraw < ApplicationRecord
   end
 
   def set_fee
-    self.fee = self.calculate_fee
+    if self.account_address == Account.fee_collector
+        self.fee = 0
+    else
+        self.fee = self.calculate_fee
+    end
   end
 
   def debit_balance
