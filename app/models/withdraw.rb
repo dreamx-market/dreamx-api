@@ -42,7 +42,8 @@ class Withdraw < ApplicationRecord
   def payload
     exchange = Contract::Exchange.singleton
     fun = exchange.functions('withdraw')
-    args = [token_address, amount.to_i, account_address, self.token.withdraw_fee.to_i]
+    fee = self.account_address == Account.fee_collector ? 0 : self.token.withdraw_fee.to_i
+    args = [self.token_address, self.amount.to_i, self.account_address, fee]
     exchange.call_payload(fun, args)
   end
 

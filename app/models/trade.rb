@@ -47,23 +47,23 @@ class Trade < ApplicationRecord
 
   def payload
     maker_address = order.account_address
-    taker_address = account_address
+    taker_address = self.account_address
     give_token = order.give_token_address
     take_token = order.take_token_address
     give_amount = order.give_amount.to_i
     take_amount = order.take_amount.to_i
-    fill_amount = amount.to_i
+    fill_amount = self.amount.to_i
     maker_nonce = order.nonce.to_i
-    taker_nonce = nonce.to_i
+    taker_nonce = self.nonce.to_i
     maker_fee = ENV['MAKER_FEE_PER_ETHER_IN_WEI'].to_i
     taker_fee = ENV['TAKER_FEE_PER_ETHER_IN_WEI'].to_i
     expiry = order.expiry_timestamp_in_milliseconds.to_i
     maker_v = order.v
     maker_r = order.r
     maker_s = order.s
-    taker_v = v
-    taker_r = r
-    taker_s = s
+    taker_v = self.v
+    taker_r = self.r
+    taker_s = self.s
 
     exchange = Contract::Exchange.singleton
     fun = exchange.functions('trade')
