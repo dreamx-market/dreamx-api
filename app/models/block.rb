@@ -21,7 +21,6 @@ class Block < ApplicationRecord
       ActiveRecord::Base.transaction do
         self.process(last_processed_block_number + 1, last_confirmed_block_number)
         last_block.update!(block_number: last_confirmed_block_number)
-        Redis.current.set('gas_price', Etherscan.gas_price)
       end
     rescue => err
       AppLogger.log("Failed to process new blocks from #{last_processed_block_number + 1} to #{last_confirmed_block_number}, received following error: #{err}")

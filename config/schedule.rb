@@ -26,8 +26,3 @@ end
 every 7.days do
   rake_with_lock "chart:remove_expired"
 end
-
-# TEMPORARY
-every 2.hours do
-  rake_with_lock "faucet:request_ether"
-end
