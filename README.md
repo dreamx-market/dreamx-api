@@ -1,6 +1,13 @@
 # Welcome
 
-DreamX is an open source decentralized exchange (DEX) based on Ethereum
+DreamX is an open source decentralized exchange (DEX) based on Ethereum, this repo is for the Ruby on Rails API, there are various other repos which will be listed down below
+
+* [dreamx-react](https://github.com/dreamx-market/dreamx-react)
+* [dreamx-docs](https://github.com/dreamx-market/dreamx-docs)
+* [dreamx-match-engine](https://github.com/dreamx-market/dreamx-match-engine)
+* [dreamx-contracts](https://github.com/dreamx-market/dreamx-contracts)
+
+# Screenshots
 
 ![home](./.screenshots/home.png)
 
