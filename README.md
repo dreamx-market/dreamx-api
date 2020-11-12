@@ -1,3 +1,13 @@
+# Welcome
+
+DreamX is an open source decentralized exchange (DEX) based on Ethereum
+
+![home](./.screenshots/home.png)
+
+![login](./.screenshots/login.png)
+
+![book](./.screenshots/book.png)
+
 # Dependencies:
 
 * ruby 2.5.1p57
